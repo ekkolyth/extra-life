@@ -7,6 +7,7 @@ import QuickResources from '../components/cards/QuickResources'
 import TotalRaised from '../components/cards/TotalRaised'
 import TopDonor from '../components/cards/TopDonor'
 import { useRouter } from 'next/router'
+import LatestDonations from '../components/cards/LatestDonations'
 
 const DashboardPage: NextPageWithLayout = () => {
   const { push } = useRouter()
@@ -25,13 +26,16 @@ const DashboardPage: NextPageWithLayout = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <div className='grid grid-cols-2 gap-4'>
+      <div className='grid grid-cols-3 gap-4'>
         <div className='flex flex-col gap-y-4'>
           <TotalRaised />
           <QuickResources />
         </div>
         <div className='flex flex-col gap-y-4'>
           <TopDonor />
+        </div>
+        <div className='flex flex-col gap-y-4'>
+          <LatestDonations />
         </div>
       </div>
     </>
