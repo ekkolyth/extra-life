@@ -18,8 +18,6 @@ const Navbar = () => {
     { name: 'Settings', href: '/settings', icon: AdjustmentsHorizontalIcon, current: route === '/settings' }
   ]
 
-  console.log(session)
-
   return (
     <div className='flex min-h-0 w-64 flex-col bg-el-dark-blue'>
       <div className='flex flex-1 flex-col overflow-y-auto pt-5 pb-4'>
