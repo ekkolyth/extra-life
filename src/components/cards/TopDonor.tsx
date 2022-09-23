@@ -35,7 +35,9 @@ const TopDonor = () => {
   return (
     <Card title='Top Donor' icon={<BanknotesIcon />}>
       <div className='my-4 flex items-center'>
-        <Image height={64} width={64} alt='Top Donor' src={data.avatarImageURL} className='mr-2' />
+        <div className='mr-2 flex items-center'>
+          <Image height={64} width={64} alt='Top Donor' src={data.avatarImageURL} />
+        </div>
         <div className='w-full flex justify-between items-center'>
           <div>
             <p className='font-semibold text-neutral-800'>{data?.displayName}</p>
