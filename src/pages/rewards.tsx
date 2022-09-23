@@ -1,4 +1,6 @@
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import Layout from '../components/Layout'
 import { trpc } from '../utils/trpc'
@@ -6,6 +8,14 @@ import type { NextPageWithLayout } from './_app'
 
 const RewardsPage: NextPageWithLayout = () => {
   const hello = trpc.useQuery(['example.hello', { text: 'from tRPC' }])
+  const { push } = useRouter()
+  const { data: session, status } = useSession()
+  if (status === 'loading') {
+    return <p>Loading...</p>
+  }
+  if (status === 'unauthenticated') {
+    push('/api/auth/signin')
+  }
 
   return (
     <>
