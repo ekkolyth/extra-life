@@ -81,6 +81,7 @@ const TotalRaised = () => {
         <a
           href={data.links?.page}
           target='_blank'
+          rel='noreferrer'
           className='flex items-center text-sm font-semibold uppercase text-el-dark-blue'>
           Go to Extra Life Page <ChevronRightIcon className='w-4 h-4' />
         </a>

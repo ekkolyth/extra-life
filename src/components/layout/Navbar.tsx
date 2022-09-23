@@ -4,6 +4,7 @@ import logo from 'src/assets/logo/default-monochrome.svg'
 import ControllerIcon from '../icons/Controller'
 import DiceIcon from '../icons/Dice'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 const Navbar = () => {
   const { route } = useRouter()
@@ -19,7 +20,7 @@ const Navbar = () => {
     <div className='flex min-h-0 w-64 flex-col bg-el-dark-blue'>
       <div className='flex flex-1 flex-col overflow-y-auto pt-5 pb-4'>
         <div className='flex flex-shrink-0 items-center px-4'>
-          <img className='h-8 w-auto' src={logo.src} alt='GnomeBoard' />
+          <Image height={45} width={300} src={logo.src} alt='GnomeBoard' />
         </div>
         <nav className='mt-5 flex-1 space-y-1 px-2' aria-label='Sidebar'>
           {navigation.map(item => (
@@ -40,11 +41,11 @@ const Navbar = () => {
         <a href='#' className='group block w-full flex-shrink-0'>
           <div className='flex items-center'>
             <div>
-              <img
+              {/* <img
                 className='inline-block h-9 w-9 rounded-full'
                 src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
                 alt=''
-              />
+              /> */}
             </div>
             <div className='ml-3'>
               <p className='text-sm font-medium text-white'>Tom Cook</p>

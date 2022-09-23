@@ -1,5 +1,6 @@
 import { BanknotesIcon } from '@heroicons/react/24/solid'
 import axios from 'axios'
+import Image from 'next/image'
 import { useQuery } from 'react-query'
 import Card from '../layout/Card'
 
@@ -34,7 +35,7 @@ const TopDonor = () => {
   return (
     <Card title='Top Donor' icon={<BanknotesIcon />}>
       <div className='my-4 flex items-center'>
-        <img src={data.avatarImageURL} className='w-16 h-16 mr-2' />
+        <Image height={64} width={64} alt='Top Donor' src={data.avatarImageURL} className='mr-2' />
         <div className='w-full flex justify-between items-center'>
           <div>
             <p className='font-semibold text-neutral-800'>{data?.displayName}</p>

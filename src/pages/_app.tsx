@@ -12,7 +12,7 @@ import { ReactElement, ReactNode } from 'react'
 import { NextPage } from 'next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+export type NextPageWithLayout<P = Record<string, never>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
 }
 
@@ -43,24 +43,24 @@ const getBaseUrl = () => {
 };
 
 export default withTRPC<AppRouter>({
-  config({ ctx }) {
+  // config({ ctx }) {
+  config() {
     /**
      * If you want to use SSR, you need to use the server's full URL
      * @link https://trpc.io/docs/ssr
      */
-    const url = `${getBaseUrl()}/api/trpc`;
+    const url = `${getBaseUrl()}/api/trpc`
 
     return {
       links: [
         loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
+          enabled: opts =>
+            process.env.NODE_ENV === 'development' || (opts.direction === 'down' && opts.result instanceof Error)
         }),
-        httpBatchLink({ url }),
+        httpBatchLink({ url })
       ],
       url,
-      transformer: superjson,
+      transformer: superjson
       /**
        * @link https://react-query.tanstack.com/reference/QueryClient
        */
@@ -78,10 +78,10 @@ export default withTRPC<AppRouter>({
       //   }
       //   return {};
       // }
-    };
+    }
   },
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: false,
-})(MyApp);
+  ssr: false
+})(MyApp)

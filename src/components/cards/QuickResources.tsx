@@ -12,7 +12,7 @@ const QuickResources = () => {
           <li key={r.name} className='flex justify-between py-2'>
             <div>
               <h3 className='font-semibold text-el-dark-blue hover:text-sky-800'>
-                <a href={r.url} target='_blank'>
+                <a href={r.url} target='_blank' rel='noreferrer'>
                   {r.name}
                 </a>
               </h3>
