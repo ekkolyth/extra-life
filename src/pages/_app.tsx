@@ -4,21 +4,37 @@ import { loggerLink } from "@trpc/client/links/loggerLink";
 import { withTRPC } from "@trpc/next";
 import { SessionProvider } from "next-auth/react";
 import superjson from "superjson";
-import type { AppType } from "next/app";
-import type { AppRouter } from "../server/router";
-import type { Session } from "next-auth";
-import "../styles/globals.css";
+import type { AppProps } from 'next/app'
+import type { AppRouter } from '../server/router'
+import type { Session } from 'next-auth'
+import '../styles/globals.css'
+import { ReactElement, ReactNode } from 'react'
+import { NextPage } from 'next'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
-const MyApp: AppType<{ session: Session | null }> = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}) => {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+  pageProps: {
+    session: Session | null
+  }
+}
+
+const queryClient = new QueryClient()
+
+const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
+  const getLayout = Component.getLayout ?? (page => page)
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
-  );
-};
+    <div data-theme='light'>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider session={session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>
+      </QueryClientProvider>
+    </div>
+  )
+}
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
