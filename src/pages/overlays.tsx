@@ -9,7 +9,7 @@ import type { NextPageWithLayout } from './_app'
 const OverlaysPage: NextPageWithLayout = () => {
   const hello = trpc.useQuery(['example.hello', { text: 'from tRPC' }])
   const { push } = useRouter()
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   if (status === 'loading') {
     return <p>Loading...</p>
   }
