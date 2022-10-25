@@ -27,5 +27,8 @@ export default defineNextConfig({
         hostname: 'assets.donordrive.com'
       }
     ]
+  },
+  experimental: {
+    appDir: true
   }
 })
