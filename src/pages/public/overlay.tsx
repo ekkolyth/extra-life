@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import TopRotator from '../../components/overlay/TopRotator'
 import ProgressBar from '../../components/overlay/ProgressBar'
+import WheelSpins from '../../components/overlay/WheelSpins'
 
 const Overlay = () => {
   const [confetti, setConfetti] = useState(false)
@@ -47,6 +48,9 @@ const Overlay = () => {
       <div className='absolute bottom-14 right-12'>
         <TimeLeft timesUp={value => setTimesUp(value)} />
       </div>
+      {/* <div className='absolute bottom-14 left-12'>
+        <WheelSpins />
+      </div> */}
     </div>
   )
 }
