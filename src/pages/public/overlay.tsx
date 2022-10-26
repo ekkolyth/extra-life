@@ -5,6 +5,7 @@ import { fetchStats, formatter, percentage } from '../../utils/donorDrive'
 
 const Overlay = () => {
   const { data, error, isLoading } = useQuery(['extralife', 'donors'], () => fetchStats('478888'))
+	console.log('Loaded overlay page!')
 
   return (
     <div style={{ width: 1920, height: 1080 }} className='relative bg-transparent'>
