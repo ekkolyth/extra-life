@@ -3,6 +3,7 @@
 import { useQuery } from 'react-query'
 import { fetchStats, formatter, percentage } from '../../utils/donorDrive'
 import LurkMerch from '../../assets/img/lurk-merch.png'
+import TimeLeft from '../../components/overlay/TimeLeft'
 
 const Overlay = () => {
   const { data, error, isLoading } = useQuery(['extralife', 'donors'], () => fetchStats('478888'))
@@ -23,6 +24,9 @@ const Overlay = () => {
             <img src={LurkMerch.src} />
           </div>
         </div>
+      </div>
+      <div className='absolute bottom-14 right-12'>
+        <TimeLeft />
       </div>
     </div>
   )

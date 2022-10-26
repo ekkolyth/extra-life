@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.shadow-super {
+	box-shadow: 0.65rem 0.65rem 0 0 rgba(0, 0, 0, 1);
+	}
