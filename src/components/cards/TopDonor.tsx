@@ -1,16 +1,8 @@
 import { BanknotesIcon } from '@heroicons/react/24/solid'
-import axios from 'axios'
 import Image from 'next/image'
 import { useQuery } from 'react-query'
+import { fetchTopDonor } from '../../utils/donorDrive'
 import Card from '../layout/Card'
-
-const fetchTopDonor = async (id: string) => {
-  return await axios
-    .get(
-      `https://extra-life.org/api/participants/${id}/donors?limit=1&orderBy=sumDonations%20DESC&where=amountVisibility%20%3D%20ALL%20AND%20sumDonations%20%3E%200`
-    )
-    .then(res => res.data[0])
-}
 
 const TopDonor = () => {
   const { data, error, isLoading } = useQuery(['extralife', 'topDonor'], () => fetchTopDonor('478888'))

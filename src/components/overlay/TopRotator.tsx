@@ -1,11 +1,21 @@
 import { useEffect, useState } from 'react'
+import { useQuery } from 'react-query'
 import TextTransition, { presets } from 'react-text-transition'
 import ELControllerDice from '../../assets/img/EL_controllerdice.png'
 import Hashtags from '../../data/hashtags.json'
+import { fetchTopDonation } from '../../utils/donorDrive'
+import { trpc } from '../../utils/trpc'
 
 const TopRotator = () => {
-  const [mainText, setMainText] = useState(<p>{Hashtags[0]}</p>)
+  const { data } = useQuery(['extralife', 'topDonation'], () => fetchTopDonation('478888'))
+  const schedule = trpc.useQuery(['schedule.get'], {
+    refetchInterval: 5000
+  })
+  const [bonusTextIndex, setBonusTextIndex] = useState(0)
   const [hashtagIndex, setHashtagIndex] = useState(0)
+  const [mainText, setMainText] = useState(<p>{Hashtags[0]}</p>)
+  const [secondaryLabel, setSecondaryLabel] = useState('fuck')
+  const [secondaryText, setSecondaryText] = useState('penn state')
 
   // Rotate through the hashtags array as the main text every second
   // After the hashtags, display a string, then start over
@@ -19,10 +29,44 @@ const TopRotator = () => {
     }
   }
 
+  const rotateBonusText = () => {
+    switch (bonusTextIndex) {
+      case 0:
+        console.log(data)
+        setSecondaryLabel('top donation')
+        setSecondaryText(`${data?.displayName ?? 'Your'} - $${data?.amount ?? 'Mom'}`)
+        setBonusTextIndex(1)
+        break
+      case 1:
+        setSecondaryLabel('next goal unlock')
+        setSecondaryText('reading rainbow - $1000')
+        setBonusTextIndex(2)
+        break
+      case 2:
+        setSecondaryLabel('right now')
+        setSecondaryText(schedule?.data?.now ?? 'nothing')
+        setBonusTextIndex(3)
+        break
+      case 3:
+        setSecondaryLabel('up next')
+        setSecondaryText(schedule?.data?.next ?? 'nothing')
+        setBonusTextIndex(0)
+        break
+      default:
+        setSecondaryLabel('')
+        setSecondaryText('')
+        setBonusTextIndex(0)
+    }
+  }
+
   // Rotate the hashtags every 10 seconds
   useEffect(() => {
-    const interval = setInterval(rotateHashtags, 10000)
-    return () => clearInterval(interval)
+    const bonusText = setInterval(rotateBonusText, 10000)
+    const hashtags = setInterval(rotateHashtags, 10000)
+    return () => {
+      clearInterval(bonusText)
+      clearInterval(hashtags)
+    }
   })
 
   return (
@@ -35,9 +79,9 @@ const TopRotator = () => {
         <div className='flex-grow flex justify-end py-3'>
           <div className='text-right'>
             <p className='text-xl font-bold text-white -mb-1'>
-              <span className='border-b border-white'>up next</span>
+              <span className='border-b border-white'>{secondaryLabel}</span>
             </p>
-            <p className='text-xl font-bold text-white'>cards against humanity</p>
+            <p className='text-xl font-bold text-white'>{secondaryText}</p>
           </div>
         </div>
       </div>

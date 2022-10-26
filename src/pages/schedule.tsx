@@ -1,13 +1,19 @@
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
 import Layout from '../components/Layout'
 import { trpc } from '../utils/trpc'
 import type { NextPageWithLayout } from './_app'
 
 const SchedulePage: NextPageWithLayout = () => {
-  const hello = trpc.useQuery(['example.hello', { text: 'from tRPC' }])
+  const [now, setNow] = useState('')
+  const [next, setNext] = useState('')
+  const schedule = trpc.useQuery(['schedule.get'], {
+    refetchInterval: 5000
+  })
+  const create = trpc.useMutation('schedule.new')
+  const update = trpc.useMutation('schedule.update')
   const { push } = useRouter()
   const { status } = useSession()
   if (status === 'loading') {
@@ -15,6 +21,19 @@ const SchedulePage: NextPageWithLayout = () => {
   }
   if (status === 'unauthenticated') {
     push('/api/auth/signin')
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    if (schedule?.data?.id) {
+      await update.mutate({ id: schedule.data.id, now, next })
+    } else {
+      await create.mutate({ now, next })
+    }
+
+    setNow('')
+    setNext('')
   }
 
   return (
@@ -25,9 +44,59 @@ const SchedulePage: NextPageWithLayout = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <div className='pt-6 text-2xl text-blue-500 flex justify-center items-center w-full'>
-        {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
+      <h2 className='text-4xl'>Schedule Page</h2>
+
+      <div className='grid grid-cols-2 gap-8 my-8 max-w-lg'>
+        <div className='bg-white rounded-xl p-4 shadow-super'>
+          <p className='font-bold text-3xl text-center text-purple-bar-1'>Now</p>
+          <p className='font-semibold text-xl text-center mt-2'>{schedule?.data?.now ?? 'nothing'}</p>
+        </div>
+        <div className='bg-white rounded-xl p-4 shadow-super'>
+          <p className='font-bold text-3xl text-center text-purple-bar-1'>Up Next</p>
+          <p className='font-semibold text-xl text-center mt-2'>{schedule?.data?.next ?? 'nothing'}</p>
+        </div>
       </div>
+
+      <form onSubmit={handleSubmit} className='flex max-w-lg gap-4 bg-white rounded-xl p-4 shadow-super'>
+        <div className='flex-1'>
+          <label htmlFor='now' className='block text-sm font-medium text-gray-700'>
+            Now
+          </label>
+          <div className='mt-1'>
+            <input
+              type='text'
+              name='now'
+              id='now'
+              value={now}
+              onChange={e => setNow(e.target.value)}
+              className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+            />
+          </div>
+        </div>
+        <div className='flex-1'>
+          <label htmlFor='next' className='block text-sm font-medium text-gray-700'>
+            Next
+          </label>
+          <div className='mt-1'>
+            <input
+              type='text'
+              name='next'
+              id='next'
+              value={next}
+              onChange={e => setNext(e.target.value)}
+              className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+            />
+          </div>
+        </div>
+
+        <div className='flex items-end justify-end'>
+          <button
+            type='submit'
+            className='inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
+            Save
+          </button>
+        </div>
+      </form>
     </>
   )
 }
