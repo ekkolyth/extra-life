@@ -10,7 +10,6 @@ const Overlay = () => {
   return (
     <div style={{ width: 1920, height: 1080 }} className='relative bg-transparent'>
       <div className='absolute bottom-12 left-0 right-0 w-full flex justify-center'>
-        <p>testing</p>
         <div
           style={{ width: 934 }}
           className='bg-gray-600 border-8 border-black text-white rounded-full text-3xl font-bold text-center relative overflow-hidden'>
