@@ -2,10 +2,14 @@
 // Bonus fun when we reach zero
 
 import { useEffect, useState } from 'react'
+import TextTransition, { presets } from 'react-text-transition'
 
 const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
   const [displayTime, setDisplayTime] = useState(true)
   const [timeLeft, setTimeLeft] = useState('00h 00m 00s')
+  const [hoursLeft, setHoursLeft] = useState('00')
+  const [minutesLeft, setMinutesLeft] = useState('00')
+  const [secondsLeft, setSecondsLeft] = useState('00')
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -31,6 +35,9 @@ const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
         timesUp(false)
       }
 
+      setHoursLeft(hDisplay.toString())
+      setMinutesLeft(mDisplay.toString())
+      setSecondsLeft(sDisplay.toString())
       setTimeLeft(`${hDisplay}h ${mDisplay}m ${sDisplay}s`)
     }, 1000)
 
@@ -42,7 +49,15 @@ const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
       {displayTime ? (
         <>
           <p className='font-bold text-3xl text-white mb-2'>time left:</p>
-          <p className='font-bold text-4xl text-white truncate'>{timeLeft}</p>
+          <p className='font-bold text-4xl text-white flex gap-x-3'>
+            <span className='flex'>
+              <TextTransition springConfig={presets.default}>{hoursLeft}</TextTransition>h
+            </span>
+            <span className='flex'>
+              <TextTransition springConfig={presets.default}>{minutesLeft}</TextTransition>m
+            </span>
+            <span>{secondsLeft}s</span>
+          </p>
         </>
       ) : (
         <p className='font-bold text-4xl text-white'>

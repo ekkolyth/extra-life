@@ -47,17 +47,17 @@ const SchedulePage: NextPageWithLayout = () => {
       <h2 className='text-4xl'>Schedule Page</h2>
 
       <div className='grid grid-cols-2 gap-8 my-8 max-w-lg'>
-        <div className='bg-white rounded-xl p-4 shadow-super'>
+        <div className='bg-white rounded-xl p-4 shadow'>
           <p className='font-bold text-3xl text-center text-purple-bar-1'>Now</p>
           <p className='font-semibold text-xl text-center mt-2'>{schedule?.data?.now ?? 'nothing'}</p>
         </div>
-        <div className='bg-white rounded-xl p-4 shadow-super'>
+        <div className='bg-white rounded-xl p-4 shadow'>
           <p className='font-bold text-3xl text-center text-purple-bar-1'>Up Next</p>
           <p className='font-semibold text-xl text-center mt-2'>{schedule?.data?.next ?? 'nothing'}</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className='flex max-w-lg gap-4 bg-white rounded-xl p-4 shadow-super'>
+      <form onSubmit={handleSubmit} className='flex max-w-lg gap-4 bg-white rounded-xl p-4 shadow'>
         <div className='flex-1'>
           <label htmlFor='now' className='block text-sm font-medium text-gray-700'>
             Now

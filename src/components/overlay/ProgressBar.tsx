@@ -16,8 +16,8 @@ const ProgressBar = () => {
 
   return (
     <div
-      style={{ width: 934 }}
-      className='bg-gray-600 border-8 border-black text-white rounded-full text-3xl font-bold text-center relative'>
+      style={{ width: 960 }}
+      className='bg-gray-600 border-4 border-black text-white shadow-super rounded-full text-3xl font-bold text-center relative'>
       <div className='overflow-hidden rounded-full'>
         <div className='h-16 bg-purple-bar-1 rounded-full' style={{ width: `${donationPercentage}%` }}></div>
       </div>
