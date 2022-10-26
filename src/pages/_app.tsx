@@ -4,6 +4,7 @@ import { loggerLink } from '@trpc/client/links/loggerLink'
 import { withTRPC } from '@trpc/next'
 import { SessionProvider } from 'next-auth/react'
 import superjson from 'superjson'
+import { ToastContainer } from 'react-toastify'
 import type { AppProps } from 'next/app'
 import type { AppRouter } from '../server/router'
 import type { Session } from 'next-auth'
@@ -11,6 +12,8 @@ import '../styles/globals.css'
 import { ReactElement, ReactNode } from 'react'
 import { NextPage } from 'next'
 import { QueryClient, QueryClientProvider } from 'react-query'
+
+import 'react-toastify/dist/ReactToastify.css'
 
 export type NextPageWithLayout<P = Record<string, never>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -32,6 +35,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
       <QueryClientProvider client={queryClient}>
         <SessionProvider session={session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>
       </QueryClientProvider>
+      <ToastContainer position='bottom-right' />
     </div>
   )
 }
