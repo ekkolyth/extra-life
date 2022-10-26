@@ -1,5 +1,6 @@
 import { ClipboardIcon } from '@heroicons/react/24/outline'
 import { BookmarkIcon } from '@heroicons/react/24/solid'
+import { toast } from 'react-toastify'
 import Card from '../layout/Card'
 
 import resources from '../../data/resources.json'
@@ -21,7 +22,12 @@ const QuickResources = () => {
             <button
               className='inline-flex items-center rounded-md border border-transparent bg-el-dark-blue px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-sky-800 focus:outline-none focus:ring-2 focus:ring-el-dark-blue focus:ring-offset-2'
               onClick={() => {
-                navigator.clipboard.writeText(r.url)
+                if (r.url.length > 0) {
+                  navigator.clipboard.writeText(r.url)
+                  toast.success(`Copied ${r.name} to clipboard!`)
+                } else {
+                  toast.error(`No URL found for ${r.name}`)
+                }
               }}>
               Copy link
               <ClipboardIcon className='-mr-0.5 ml-2 h-4 w-4' aria-hidden='true' />
