@@ -49,7 +49,7 @@ const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
       {displayTime ? (
         <>
           <p className='font-bold text-3xl text-white mb-2'>time left:</p>
-          <p className='font-bold text-4xl text-white flex gap-x-3'>
+          <div className='font-bold text-4xl text-white flex gap-x-3'>
             <span className='flex'>
               <TextTransition springConfig={presets.default}>{hoursLeft}</TextTransition>h
             </span>
@@ -57,7 +57,7 @@ const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
               <TextTransition springConfig={presets.default}>{minutesLeft}</TextTransition>m
             </span>
             <span>{secondsLeft}s</span>
-          </p>
+          </div>
         </>
       ) : (
         <p className='font-bold text-4xl text-white'>
