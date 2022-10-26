@@ -2,13 +2,13 @@
 
 import { useQuery } from 'react-query'
 import { fetchStats, formatter, percentage } from '../../utils/donorDrive'
+import LurkMerch from '../../assets/img/lurk-merch.png'
 
 const Overlay = () => {
   const { data, error, isLoading } = useQuery(['extralife', 'donors'], () => fetchStats('478888'))
-	console.log('Loaded overlay page!')
 
   return (
-    <div style={{ width: 1920, height: 1080 }} className='relative bg-transparent'>
+    <div style={{ width: 1920, height: 1080 }} className='relative bg-green-500'>
       <div className='absolute bottom-12 left-0 right-0 w-full flex justify-center'>
         <div
           style={{ width: 934 }}
@@ -18,6 +18,9 @@ const Overlay = () => {
             style={{ width: `${percentage(data?.sumDonations, data?.fundraisingGoal)}%` }}></div>
           <div className='absolute inset-0 flex items-center justify-center'>
             <p>{formatter.format(data?.sumDonations)}</p>
+          </div>
+          <div className='absolute bottom-0 right-64 w-16 h-16'>
+            <img src={LurkMerch.src} />
           </div>
         </div>
       </div>
