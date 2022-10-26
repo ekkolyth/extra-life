@@ -1,21 +1,12 @@
 import { ChartPieIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
-import axios from 'axios'
+import { fetchStats, formatter, percentage } from '../../utils/donorDrive'
 import { useQuery } from 'react-query'
 import { classNames } from '../../utils/style'
 import Card from '../layout/Card'
 
-const fetchStats = async (id: string) => {
-  return await axios.get(`https://extra-life.org/api/participants/${id}`).then(res => res.data)
-}
 
 const TotalRaised = () => {
   const { data, error, isLoading } = useQuery(['extralife', 'donors'], () => fetchStats('478888'))
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  })
-
-  const percentage = Math.floor((data?.sumDonations / data?.fundraisingGoal) * 100)
 
   if (isLoading)
     return (
@@ -35,7 +26,7 @@ const TotalRaised = () => {
       <div className='flex items-center justify-center my-4'>
         <div
           className={classNames(
-            percentage >= 100
+            percentage(data?.sumDonations, data?.fundraisingGoal) >= 100
               ? 'text-green-700 border-green-50 bg-green-100'
               : 'text-el-dark-blue border-blue-50 bg-blue-50',
             'radial-progress border-4'
