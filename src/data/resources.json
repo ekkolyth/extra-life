@@ -1,17 +1,27 @@
 [
-	{
-		"name": "Extra Life Page",
-		"subtitle": "Donation Page",
-		"url": "https://www.extra-life.org/index.cfm?fuseaction=donorDrive.participant&participantID=478888"
-	},
-	{
-		"name": "Twitch Page",
-		"subtitle": "Watch the Stream",
-		"url": "https://www.twitch.tv/mikekenway"
-	},
-	{
-		"name": "Viewer Info",
-		"subtitle": "Send for Clarity",
-		"url": ""
-	}
+  {
+    "name": "Extra Life Page",
+    "subtitle": "Donation Page",
+    "url": "https://www.extra-life.org/index.cfm?fuseaction=donorDrive.participant&participantID=478888"
+  },
+  {
+    "name": "Twitch Page",
+    "subtitle": "Watch the Stream",
+    "url": "https://www.twitch.tv/mikekenway"
+  },
+  {
+    "name": "Viewer Info",
+    "subtitle": "Send for Clarity",
+    "url": ""
+  },
+  {
+    "name": "Overlay",
+    "subtitle": "Stream Overlay",
+    "url": "https://gnome-board.vercel.app/public/overlay"
+  },
+  {
+    "name": "Donation Counter",
+    "subtitle": "Full Screen Donation Counter",
+    "url": "https://gnome-board.vercel.app/public/donations"
+  }
 ]
