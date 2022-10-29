@@ -12,10 +12,10 @@ const Navbar = () => {
   const { data: session } = useSession()
   const navigation = [
     { name: 'Dashboard', href: '/', icon: ControllerIcon, current: route === '/' },
-    { name: 'Rewards', href: '/rewards', icon: DiceIcon, current: route === '/rewards' },
-    { name: 'Overlays', href: '/overlays', icon: ComputerDesktopIcon, current: route === '/overlays' },
-    { name: 'Schedule', href: '/schedule', icon: CalendarIcon, current: route === '/schedule' },
-    { name: 'Settings', href: '/settings', icon: AdjustmentsHorizontalIcon, current: route === '/settings' }
+    // { name: 'Rewards', href: '/rewards', icon: DiceIcon, current: route === '/rewards' },
+    // { name: 'Overlays', href: '/overlays', icon: ComputerDesktopIcon, current: route === '/overlays' },
+    { name: 'Schedule', href: '/schedule', icon: CalendarIcon, current: route === '/schedule' }
+    // { name: 'Settings', href: '/settings', icon: AdjustmentsHorizontalIcon, current: route === '/settings' }
   ]
 
   return (
