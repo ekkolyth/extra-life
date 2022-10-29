@@ -8,6 +8,8 @@ import TotalRaised from '../components/cards/TotalRaised'
 import TopDonor from '../components/cards/TopDonor'
 import { useRouter } from 'next/router'
 import LatestDonations from '../components/cards/LatestDonations'
+import Goals from '../components/cards/Goals'
+import NextGoal from '../components/cards/NextGoal'
 
 const DashboardPage: NextPageWithLayout = () => {
   const { push } = useRouter()
@@ -33,6 +35,8 @@ const DashboardPage: NextPageWithLayout = () => {
         </div>
         <div className='flex flex-col gap-y-4'>
           <TopDonor />
+          <NextGoal />
+          <Goals />
         </div>
         <div className='flex flex-col gap-y-4'>
           <LatestDonations />

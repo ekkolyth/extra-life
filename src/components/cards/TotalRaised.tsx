@@ -36,8 +36,8 @@ const TotalRaised = () => {
           {formatter.format(data?.sumDonations)}
         </div>
       </div>
-      <div className='overflow-x-auto my-6'>
-        <table className='table table-compact w-full border'>
+      <div className='overflow-hidden border rounded-lg my-6'>
+        <table className='table table-compact w-full'>
           <thead>
             <tr>
               <th>Stat</th>
