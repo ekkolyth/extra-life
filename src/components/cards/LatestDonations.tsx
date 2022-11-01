@@ -4,9 +4,11 @@ import Image from 'next/image'
 import { useQuery } from 'react-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
+import { Menu, Transition } from '@headlessui/react'
 import Card from '../layout/Card'
 import { toast } from 'react-toastify'
+import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 dayjs.extend(relativeTime)
 
 const fetchLatestDonations = async (id: string, limit: number) => {
@@ -38,23 +40,49 @@ const LatestDonations = () => {
 
   return (
     <Card title='Latest Donations' icon={<CurrencyDollarIcon />}>
-      <h3 className='mt-4 mb-2 font-bold'>Display Limit</h3>
-      <div className='w-full flex items-center'>
-        <button
-          onClick={() =>
-            limit > 2
-              ? setLimit(prev => prev - 2)
-              : toast.error('You cannot go lower than 2 donations!', {
-                  autoClose: false
-                })
-          }>
-          <MinusIcon className='w-8 h-8 rounded-full p-1 bg-el-dark-blue text-white' />
-        </button>
-        <p className='text-xl mx-4 font-bold'>{limit}</p>
-        <button onClick={() => setLimit(prev => prev + 2)}>
-          <PlusIcon className='w-8 h-8 rounded-full p-1 bg-el-dark-blue text-white' />
-        </button>
+      <div className='absolute top-6 right-5'>
+        <Menu as='div' className='relative inline-block text-left'>
+          <div>
+            <Menu.Button className='inline-flex w-full justify-center rounded-full border border-gray-300 bg-white p-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-el-dark-blue focus:ring-offset-2 focus:ring-offset-gray-100'>
+              <EllipsisHorizontalIcon className='w-5 h-5' />
+            </Menu.Button>
+          </div>
+
+          <Transition
+            as={Fragment}
+            enter='transition ease-out duration-100'
+            enterFrom='transform opacity-0 scale-95'
+            enterTo='transform opacity-100 scale-100'
+            leave='transition ease-in duration-75'
+            leaveFrom='transform opacity-100 scale-100'
+            leaveTo='transform opacity-0 scale-95'>
+            <Menu.Items className='absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+              <div className='py-1'>
+                <Menu.Item>
+                  <div className='p-2 flex items-center'>
+                    <button
+                      type='button'
+                      onClick={() =>
+                        limit > 2
+                          ? setLimit(prev => prev - 2)
+                          : toast.error('You cannot go lower than 2 donations!', {
+                              autoClose: false
+                            })
+                      }>
+                      <MinusIcon className='w-8 h-8 rounded-full p-1 bg-el-dark-blue text-white' />
+                    </button>
+                    <p className='text-xl mx-4 font-bold'>{limit}</p>
+                    <button type='button' onClick={() => setLimit(prev => prev + 2)}>
+                      <PlusIcon className='w-8 h-8 rounded-full p-1 bg-el-dark-blue text-white' />
+                    </button>
+                  </div>
+                </Menu.Item>
+              </div>
+            </Menu.Items>
+          </Transition>
+        </Menu>
       </div>
+
       <ol className='my-4 flex flex-col divide-y divide-gray-200'>
         {data.map(
           (d: {
