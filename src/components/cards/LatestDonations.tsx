@@ -2,7 +2,10 @@ import { CurrencyDollarIcon } from '@heroicons/react/24/solid'
 import axios from 'axios'
 import Image from 'next/image'
 import { useQuery } from 'react-query'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import Card from '../layout/Card'
+dayjs.extend(relativeTime)
 
 const fetchLatestDonations = async (id: string) => {
   return await axios.get(`https://extra-life.org/api/participants/${id}/donations?limit=8`).then(res => res.data)
@@ -38,6 +41,7 @@ const LatestDonations = () => {
             displayName: string
             message: string | null
             amount: number
+            createdDateUTC: string
           }) => (
             <li key={d.donationID} className='flex py-3'>
               <div className='mr-2 flex items-center'>
@@ -45,8 +49,11 @@ const LatestDonations = () => {
               </div>
               <div className='w-full flex justify-between items-center'>
                 <div>
-                  <p className='font-semibold text-neutral-800'>{d.displayName}</p>
-                  <p className='text-xs text-neutral-500'>{d.message ?? 'No message supplied'}</p>
+                  <div className='flex items-baseline'>
+                    <p className='font-semibold text-neutral-800'>{d.displayName}</p>
+                    <p className='ml-2 text-xs text-neutral-500'>{dayjs(d.createdDateUTC).fromNow()}</p>
+                  </div>
+                  <p className='text-xs text-neutral-800'>{d.message ?? 'No message supplied'}</p>
                 </div>
                 <p className='font-semibold text-neutral-800'>{formatter.format(d.amount)}</p>
               </div>
