@@ -1,16 +1,30 @@
-'use client'
-
-import TimeLeft from '../../components/overlay/TimeLeft'
 import Confetti from 'react-confetti'
 import { useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import TopRotator from '../../components/overlay/TopRotator'
 import ProgressBar from '../../components/overlay/ProgressBar'
+import TimeLeft from '../../components/overlay/TimeLeft'
 import WheelSpins from '../../components/overlay/WheelSpins'
 
 const Overlay = () => {
   const [confetti, setConfetti] = useState(false)
   const [timesUp, setTimesUp] = useState(false)
+  const [panel, setPanel] = useState('timeLeft')
+
+  // Display time left for 5 seconds, then switch to wheel spins for 10 seconds, then repeat
+  useEffect(() => {
+    const timer = setTimeout(
+      () => {
+        if (panel === 'timeLeft') {
+          setPanel('wheelSpins')
+        } else {
+          setPanel('timeLeft')
+        }
+      },
+      panel === 'wheelSpins' ? 5000 : 10000
+    )
+    return () => clearTimeout(timer)
+  }, [panel])
 
   // Once times up turns to true, set confetti to true
   // After 1 minute, set confetti to false
@@ -46,11 +60,11 @@ const Overlay = () => {
         <ProgressBar />
       </div>
       <div className='absolute bottom-14 right-12'>
-        <TimeLeft timesUp={value => setTimesUp(value)} />
+        <div className='bg-purple-bar-1 w-72 rounded-xl py-4 px-6 shadow-super relative'>
+          <TimeLeft visible={panel === 'timeLeft'} timesUp={value => setTimesUp(value)} />
+          <WheelSpins visible={panel === 'wheelSpins'} />
+        </div>
       </div>
-      {/* <div className='absolute bottom-14 left-12'>
-        <WheelSpins />
-      </div> */}
     </div>
   )
 }

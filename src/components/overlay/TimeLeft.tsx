@@ -1,12 +1,10 @@
 // Display the current countdown to November 13 at 10am in hours, minutes, and seconds
 // Bonus fun when we reach zero
-
 import { useEffect, useState } from 'react'
 import TextTransition, { presets } from 'react-text-transition'
 
-const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
+const TimeLeft = ({ visible, timesUp }: { visible: boolean; timesUp: (value: boolean) => void }) => {
   const [displayTime, setDisplayTime] = useState(true)
-  const [timeLeft, setTimeLeft] = useState('00h 00m 00s')
   const [hoursLeft, setHoursLeft] = useState('00')
   const [minutesLeft, setMinutesLeft] = useState('00')
   const [secondsLeft, setSecondsLeft] = useState('00')
@@ -38,16 +36,15 @@ const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
       setHoursLeft(hDisplay.toString())
       setMinutesLeft(mDisplay.toString())
       setSecondsLeft(sDisplay.toString())
-      setTimeLeft(`${hDisplay}h ${mDisplay}m ${sDisplay}s`)
     }, 1000)
 
     return () => clearInterval(interval)
   }, [])
 
   return (
-    <div className='bg-purple-bar-1 w-72 rounded-xl py-4 px-6 shadow-super'>
+    <>
       {displayTime ? (
-        <>
+        <div className={visible ? '' : 'hidden'}>
           <p className='font-bold text-3xl text-white mb-2'>time left:</p>
           <div className='font-bold text-4xl text-white flex gap-x-3'>
             <span className='flex'>
@@ -58,7 +55,7 @@ const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
             </span>
             <span>{secondsLeft}s</span>
           </div>
-        </>
+        </div>
       ) : (
         <p className='font-bold text-4xl text-white'>
           Fuck
@@ -66,7 +63,7 @@ const TimeLeft = ({ timesUp }: { timesUp: (value: boolean) => void }) => {
           Penn State!
         </p>
       )}
-    </div>
+    </>
   )
 }
 
