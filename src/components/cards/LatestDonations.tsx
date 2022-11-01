@@ -1,4 +1,4 @@
-import { CurrencyDollarIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/solid'
+import { ChevronRightIcon, CurrencyDollarIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/solid'
 import axios from 'axios'
 import Image from 'next/image'
 import { useQuery } from 'react-query'
@@ -55,7 +55,7 @@ const LatestDonations = () => {
           <PlusIcon className='w-8 h-8 rounded-full p-1 bg-el-dark-blue text-white' />
         </button>
       </div>
-      <ol className='mt-4 -mb-4 flex flex-col divide-y divide-gray-200'>
+      <ol className='my-4 flex flex-col divide-y divide-gray-200'>
         {data.map(
           (d: {
             donationID: string
@@ -83,6 +83,15 @@ const LatestDonations = () => {
           )
         )}
       </ol>
+      <footer className='flex justify-end'>
+        <a
+          href='https://www.extra-life.org/index.cfm?fuseaction=portal.donations'
+          target='_blank'
+          rel='noreferrer'
+          className='flex items-center text-sm font-semibold uppercase text-el-dark-blue'>
+          Go to Extra Life Donations Page <ChevronRightIcon className='w-4 h-4' />
+        </a>
+      </footer>
     </Card>
   )
 }

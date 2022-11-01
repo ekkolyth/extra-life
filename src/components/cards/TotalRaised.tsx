@@ -75,7 +75,7 @@ const TotalRaised = () => {
           target='_blank'
           rel='noreferrer'
           className='flex items-center text-sm font-semibold uppercase text-el-dark-blue'>
-          Go to Extra Life Page <ChevronRightIcon className='w-4 h-4' />
+          Go to Extra Life Profile <ChevronRightIcon className='w-4 h-4' />
         </a>
       </footer>
     </Card>
