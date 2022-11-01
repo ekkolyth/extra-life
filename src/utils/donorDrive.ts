@@ -27,7 +27,7 @@ export const fetchTopDonation = async (id: string) => {
 
 export const fetchWheelSpinDonations = async (id: string) => {
   return await axios
-    .get(`https://extra-life.org/api/participants/${id}/donations?limit=100`)
+    .get(`https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`)
     .then(res => res.data)
-    .then(data => data.filter((d: { amount: number }) => d.amount > 20.22))
+    .then(data => data.filter((d: { amount: number }) => d.amount > 20.22 && d.amount < 99.99))
 }

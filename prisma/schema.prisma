@@ -68,3 +68,10 @@ model Schedule {
 		now String
 		next String
 }
+
+model WheelSpin {
+		id String @id @default(cuid())
+		isSpun Boolean
+		updatedAt DateTime @updatedAt
+		createdAt DateTime @default(now())
+}

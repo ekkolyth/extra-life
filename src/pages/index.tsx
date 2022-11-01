@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import LatestDonations from '../components/cards/LatestDonations'
 import Goals from '../components/cards/Goals'
 import NextGoal from '../components/cards/NextGoal'
+import WheelSpins from '../components/cards/WheelSpins'
 
 const DashboardPage: NextPageWithLayout = () => {
   const { push } = useRouter()
@@ -39,6 +40,7 @@ const DashboardPage: NextPageWithLayout = () => {
           <Goals />
         </div>
         <div className='flex flex-col gap-y-4'>
+          <WheelSpins />
           <LatestDonations />
         </div>
       </div>
