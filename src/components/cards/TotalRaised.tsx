@@ -7,6 +7,7 @@ import Card from '../layout/Card'
 
 const TotalRaised = () => {
   const { data, error, isLoading } = useQuery(['extralife', 'donors'], () => fetchStats('478888'))
+	const calculatedPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
 
   if (isLoading)
     return (
@@ -26,13 +27,13 @@ const TotalRaised = () => {
       <div className='flex items-center justify-center my-4'>
         <div
           className={classNames(
-            percentage(data?.sumDonations, data?.fundraisingGoal) >= 100
+            calculatedPercentage >= 100
               ? 'text-green-700 border-green-50 bg-green-100'
               : 'text-el-dark-blue border-blue-50 bg-blue-50',
             'radial-progress border-4'
           )}
           /* @ts-ignore */
-          style={{ '--value': percentage, '--size': '8rem' }}>
+          style={{ '--value': calculatedPercentage, '--size': '8rem' }}>
           {formatter.format(data?.sumDonations)}
         </div>
       </div>
