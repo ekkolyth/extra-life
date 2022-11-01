@@ -14,7 +14,7 @@ const NextGoal = () => {
   return (
     <Card title='Next Goal' icon={<FlagIcon />}>
       <div className='flex items-center justify-center pt-4 pb-2'>
-        <p className='text-2xl font-bold text-purple-bar-1'>{nextGoal?.name}</p>
+        <p className='text-2xl font-bold text-el-light-blue'>{nextGoal?.name}</p>
       </div>
     </Card>
   )

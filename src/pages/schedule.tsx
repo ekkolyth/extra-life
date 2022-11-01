@@ -2,6 +2,7 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
+import { toast } from 'react-toastify'
 import Layout from '../components/Layout'
 import { trpc } from '../utils/trpc'
 import type { NextPageWithLayout } from './_app'
@@ -26,14 +27,23 @@ const SchedulePage: NextPageWithLayout = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (schedule?.data?.id) {
-      await update.mutate({ id: schedule.data.id, now, next })
-    } else {
-      await create.mutate({ now, next })
-    }
+    try {
+      if (now.length < 4 || next.length < 4) {
+        toast.error('Fuck you. Enter more than 3 characters you lazy sack of shit.')
+      } else {
+        if (schedule?.data?.id) {
+          await update.mutate({ id: schedule.data.id, now, next })
+        } else {
+          await create.mutate({ now, next })
+        }
 
-    setNow('')
-    setNext('')
+        toast.success('Schedule updated!')
+        setNow('')
+        setNext('')
+      }
+    } catch (e) {
+      toast.error('Something went wrong. Try again later.')
+    }
   }
 
   return (
@@ -48,11 +58,11 @@ const SchedulePage: NextPageWithLayout = () => {
 
       <div className='grid grid-cols-2 gap-8 my-8 max-w-lg'>
         <div className='bg-white rounded-xl p-4 shadow'>
-          <p className='font-bold text-3xl text-center text-purple-bar-1'>Now</p>
+          <p className='font-bold text-3xl text-center text-el-light-blue'>Now</p>
           <p className='font-semibold text-xl text-center mt-2'>{schedule?.data?.now ?? 'nothing'}</p>
         </div>
         <div className='bg-white rounded-xl p-4 shadow'>
-          <p className='font-bold text-3xl text-center text-purple-bar-1'>Up Next</p>
+          <p className='font-bold text-3xl text-center text-el-light-blue'>Up Next</p>
           <p className='font-semibold text-xl text-center mt-2'>{schedule?.data?.next ?? 'nothing'}</p>
         </div>
       </div>
@@ -67,9 +77,10 @@ const SchedulePage: NextPageWithLayout = () => {
               type='text'
               name='now'
               id='now'
+              required
               value={now}
               onChange={e => setNow(e.target.value)}
-              className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+              className='block w-full rounded-md border-gray-300 shadow-sm focus:border-el-dark-blue focus:ring-el-dark-blue sm:text-sm'
             />
           </div>
         </div>
@@ -82,9 +93,10 @@ const SchedulePage: NextPageWithLayout = () => {
               type='text'
               name='next'
               id='next'
+              required
               value={next}
               onChange={e => setNext(e.target.value)}
-              className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+              className='block w-full rounded-md border-gray-300 shadow-sm focus:border-el-dark-blue focus:ring-el-dark-blue sm:text-sm'
             />
           </div>
         </div>
@@ -92,7 +104,7 @@ const SchedulePage: NextPageWithLayout = () => {
         <div className='flex items-end justify-end'>
           <button
             type='submit'
-            className='inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
+            className='inline-flex items-center rounded-md border border-transparent bg-el-dark-blue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-opacity-75 focus:outline-none focus:ring-2 focus:ring-el-dark-blue focus:ring-offset-2'>
             Save
           </button>
         </div>

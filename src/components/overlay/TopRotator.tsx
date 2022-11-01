@@ -8,7 +8,7 @@ import { fetchTopDonation, fetchStats } from '../../utils/donorDrive'
 import { trpc } from '../../utils/trpc'
 
 const TopRotator = () => {
-  const rotationInterval = 10000
+  const rotationInterval = 7000
   const { data: stats } = useQuery(['extralife', 'donors'], () => fetchStats('478888'), {
     refetchInterval: rotationInterval
   })
@@ -64,10 +64,6 @@ const TopRotator = () => {
       clearInterval(hashtags)
     }
   }, [hashtagIndex, bonusTextIndex])
-
-  useEffect(() => {
-    console.log('next goal', nextGoal)
-  }, [nextGoal])
 
   return (
     <div style={{ width: 1200, height: 78 }} className='bg-purple-bar-1 rounded-full relative shadow-super'>
