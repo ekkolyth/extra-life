@@ -9,11 +9,10 @@ import { Menu, Transition } from '@headlessui/react'
 import Card from '../layout/Card'
 import { toast } from 'react-toastify'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
+import { fetchLatestDonations } from '../../utils/donorDrive'
 dayjs.extend(relativeTime)
 
-const fetchLatestDonations = async (id: string, limit: number) => {
-  return await axios.get(`https://extra-life.org/api/participants/${id}/donations?limit=${limit}`).then(res => res.data)
-}
+
 
 const LatestDonations = () => {
   const [limit, setLimit] = useState(6)
@@ -84,32 +83,23 @@ const LatestDonations = () => {
       </div>
 
       <ol className='my-4 flex flex-col divide-y divide-gray-200'>
-        {data.map(
-          (d: {
-            donationID: string
-            avatarImageURL: string
-            displayName: string
-            message: string | null
-            amount: number
-            createdDateUTC: string
-          }) => (
-            <li key={d.donationID} className='flex flex-wrap py-3'>
-              <div className='mr-2 flex items-center'>
-                <Image height={32} width={32} alt='Top Donor' className='rounded-full' src={d.avatarImageURL} />
+        {data?.map(d => (
+          <li key={d.donationID} className='flex flex-wrap py-3'>
+            <div className='mr-2 flex items-center'>
+              <Image height={32} width={32} alt='Top Donor' className='rounded-full' src={d.avatarImageURL} />
+            </div>
+            <div className='flex flex-grow justify-between items-center'>
+              <div>
+                <p className='font-semibold text-gray-800'>{d.displayName}</p>
+                <p className='text-xs -mt-1 text-gray-500'>{dayjs(d.createdDateUTC).fromNow()}</p>
               </div>
-              <div className='flex flex-grow justify-between items-center'>
-                <div>
-                  <p className='font-semibold text-gray-800'>{d.displayName}</p>
-                  <p className='text-xs -mt-1 text-gray-500'>{dayjs(d.createdDateUTC).fromNow()}</p>
-                </div>
-                <p className='font-semibold text-gray-800'>{formatter.format(d.amount)}</p>
-              </div>
-              <div className='w-full mt-2'>
-                <p className='text-xs text-gray-800'>{d.message ?? 'No message supplied'}</p>
-              </div>
-            </li>
-          )
-        )}
+              <p className='font-semibold text-gray-800'>{formatter.format(d.amount)}</p>
+            </div>
+            <div className='w-full mt-2'>
+              <p className='text-xs text-gray-800'>{d.message ?? 'No message supplied'}</p>
+            </div>
+          </li>
+        ))}
       </ol>
       <footer className='flex justify-end'>
         <a

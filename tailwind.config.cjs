@@ -22,6 +22,9 @@ module.exports = {
       backgroundImage: {
         'grid-pattern': "url('/assets/img/grid-pattern.png')",
         'purple-overlay': "url('/assets/img/purple-overlay.png')"
+      },
+      transitionDelay: {
+        alert: '7000ms'
       }
     }
   },
