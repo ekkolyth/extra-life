@@ -7,7 +7,9 @@ import { fetchStats, formatter, percentage } from '../../utils/donorDrive'
 import { classNames } from '../../utils/style'
 
 const ProgressBar = () => {
-  const { data, error } = useQuery(['extralife', 'donors'], () => fetchStats('478888'))
+  const { data, error } = useQuery(['extralife', 'donors'], () => fetchStats('478888'), {
+    refetchInterval: 5000
+  })
   const donationPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
 
   useEffect(() => {

@@ -11,6 +11,7 @@ const WheelSpins = ({ visible }: { visible: boolean }) => {
     }
   })
   useQuery(['extralife', 'wheelSpinDonations'], () => fetchWheelSpinDonations('478888'), {
+    refetchInterval: 5000,
     onSuccess(data) {
       setTotal(data.length)
     }
