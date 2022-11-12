@@ -12,7 +12,6 @@ import { formatter } from '../../utils/donorDrive'
 
 const Overlay = () => {
   const [alerts, setAlerts] = useState<Donation[]>([])
-  const [lastFetched, setLastFetched] = useState<Date | null>(null)
   const [donationAlert, setDonationAlert] = useState(false)
   const [confetti, setConfetti] = useState(false)
   const [timesUp, setTimesUp] = useState(false)
@@ -23,10 +22,9 @@ const Overlay = () => {
     onSuccess(data) {
       // If any of the donations are over $100, add them to the alerts queue
       const newAlerts = data.filter(
-        donation => donation.amount >= 100 && dayjs(donation.createdDateUTC).isAfter(dayjs(lastFetched))
+        donation => donation.amount >= 100 && dayjs(donation.createdDateUTC).isAfter(dayjs().subtract(30, 'seconds'))
       )
       setAlerts(alerts => [...alerts, ...newAlerts])
-      setLastFetched(new Date())
     }
   })
 
