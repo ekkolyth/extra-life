@@ -2,7 +2,7 @@
 
 import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { CheckBadgeIcon, ClockIcon } from '@heroicons/react/24/solid'
-import Card from '../layout/card'
+import Card from './card'
 import { formatter } from '../../utils/donor-drive'
 
 import GoalsData from '../../data/goals.json'

@@ -3,7 +3,7 @@
 import { ChartPieIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 import { fetchStats, formatter, percentage } from '../../utils/donor-drive'
 import { useQuery } from 'react-query'
-import Card from '../layout/card'
+import Card from './card'
 import { Progress } from '@/components/ui/progress'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import Link from 'next/link'

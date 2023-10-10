@@ -2,7 +2,7 @@
 
 import { EllipsisHorizontalIcon, GiftIcon } from '@heroicons/react/24/outline'
 import { Fragment, useState } from 'react'
-import Card from '../layout/card'
+import Card from './card'
 import { fetchWheelSpinDonations } from '../../utils/donor-drive'
 import { useQuery } from 'react-query'
 import { toast } from 'react-toastify'

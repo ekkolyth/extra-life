@@ -1,5 +1,5 @@
 import { ReactElement } from 'react'
-import Navbar from './layout/navbar'
+import Navbar from './navbar'
 
 const Layout = ({ children }: { children: ReactElement }) => {
   return (

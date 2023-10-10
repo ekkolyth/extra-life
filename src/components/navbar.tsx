@@ -3,7 +3,7 @@
 import { CalendarIcon } from '@heroicons/react/24/outline'
 import ControllerIcon from '@/components/icons/controller'
 import { usePathname } from 'next/navigation'
-import { Button } from '../ui/button'
+import { Button } from './ui/button'
 import Link from 'next/link'
 
 const Navbar = () => {
@@ -22,8 +22,8 @@ const Navbar = () => {
         <h1 className='scroll-m-20 text-3xl font-semibold tracking-tight'>ExtraLife Dash</h1>
         <nav className='flex gap-2'>
           {navigation.map(item => (
-            <Button variant={item.current ? 'default' : 'link'} asChild>
-              <Link key={item.name} href={item.href} className='flex gap-3'>
+            <Button key={item.name} variant={item.current ? 'default' : 'link'} asChild>
+              <Link href={item.href} className='flex gap-3'>
                 <item.icon className='h-6 w-6' aria-hidden='true' />
                 {item.name}
               </Link>

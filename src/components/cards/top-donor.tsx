@@ -4,7 +4,7 @@ import { BanknotesIcon } from '@heroicons/react/24/solid'
 import Image from 'next/image'
 import { useQuery } from 'react-query'
 import { fetchTopDonor } from '../../utils/donor-drive'
-import Card from '../layout/card'
+import Card from './card'
 
 export const TopDonor = () => {
   const { data, error, isLoading } = useQuery(['extralife', 'topDonor'], () =>

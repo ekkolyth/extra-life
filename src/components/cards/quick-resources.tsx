@@ -3,7 +3,7 @@
 import { ClipboardIcon } from '@heroicons/react/24/outline'
 import { BookmarkIcon } from '@heroicons/react/24/solid'
 import { toast } from 'react-toastify'
-import Card from '../layout/card'
+import Card from './card'
 
 import resources from '../../data/resources.json'
 import { Button } from '../ui/button'

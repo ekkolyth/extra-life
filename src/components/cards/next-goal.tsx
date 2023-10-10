@@ -1,7 +1,7 @@
 'use client'
 
 import { FlagIcon } from '@heroicons/react/24/outline'
-import Card from '../layout/card'
+import Card from './card'
 
 import GoalsData from '../../data/goals.json'
 import { useQuery } from 'react-query'
