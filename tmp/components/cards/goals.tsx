@@ -9,7 +9,7 @@ import GoalsData from '../../data/goals.json'
 import { useQuery } from 'react-query'
 import { fetchStats } from '../../utils/donor-drive'
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from 'tmp/components/ui/table'
 
 export const Goals = () => {
   const { data: stats } = useQuery(

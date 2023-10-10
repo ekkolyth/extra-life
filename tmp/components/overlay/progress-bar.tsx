@@ -3,8 +3,8 @@ import { useQuery } from 'react-query'
 import LurkMerch from '@/assets/img/lurk-merch.png'
 import Scolei from '@/assets/img/scolei.png'
 
-import { fetchStats, formatter, percentage } from '@/utils/donor-drive'
-import { cn } from '@/utils/style'
+import { fetchStats, formatter, percentage } from 'tmp/utils/donor-drive'
+import { cn } from 'tmp/utils/style'
 
 const ProgressBar = () => {
   const { data, error } = useQuery(

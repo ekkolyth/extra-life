@@ -7,7 +7,7 @@ import { fetchWheelSpinDonations } from '../../utils/donor-drive'
 import { useQuery } from 'react-query'
 import { toast } from 'react-toastify'
 import { Menu, Transition } from '@headlessui/react'
-import { cn } from '@/utils/style'
+import { cn } from 'tmp/utils/style'
 
 const WheelSpins = () => {
   // const spin = trpc.useMutation('wheelSpins.spin')
