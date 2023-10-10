@@ -3,8 +3,8 @@ import { useQuery } from 'react-query'
 import TextTransition, { presets } from 'react-text-transition'
 import ELControllerDice from '@/assets/img/EL_controllerdice.png'
 import Hashtags from '@/data/hashtags.json'
-import Goals from 'tmp/data/goals.json'
-import { fetchTopDonation, fetchStats } from 'tmp/utils/donor-drive'
+import Goals from 'src/data/goals.json'
+import { fetchTopDonation, fetchStats } from 'src/utils/donor-drive'
 
 const TopRotator = () => {
   const rotationInterval = 7000

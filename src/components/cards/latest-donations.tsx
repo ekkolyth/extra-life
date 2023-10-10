@@ -11,7 +11,7 @@ import Card from './card'
 import { toast } from 'react-toastify'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 import { fetchLatestDonations } from '../../utils/donor-drive'
-import { Popover, PopoverContent, PopoverTrigger } from 'tmp/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from 'src/components/ui/popover'
 import { Button } from '../ui/button'
 import Link from 'next/link'
 

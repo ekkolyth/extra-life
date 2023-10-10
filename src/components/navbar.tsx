@@ -1,7 +1,7 @@
 'use client'
 
 import { CalendarIcon } from '@heroicons/react/24/outline'
-import { ControllerIcon } from 'tmp/components/icons/controller'
+import { ControllerIcon } from 'src/components/icons/controller'
 import { usePathname } from 'next/navigation'
 import { Button } from './ui/button'
 import Link from 'next/link'

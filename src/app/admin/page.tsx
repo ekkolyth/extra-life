@@ -1,10 +1,10 @@
-import { Goals } from 'tmp/components/cards/goals'
-import { LatestDonations } from 'tmp/components/cards/latest-donations'
-import { NextGoal } from 'tmp/components/cards/next-goal'
-import { QuickResources } from 'tmp/components/cards/quick-resources'
-import { TopDonor } from 'tmp/components/cards/top-donor'
-import { TotalRaised } from 'tmp/components/cards/total-raised'
-import { WheelSpins } from 'tmp/components/overlay/wheel-spins'
+import { Goals } from 'src/components/cards/goals'
+import { LatestDonations } from 'src/components/cards/latest-donations'
+import { NextGoal } from 'src/components/cards/next-goal'
+import { QuickResources } from 'src/components/cards/quick-resources'
+import { TopDonor } from 'src/components/cards/top-donor'
+import { TotalRaised } from 'src/components/cards/total-raised'
+import { WheelSpins } from 'src/components/overlay/wheel-spins'
 
 export default function AdminPage() {
   return (

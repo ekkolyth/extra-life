@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from 'react-query'
-import { fetchStats, formatter } from 'tmp/utils/donor-drive'
+import { fetchStats, formatter } from 'src/utils/donor-drive'
 
 export default function DonationsPage() {
   const rotationInterval = 10000
