@@ -74,21 +74,22 @@ export const LatestDonations = () => {
       </div>
 
       <ol className='my-4 flex flex-col divide-y divide-border'>
-        {data?.map(d => (
-          <li key={d.donationID} className='flex flex-wrap py-3'>
-            <div className='mr-2 flex items-center'>
-              <Image height={32} width={32} alt='Top Donor' className='rounded-full' src={d.avatarImageURL} />
-            </div>
-            <div className='flex flex-grow justify-between items-center'>
-              <div>
-                <p className='font-semibold'>{d.displayName}</p>
-                <p className='text-xs -mt-1 text-primary'>{dayjs(d.createdDateUTC).fromNow()}</p>
+        {data &&
+          data?.map(d => (
+            <li key={d.donationID} className='flex flex-wrap py-3'>
+              <div className='mr-2 flex items-center'>
+                <Image height={32} width={32} alt='Top Donor' className='rounded-full' src={d.avatarImageURL} />
               </div>
-              <p className='font-semibold'>{formatter.format(d.amount)}</p>
-            </div>
-            <div className='w-full mt-2'>{d.message && <p className='text-xs'>{d.message}</p>}</div>
-          </li>
-        ))}
+              <div className='flex flex-grow justify-between items-center'>
+                <div>
+                  <p className='font-semibold'>{d.displayName}</p>
+                  <p className='text-xs -mt-1 text-primary'>{dayjs(d.createdDateUTC).fromNow()}</p>
+                </div>
+                <p className='font-semibold'>{formatter.format(d.amount)}</p>
+              </div>
+              <div className='w-full mt-2'>{d.message && <p className='text-xs'>{d.message}</p>}</div>
+            </li>
+          ))}
       </ol>
       <Button variant='link' className='w-full' asChild>
         <Link href='https://www.extra-life.org/index.cfm?fuseaction=portal.donations' target='_blank' rel='noreferrer'>
