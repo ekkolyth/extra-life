@@ -21,11 +21,13 @@ export const LatestDonations = (props: LatestDonationsProps) => {
   const { data: donations } = props
 
   const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)
-  const { data } = useQuery('goals', () => fetchLatestDonations(id, 10), {
+  const { data } = useQuery('donations', () => fetchLatestDonations(id, 10), {
     initialData: donations,
     enabled: !!id,
     refetchInterval: 15000
   })
+
+  console.log(data)
 
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',

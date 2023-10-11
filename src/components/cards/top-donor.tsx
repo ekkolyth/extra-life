@@ -14,7 +14,7 @@ export const TopDonor = (props: TopDonorProps) => {
   const { data: topDonor } = props
 
   const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)
-  const { data } = useQuery('goals', () => fetchTopDonor(id), {
+  const { data } = useQuery('topDonor', () => fetchTopDonor(id), {
     initialData: topDonor,
     enabled: !!id,
     refetchInterval: 15000

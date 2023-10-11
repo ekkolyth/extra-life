@@ -15,7 +15,7 @@ export const NextGoal = (props: NextGoalProps) => {
   const { data: stats } = props
 
   const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)
-  const { data } = useQuery('goals', () => fetchStats(id), {
+  const { data } = useQuery('stats', () => fetchStats(id), {
     initialData: stats,
     enabled: !!id,
     refetchInterval: 15000
