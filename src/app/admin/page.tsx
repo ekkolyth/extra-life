@@ -1,27 +1,38 @@
 import { Goals } from 'src/components/cards/goals'
-import { LatestDonations } from 'src/components/cards/latest-donations'
 import { NextGoal } from 'src/components/cards/next-goal'
-import { QuickResources } from 'src/components/cards/quick-resources'
 import { TopDonor } from 'src/components/cards/top-donor'
 import { TotalRaised } from 'src/components/cards/total-raised'
-import { WheelSpins } from 'src/components/overlay/wheel-spins'
+import { QuickResources } from 'src/components/cards/quick-resources'
+import { LatestDonations } from 'src/components/cards/latest-donations'
+import { fetchLatestDonations, fetchStats, fetchTopDonor } from '@/utils/donor-drive'
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const id = process.env.NEXT_PUBLIC_DONORDRIVE_ID
+  if (id === undefined) {
+    return <div>DonorDrive ID not set</div>
+  }
+
+  const statsData = fetchStats(id)
+  const donationsData = fetchLatestDonations(id, 10)
+  const topDonorData = fetchTopDonor(id)
+
+  const [stats, donations, topDonor] = await Promise.all([statsData, donationsData, topDonorData])
+
   return (
     <div className='grid grid-cols-3 gap-4'>
       <div className='flex flex-col gap-y-4'>
-        <TotalRaised />
+        <TotalRaised data={stats} />
         <QuickResources />
       </div>
       <div className='flex flex-col gap-y-4'>
-        <TopDonor />
-        <NextGoal />
-        <Goals />
+        <TopDonor data={topDonor} />
+        <LatestDonations data={donations} />
       </div>
       <div className='flex flex-col gap-y-4'>
-        <WheelSpins visible={false} />
-        <LatestDonations />
+        <NextGoal data={stats} />
+        <Goals data={stats} />
       </div>
+      <div className='flex flex-col gap-y-4'></div>
     </div>
   )
 }

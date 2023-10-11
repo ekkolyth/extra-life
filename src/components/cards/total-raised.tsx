@@ -1,32 +1,33 @@
 'use client'
 
 import { ChartPieIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
-import { fetchStats, formatter, percentage } from '../../utils/donor-drive'
-import { useQuery } from 'react-query'
+import { StatsResult, fetchStats, formatter, percentage } from '@/utils/donor-drive'
 import Card from './card'
-import { Progress } from 'src/components/ui/progress'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'src/components/ui/table'
+import { Progress } from '@/components/ui/progress'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import Link from 'next/link'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
+import { useQuery } from 'react-query'
 
-export const TotalRaised = () => {
-  const { data, error, isLoading } = useQuery(['extralife', 'donors'], () =>
-    fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID))
-  )
+interface TotalRaisedProps {
+  data: StatsResult
+}
+
+export const TotalRaised = (props: TotalRaisedProps) => {
+  const { data: stats } = props
+
+  const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)
+  const { data } = useQuery('goals', () => fetchStats(id), {
+    initialData: stats,
+    enabled: !!id,
+    refetchInterval: 15000
+  })
+
+  if (data === undefined) {
+    return null
+  }
+
   const calculatedPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
-
-  if (isLoading)
-    return (
-      <Card title='Total Raised YTD' icon={<ChartPieIcon />}>
-        Loading...
-      </Card>
-    )
-  if (error)
-    return (
-      <Card title='Total Raised YTD' icon={<ChartPieIcon />}>
-        Error
-      </Card>
-    )
 
   return (
     <Card title='Total Raised YTD' icon={<ChartPieIcon />}>
@@ -70,7 +71,7 @@ export const TotalRaised = () => {
         </Table>
       </div>
       <Button className='w-full' variant='link' asChild>
-        <Link href={data.links?.page} target='_blank' rel='noreferrer'>
+        <Link href={data?.links.page} target='_blank' rel='noreferrer'>
           Go to Extra Life Profile <ChevronRightIcon className='w-4 h-4' />
         </Link>
       </Button>

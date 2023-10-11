@@ -1,3 +1,35 @@
+export type StatsResult = {
+  avatarImageURL: string
+  createdDateUTC: string
+  displayName: string
+  eventID: number
+  eventName: string
+  fundraisingGoal: number
+  hasActivityTracking: boolean
+  isCustomAvatarImage: boolean
+  isTeamCaptain: boolean
+  isTeamCoCaptain: boolean
+  links: {
+    donate: string
+    page: string
+    stream: string
+  }
+  numDonations: number
+  numIncentives: number
+  numMilestones: number
+  participantID: number
+  participantTypeCode: string
+  role: string
+  streamIsEnabled: boolean
+  streamIsLive: boolean
+  streamingChannel: string
+  streamingPlatform: string
+  sumDonations: number
+  sumPledges: number
+  teamID: number
+  teamName: string
+}
+
 export type Donor = {
   displayName: string
   donorID: string
@@ -26,7 +58,7 @@ export type Donation = {
 }
 
 export const fetchStats = async (id: string) => {
-  return await fetch(`https://extra-life.org/api/participants/${id}`).then(res => res.json())
+  return (await fetch(`https://extra-life.org/api/participants/${id}`).then(res => res.json())) as StatsResult
 }
 
 export const formatter = new Intl.NumberFormat('en-US', {

@@ -2,31 +2,28 @@
 
 import { BanknotesIcon } from '@heroicons/react/24/solid'
 import Image from 'next/image'
-import { useQuery } from 'react-query'
-import { fetchTopDonor } from '../../utils/donor-drive'
 import Card from './card'
+import { Donor, StatsResult, fetchStats, fetchTopDonor } from '@/utils/donor-drive'
+import { useQuery } from 'react-query'
 
-export const TopDonor = () => {
-  const { data, error, isLoading } = useQuery(['extralife', 'topDonor'], () =>
-    fetchTopDonor(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID))
-  )
+interface TopDonorProps {
+  data: Donor
+}
+
+export const TopDonor = (props: TopDonorProps) => {
+  const { data: topDonor } = props
+
+  const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)
+  const { data } = useQuery('goals', () => fetchTopDonor(id), {
+    initialData: topDonor,
+    enabled: !!id,
+    refetchInterval: 15000
+  })
+
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD'
   })
-
-  if (isLoading)
-    return (
-      <Card title='Top Donor' icon={<BanknotesIcon />}>
-        Loading...
-      </Card>
-    )
-  if (error)
-    return (
-      <Card title='Top Donor' icon={<BanknotesIcon />}>
-        Error
-      </Card>
-    )
 
   return (
     <Card title='Top Donor' icon={<BanknotesIcon />}>

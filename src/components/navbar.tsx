@@ -5,6 +5,7 @@ import { ControllerIcon } from 'src/components/icons/controller'
 import { usePathname } from 'next/navigation'
 import { Button } from './ui/button'
 import Link from 'next/link'
+import { signOut } from 'next-auth/react'
 
 const Navbar = () => {
   const route = usePathname()
@@ -31,7 +32,7 @@ const Navbar = () => {
           ))}
         </nav>
       </div>
-      <Button>Sign out</Button>
+      <Button onClick={() => signOut()}>Sign out</Button>
     </header>
   )
 }

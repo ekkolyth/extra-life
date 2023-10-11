@@ -2,24 +2,28 @@
 
 import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { CheckBadgeIcon, ClockIcon } from '@heroicons/react/24/solid'
+
 import Card from './card'
-import { formatter } from '../../utils/donor-drive'
-
-import GoalsData from '../../data/goals.json'
+import GoalsData from '@/data/goals.json'
+import { StatsResult, fetchStats, formatter } from '@/utils/donor-drive'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'src/components/ui/table'
 import { useQuery } from 'react-query'
-import { fetchStats } from '../../utils/donor-drive'
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from 'src/components/ui/table'
+interface GoalsProps {
+  data: StatsResult
+}
 
-export const Goals = () => {
-  const { data: stats } = useQuery(
-    ['extralife', 'donors'],
-    () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
-    {
-      refetchInterval: 5000
-    }
-  )
-  const nextGoalIndex = GoalsData.findIndex(goal => goal.value > stats?.sumDonations * 100)
+export const Goals = (props: GoalsProps) => {
+  const { data: stats } = props
+
+  const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)
+  const { data } = useQuery('goals', () => fetchStats(id), {
+    initialData: stats,
+    enabled: !!id,
+    refetchInterval: 15000
+  })
+
+  const nextGoalIndex = data?.sumDonations ? GoalsData.findIndex(goal => goal.value > data.sumDonations * 100) : 0
   const nextGoal = GoalsData[nextGoalIndex]
 
   return (

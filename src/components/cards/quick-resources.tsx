@@ -1,13 +1,13 @@
 'use client'
 
-import { ClipboardIcon } from '@heroicons/react/24/outline'
-import { BookmarkIcon } from '@heroicons/react/24/solid'
-import { toast } from 'react-toastify'
-import Card from './card'
-
-import resources from '../../data/resources.json'
-import { Button } from '../ui/button'
 import Link from 'next/link'
+import { toast } from 'react-toastify'
+import { BookmarkIcon } from '@heroicons/react/24/solid'
+import { ClipboardIcon } from '@heroicons/react/24/outline'
+
+import Card from './card'
+import resources from '@/data/resources.json'
+import { Button } from '@/components/ui/button'
 
 export const QuickResources = () => {
   return (
