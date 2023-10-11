@@ -27,8 +27,6 @@ export const LatestDonations = (props: LatestDonationsProps) => {
     refetchInterval: 15000
   })
 
-  console.log(data)
-
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD'
