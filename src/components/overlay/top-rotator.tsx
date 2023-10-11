@@ -18,12 +18,13 @@ const TopRotator = () => {
   const { data: topDonation } = useQuery(['extralife', 'topDonation'], () =>
     fetchTopDonation(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID))
   )
+
   // const schedule = trpc.useQuery(['schedule.get'], {
   //   refetchInterval: rotationInterval
   // })
   const [bonusTextIndex, setBonusTextIndex] = useState<number>(0)
   const [hashtagIndex, setHashtagIndex] = useState<number>(0)
-  const nextGoal = Goals.find(goal => goal.value > stats?.sumDonations * 100)
+  const nextGoal = stats?.sumDonations ? Goals.find(goal => goal.value > stats?.sumDonations * 100) : undefined
 
   const bonusText: { label: string; text: string }[] = [
     // {
@@ -69,6 +70,10 @@ const TopRotator = () => {
       clearInterval(hashtags)
     }
   }, [hashtagIndex, bonusTextIndex])
+
+  if (!stats || !topDonation) {
+    return null
+  }
 
   return (
     <div style={{ width: 1200, height: 78 }} className='bg-purple-bar-1 rounded-full relative shadow-super'>

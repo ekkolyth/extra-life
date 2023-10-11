@@ -14,11 +14,16 @@ const ProgressBar = () => {
       refetchInterval: 5000
     }
   )
-  const donationPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
 
   useEffect(() => {
     console.log('Fetching Donor Data Failed!\n', error)
   }, [error])
+
+  if (data?.sumDonations === undefined) {
+    return null
+  }
+
+  const donationPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
 
   return (
     <div
