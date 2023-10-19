@@ -17,11 +17,11 @@
   {
     "name": "Overlay",
     "subtitle": "Stream Overlay",
-    "url": "https://gnome-board.vercel.app/public/overlay"
+    "url": "https://extralife.kenway.me/overlay"
   },
   {
     "name": "Donation Counter",
     "subtitle": "Full Screen Donation Counter",
-    "url": "https://gnome-board.vercel.app/public/donations"
+    "url": "https://extralife.kenway.me/donations"
   }
 ]

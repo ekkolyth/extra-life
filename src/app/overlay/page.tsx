@@ -98,7 +98,7 @@ const Overlay = () => {
         <div className='absolute top-0 left-0 w-full h-full flex items-start justify-center pt-44'>
           {alerts.length > 0 && (
             <div className='font-display'>
-              <h1 className='text-6xl text-center font-bold text-purple-bar-1'>
+              <h1 className='text-6xl text-center font-bold text-primary'>
                 {alerts[0]?.displayName} donated {formatter.format(alerts[0]?.amount ?? 0)}!
               </h1>
               <p className='text-3xl text-center text-gray-900'>{alerts[0]?.message}</p>
@@ -125,7 +125,7 @@ const Overlay = () => {
         <ProgressBar />
       </div>
       <div className='absolute bottom-14 right-12'>
-        <div className='bg-purple-bar-1 w-72 rounded-xl py-4 px-6 shadow-super relative'>
+        <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow-super relative'>
           <TimeLeft visible={panel === 'timeLeft'} timesUp={value => setTimesUp(value)} />
           <WheelSpins visible={panel === 'wheelSpins'} />
         </div>
