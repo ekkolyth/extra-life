@@ -70,3 +70,10 @@ model WheelSpin {
   donorName      String
   donationAmount Float
 }
+
+model Goal {
+  id          String  @id @default(cuid())
+  title       String
+  amount      Float
+  endOfStream Boolean @default(false)
+}

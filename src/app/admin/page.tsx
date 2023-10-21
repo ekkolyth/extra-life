@@ -5,6 +5,7 @@ import { TotalRaised } from 'src/components/cards/total-raised'
 import { QuickResources } from 'src/components/cards/quick-resources'
 import { LatestDonations } from 'src/components/cards/latest-donations'
 import { fetchLatestDonations, fetchStats, fetchTopDonor } from '@/utils/donor-drive'
+import { getGoals } from '@/actions/goals'
 
 export default async function AdminPage() {
   const id = process.env.NEXT_PUBLIC_DONORDRIVE_ID
@@ -12,11 +13,12 @@ export default async function AdminPage() {
     return <div>DonorDrive ID not set</div>
   }
 
+  const goalsData = getGoals()
   const statsData = fetchStats(id)
   const donationsData = fetchLatestDonations(id, 10)
   const topDonorData = fetchTopDonor(id)
 
-  const [stats, donations, topDonor] = await Promise.all([statsData, donationsData, topDonorData])
+  const [goals, stats, donations, topDonor] = await Promise.all([goalsData, statsData, donationsData, topDonorData])
 
   return (
     <div className='grid grid-cols-3 gap-4'>
@@ -29,8 +31,8 @@ export default async function AdminPage() {
         <LatestDonations data={donations} />
       </div>
       <div className='flex flex-col gap-y-4'>
-        <NextGoal data={stats} />
-        <Goals data={stats} />
+        <NextGoal data={stats} goals={goals} />
+        <Goals data={stats} goals={goals} />
       </div>
       <div className='flex flex-col gap-y-4'></div>
     </div>

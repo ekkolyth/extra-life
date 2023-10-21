@@ -4,6 +4,7 @@ const nextConfig = {
     domains: ['assets.donordrive.com']
   },
   experimental: {
+    serverActions: true,
     serverComponentsExternalPackages: ['@prisma/client']
   }
 }

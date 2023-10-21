@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Button } from './ui/button'
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
+import { TrophyIcon } from '@heroicons/react/24/solid'
 
 const Navbar = () => {
   const route = usePathname()
@@ -13,7 +14,8 @@ const Navbar = () => {
     { name: 'Dashboard', href: '/admin', icon: ControllerIcon, current: route === '/admin' },
     // { name: 'Rewards', href: '/rewards', icon: DiceIcon, current: route === '/rewards' },
     // { name: 'Overlays', href: '/overlays', icon: ComputerDesktopIcon, current: route === '/overlays' },
-    { name: 'Schedule', href: '/admin/schedule', icon: CalendarIcon, current: route === '/admin/schedule' }
+    // { name: 'Schedule', href: '/admin/schedule', icon: CalendarIcon, current: route === '/admin/schedule' },
+    { name: 'Goals', href: '/admin/goals', icon: TrophyIcon, current: route === '/admin/goals' }
     // { name: 'Settings', href: '/settings', icon: AdjustmentsHorizontalIcon, current: route === '/settings' }
   ]
 
@@ -32,7 +34,9 @@ const Navbar = () => {
           ))}
         </nav>
       </div>
-      <Button onClick={() => signOut()}>Sign out</Button>
+      <Button variant='link' onClick={() => signOut()}>
+        Sign out
+      </Button>
     </header>
   )
 }
