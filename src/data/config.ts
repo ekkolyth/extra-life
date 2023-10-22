@@ -1,3 +1,3 @@
 export const config = {
-  streamStart: '20:00'
+  streamStart: '10:00'
 }
