@@ -1,14 +1,24 @@
-import { getSegments } from '@/actions/segments'
-import { prisma } from '@/lib/prisma'
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function GET(req: NextRequest) {
+import { getServerSession } from 'next-auth'
+
+import { prisma } from '@/lib/prisma'
+import { authConfig } from '@/lib/auth'
+import { getSegments } from '@/actions/segments'
+
+export async function GET() {
+  const session = await getServerSession(authConfig)
+  if (!session) return Response.json({ error: 'Unauthorized' })
+
   const data = await getSegments()
 
   return Response.json(data)
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authConfig)
+  if (!session) return Response.json({ error: 'Unauthorized' })
+
   let data = await req.json()
 
   const segment = await prisma.segment.create({
@@ -22,6 +32,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authConfig)
+  if (!session) return Response.json({ error: 'Unauthorized' })
+
   const data = await req.json()
 
   const segment = await prisma.segment.delete({
