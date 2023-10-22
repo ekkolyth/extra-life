@@ -1,12 +1,19 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
 import TextTransition, { presets } from 'react-text-transition'
 import ELControllerDice from '@/assets/img/EL_controllerdice.png'
 import Hashtags from '@/data/hashtags.json'
-import Goals from 'src/data/goals.json'
 import { fetchTopDonation, fetchStats } from 'src/utils/donor-drive'
+import { Goal } from '@prisma/client'
 
-const TopRotator = () => {
+interface TopRotatorProps {
+  goals: Goal[]
+}
+
+const TopRotator = (props: TopRotatorProps) => {
+  const { goals } = props
   const rotationInterval = 7000
   const { data: stats } = useQuery(
     ['extralife', 'donors'],
@@ -24,7 +31,7 @@ const TopRotator = () => {
   // })
   const [bonusTextIndex, setBonusTextIndex] = useState<number>(0)
   const [hashtagIndex, setHashtagIndex] = useState<number>(0)
-  const nextGoal = stats?.sumDonations ? Goals.find(goal => goal.value > stats?.sumDonations * 100) : undefined
+  const nextGoal = stats?.sumDonations ? goals.find(goal => goal.amount > stats?.sumDonations * 100) : undefined
 
   const bonusText: { label: string; text: string }[] = [
     // {
@@ -41,7 +48,7 @@ const TopRotator = () => {
     },
     {
       label: 'next goal unlock',
-      text: `${nextGoal?.name}${nextGoal?.note ? ` - ${nextGoal.note}` : ''}` ?? 'complete!'
+      text: `${nextGoal?.title}${nextGoal?.endOfStream ? ` - End Of Stream` : ''}` ?? 'complete!'
     }
   ]
 

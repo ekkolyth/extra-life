@@ -9,6 +9,7 @@ import Card from './card'
 import { StatsResult, fetchStats, formatter } from '@/utils/donor-drive'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'src/components/ui/table'
 import { useQuery } from 'react-query'
+import { USDollar } from '@/utils/currency'
 
 interface GoalsProps {
   data: StatsResult
@@ -25,8 +26,7 @@ export const Goals = (props: GoalsProps) => {
     refetchInterval: 15000
   })
 
-  const nextGoalIndex = data?.sumDonations ? goals.findIndex(goal => goal.amount > data.sumDonations * 100) : 0
-  const nextGoal = goals[nextGoalIndex]
+  const nextGoalIndex = data?.sumDonations ? goals.findIndex(goal => goal.amount > data.sumDonations) : 0
 
   return (
     <Card title='Goals' icon={<ChartBarIcon />}>
@@ -55,7 +55,7 @@ export const Goals = (props: GoalsProps) => {
                   <p className='text-sm'>{goal.title}</p>
                   <p className='text-primary text-xs font-semibold'>{goal.endOfStream ? 'End Of Stream' : null}</p>
                 </TableCell>
-                <TableCell>{formatter.format(goal.amount / 100)}</TableCell>
+                <TableCell>{USDollar.format(goal.amount)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

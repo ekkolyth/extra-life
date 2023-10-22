@@ -27,7 +27,7 @@ export const NextGoal = (props: NextGoalProps) => {
     return null
   }
 
-  const nextGoal = goals.find(goal => goal.amount > data?.sumDonations * 100)
+  const nextGoal = goals.find(goal => goal.amount > data?.sumDonations)
 
   return (
     <Card title='Next Goal' icon={<FlagIcon />}>

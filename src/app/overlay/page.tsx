@@ -10,9 +10,11 @@ import { WheelSpins } from 'src/components/overlay/wheel-spins'
 import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
 import { useQuery } from 'react-query'
 import dayjs from 'dayjs'
+import { Goal } from '@prisma/client'
 
 const Overlay = () => {
   const [alerts, setAlerts] = useState<Donation[]>([])
+  const [goals, setGoals] = useState<Goal[]>([])
   const [donationAlert, setDonationAlert] = useState(false)
   const [confetti, setConfetti] = useState(false)
   const [timesUp, setTimesUp] = useState(false)
@@ -32,6 +34,13 @@ const Overlay = () => {
       }
     }
   )
+
+  useQuery(['goals'], () => fetch('/api/goals').then(res => res.json()), {
+    refetchInterval: 30000,
+    onSuccess(data) {
+      setGoals(data)
+    }
+  })
 
   // Display time left for 5 seconds, then switch to wheel spins for 10 seconds, then repeat
   useEffect(() => {
@@ -119,7 +128,7 @@ const Overlay = () => {
         </video>
       </Transition>
       <div className='absolute top-12 left-0 right-0 w-full flex justify-center'>
-        <TopRotator />
+        <TopRotator goals={goals} />
       </div>
       <div className='absolute bottom-12 left-0 right-0 w-full flex justify-center'>
         <ProgressBar />

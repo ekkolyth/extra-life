@@ -57,13 +57,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Segment {
-  id       String   @id @default(cuid())
-  title    String
-  startsAt DateTime
-  endsAt   DateTime
-}
-
 model WheelSpin {
   id             String  @id @default(cuid())
   isSpun         Boolean @default(false)
@@ -76,4 +69,11 @@ model Goal {
   title       String
   amount      Float
   endOfStream Boolean @default(false)
+}
+
+model Segment {
+  id       String @id @default(cuid())
+  title    String
+  startsAt String
+  duration Int
 }
