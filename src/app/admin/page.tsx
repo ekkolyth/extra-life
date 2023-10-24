@@ -37,10 +37,10 @@ export default async function AdminPage() {
       </div>
       <div className='flex flex-col gap-y-4'>
         <Schedule segments={segments} />
-        <TopDonor data={topDonor} />
         <LatestDonations data={donations} />
       </div>
       <div className='flex flex-col gap-y-4'>
+        <TopDonor data={topDonor} />
         <NextGoal data={stats} goals={goals} />
         <Goals data={stats} goals={goals} />
       </div>
