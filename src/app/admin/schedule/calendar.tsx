@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { TrashIcon } from 'lucide-react'
 import { useQuery } from 'react-query'
 import { queryClient } from '@/app/providers'
+import { cn } from '@/utils/style'
+import { addHours, addMinutes, set, subMinutes } from 'date-fns'
 
 interface CalendarProps {
   segments: Segment[]
@@ -22,6 +24,42 @@ export function Calendar(props: CalendarProps) {
       initialData: props.segments
     }
   )
+
+  function getBackground(id: string) {
+    let background = 'bg-secondary'
+    if (!segments) return background
+
+    const segment = segments?.find(s => s.id === id)
+    const startHour = Number(segment?.startsAt.split(':')[0] ?? '')
+    const startMinutes = Number(segment?.startsAt.split(':')[1] ?? '')
+    const endHour = startHour + Number(segment?.duration) / 2
+    const endMinutes = startMinutes + (Number(segment?.duration) % 2) * 30
+
+    const now = new Date()
+    let start = new Date()
+    let end = new Date()
+    start = set(start, {
+      hours: startHour,
+      minutes: startMinutes,
+      seconds: 0
+    })
+    end = set(end, {
+      hours: endHour,
+      minutes: endMinutes,
+      seconds: 0
+    })
+
+    // If the end is before now, make it grey
+    if (now > end) background = 'bg-secondary'
+    // If the start is before now and the end is after now, make it green
+    else if (now > start && now < end) background = 'dark:bg-green-600'
+    // If the start is within 30 minutes of now, make it yellow
+    else if (now >= subMinutes(start, 30)) background = 'dark:bg-yellow-600'
+
+    console.log(addMinutes(start, 30))
+
+    return background
+  }
 
   return (
     <div className='isolate flex flex-auto overflow-hidden'>
@@ -60,7 +98,7 @@ export function Calendar(props: CalendarProps) {
               {segments?.map(segment => (
                 <li
                   key={segment.id}
-                  className='bg-secondary p-2 m-2 rounded flex justify-between'
+                  className={cn('p-2 m-2 rounded flex justify-between', getBackground(segment.id))}
                   style={{ gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${segment.duration}` }}>
                   <p>{segment.title}</p>
                   <form
