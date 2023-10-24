@@ -1,16 +1,15 @@
 'use client'
 
 import { Fragment } from 'react'
-import { Segment } from '@prisma/client'
-
-import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time'
-import { deleteSegment } from '@/actions/segments'
-import { Button } from '@/components/ui/button'
 import { TrashIcon } from 'lucide-react'
 import { useQuery } from 'react-query'
-import { queryClient } from '@/app/providers'
+import { Segment } from '@prisma/client'
+import { set, subMinutes } from 'date-fns'
+
 import { cn } from '@/utils/style'
-import { addHours, addMinutes, set, subMinutes } from 'date-fns'
+import { queryClient } from '@/app/providers'
+import { Button } from '@/components/ui/button'
+import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time'
 
 interface CalendarProps {
   segments: Segment[]
@@ -55,8 +54,6 @@ export function Calendar(props: CalendarProps) {
     else if (now > start && now < end) background = 'dark:bg-green-600'
     // If the start is within 30 minutes of now, make it yellow
     else if (now >= subMinutes(start, 30)) background = 'dark:bg-yellow-600'
-
-    console.log(addMinutes(start, 30))
 
     return background
   }

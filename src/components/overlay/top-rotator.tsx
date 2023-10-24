@@ -1,12 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import type { Goal, Segment } from '@prisma/client'
+
 import { useQuery } from 'react-query'
+import { useEffect, useState } from 'react'
 import TextTransition, { presets } from 'react-text-transition'
-import ELControllerDice from '@/assets/img/EL_controllerdice.png'
+
 import Hashtags from '@/data/hashtags.json'
+import { useSegments } from '@/utils/useSegments'
+import ELControllerDice from '@/assets/img/EL_controllerdice.png'
 import { fetchTopDonation, fetchStats } from 'src/utils/donor-drive'
-import { Goal } from '@prisma/client'
 
 interface TopRotatorProps {
   goals: Goal[]
@@ -25,23 +28,28 @@ const TopRotator = (props: TopRotatorProps) => {
   const { data: topDonation } = useQuery(['extralife', 'topDonation'], () =>
     fetchTopDonation(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID))
   )
+  const { data: segments } = useQuery(
+    ['segments'],
+    () => fetch('/api/segments').then(res => res.json()) as Promise<Segment[]>,
+    {
+      refetchInterval: rotationInterval
+    }
+  )
 
-  // const schedule = trpc.useQuery(['schedule.get'], {
-  //   refetchInterval: rotationInterval
-  // })
+  const { currentSegment, nextSegment } = useSegments(segments)
   const [bonusTextIndex, setBonusTextIndex] = useState<number>(0)
   const [hashtagIndex, setHashtagIndex] = useState<number>(0)
-  const nextGoal = stats?.sumDonations ? goals.find(goal => goal.amount > stats?.sumDonations * 100) : undefined
+  const nextGoal = stats?.sumDonations ? goals.find(goal => goal.amount > stats?.sumDonations) : undefined
 
   const bonusText: { label: string; text: string }[] = [
-    // {
-    //   label: 'right now',
-    //   text: schedule?.data?.now ?? 'loading...'
-    // },
-    // {
-    //   label: 'up next',
-    //   text: schedule?.data?.next ?? 'loading...'
-    // },
+    {
+      label: 'right now',
+      text: currentSegment?.title ?? 'loading...'
+    },
+    {
+      label: 'up next',
+      text: nextSegment?.title ?? 'loading...'
+    },
     {
       label: 'top donation',
       text: `${topDonation?.displayName ?? 'Your Mom'} - $${topDonation?.amount ?? '69'}`

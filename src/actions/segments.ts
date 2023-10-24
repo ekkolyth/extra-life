@@ -1,12 +1,13 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 export async function getSegments() {
   const segments = await prisma.segment.findMany()
 
+  revalidatePath('/admin/schedule')
   return segments
 }
 

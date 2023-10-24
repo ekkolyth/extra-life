@@ -1,16 +1,17 @@
 'use client'
 
-import Confetti from 'react-confetti'
-import { useEffect, useState } from 'react'
-import { Transition } from '@headlessui/react'
-import TopRotator from 'src/components/overlay/top-rotator'
-import ProgressBar from 'src/components/overlay/progress-bar'
-import TimeLeft from 'src/components/overlay/time-left'
-import { WheelSpins } from 'src/components/overlay/wheel-spins'
-import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
-import { useQuery } from 'react-query'
 import dayjs from 'dayjs'
 import { Goal } from '@prisma/client'
+import Confetti from 'react-confetti'
+import { useQuery } from 'react-query'
+import { useEffect, useState } from 'react'
+import { Transition } from '@headlessui/react'
+
+import TimeLeft from 'src/components/overlay/time-left'
+import TopRotator from 'src/components/overlay/top-rotator'
+import ProgressBar from 'src/components/overlay/progress-bar'
+import { WheelSpins } from 'src/components/overlay/wheel-spins'
+import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
 
 const Overlay = () => {
   const [alerts, setAlerts] = useState<Donation[]>([])

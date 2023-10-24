@@ -1,9 +1,10 @@
 'use client'
 
 import { Segment } from '@prisma/client'
-import Card from './card'
 import { CalendarIcon } from 'lucide-react'
-import { set } from 'date-fns'
+
+import Card from './card'
+import { useSegments } from '@/utils/useSegments'
 
 interface ScheduleProps {
   segments: Segment[]
@@ -11,32 +12,7 @@ interface ScheduleProps {
 
 export const Schedule = (props: ScheduleProps) => {
   const { segments } = props
-
-  console.log(segments)
-  const now = new Date()
-  const currentSegment = segments.find(segment => {
-    const start = set(now, {
-      hours: Number(segment.startsAt.split(':')[0]),
-      minutes: Number(segment.startsAt.split(':')[1]),
-      seconds: 0
-    })
-    const end = set(now, {
-      hours: Number(segment.startsAt.split(':')[0]) + Number(segment.duration) / 2,
-      minutes: Number(segment.startsAt.split(':')[1]) + (Number(segment.duration) % 2) * 30,
-      seconds: 0
-    })
-
-    if (now > start && now < end) return true
-  })
-  const nextSegment = segments.find(segment => {
-    const start = set(now, {
-      hours: Number(segment.startsAt.split(':')[0]),
-      minutes: Number(segment.startsAt.split(':')[1]),
-      seconds: 0
-    })
-
-    if (now < start) return true
-  })
+  const { currentSegment, nextSegment } = useSegments(segments)
 
   return (
     <Card title='Schedule' icon={<CalendarIcon />}>

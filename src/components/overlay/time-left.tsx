@@ -12,7 +12,7 @@ const TimeLeft = ({ visible, timesUp }: { visible: boolean; timesUp: (value: boo
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date()
-      const eventDate = new Date('November 13, 2022 10:00:00')
+      const eventDate = new Date('November 3, 2023 10:00:00')
       const currentTime = now.getTime()
       const eventTime = eventDate.getTime()
       const remTime = eventTime - currentTime
