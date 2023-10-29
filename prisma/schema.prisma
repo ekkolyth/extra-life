@@ -88,6 +88,7 @@ model RandomizerItem {
   id           String     @id @default(cuid())
   name         String
   limit        Int
+  redeemed     Int        @default(0)
   randomizerId String
   randomizer   Randomizer @relation(fields: [randomizerId], references: [id], onDelete: Cascade)
 }

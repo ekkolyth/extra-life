@@ -12,6 +12,18 @@ const admins = [
   {
     email: 'mike@mikekenway.com',
     provider: 'twitch'
+  },
+  {
+    email: 'mike@mikekenway.com',
+    provider: 'twitch'
+  },
+  {
+    email: 'mike@mikekenway.com',
+    provider: 'twitch'
+  },
+  {
+    email: 'mike@mikekenway.com',
+    provider: 'twitch'
   }
 ]
 

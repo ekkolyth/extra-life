@@ -6,7 +6,12 @@ export default async function RandomizerPage() {
 
   const [randomizers] = await Promise.all([randomizersData])
 
-  console.log(randomizers)
-
-  return <RandomizerForm />
+  return (
+    <div className='space-y-6'>
+      {randomizers.map(randomizer => (
+        <RandomizerForm key={randomizer.id} randomizer={randomizer} />
+      ))}
+      <RandomizerForm />
+    </div>
+  )
 }
