@@ -8,6 +8,8 @@ import { fetchLatestDonations, fetchStats, fetchTopDonor } from '@/utils/donor-d
 import { getGoals } from '@/actions/goals'
 import { Schedule } from '@/components/cards/segments'
 import { getSegments } from '@/actions/segments'
+import { RandomizerCard } from '@/components/cards/randomizers'
+import { getRandomizers } from '@/actions/randomizer'
 
 export default async function AdminPage() {
   const id = process.env.NEXT_PUBLIC_DONORDRIVE_ID
@@ -15,13 +17,15 @@ export default async function AdminPage() {
     return <div>DonorDrive ID not set</div>
   }
 
+  const randomizersData = getRandomizers()
   const segmentsData = getSegments()
   const goalsData = getGoals()
   const statsData = fetchStats(id)
   const donationsData = fetchLatestDonations(id, 10)
   const topDonorData = fetchTopDonor(id)
 
-  const [segments, goals, stats, donations, topDonor] = await Promise.all([
+  const [randomizers, segments, goals, stats, donations, topDonor] = await Promise.all([
+    randomizersData,
     segmentsData,
     goalsData,
     statsData,
@@ -37,6 +41,7 @@ export default async function AdminPage() {
       </div>
       <div className='flex flex-col gap-y-4'>
         <Schedule segments={segments} />
+        <RandomizerCard randomizers={randomizers} />
         <LatestDonations data={donations} />
       </div>
       <div className='flex flex-col gap-y-4'>
@@ -44,7 +49,6 @@ export default async function AdminPage() {
         <NextGoal data={stats} goals={goals} />
         <Goals data={stats} goals={goals} />
       </div>
-      <div className='flex flex-col gap-y-4'></div>
     </div>
   )
 }

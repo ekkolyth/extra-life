@@ -78,7 +78,7 @@ export function RandomizerForm(props: RandomizerFormProps) {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder='Demo' {...field} />
+                  <Input autoComplete='off' placeholder='Demo' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -96,7 +96,7 @@ export function RandomizerForm(props: RandomizerFormProps) {
                       <FormItem className='flex-grow'>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Input placeholder='Demo Item' {...field} />
+                          <Input autoComplete='off' placeholder='Demo Item' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

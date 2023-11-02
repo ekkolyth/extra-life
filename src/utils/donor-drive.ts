@@ -91,5 +91,11 @@ export const fetchLatestDonations = async (id: string, limit: number) => {
 export const fetchWheelSpinDonations = async (id: string) => {
   return (await fetch(`https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`)
     .then(res => res.json())
-    .then(data => data.filter((d: { amount: number }) => d.amount >= 20.22))) as Donation[]
+    .then(data => data.filter((d: { amount: number }) => d.amount >= 20 && d.amount <= 99.99))) as Donation[]
+}
+
+export const fetchBigWheelSpinDonations = async (id: string) => {
+  return (await fetch(`https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`)
+    .then(res => res.json())
+    .then(data => data.filter((d: { amount: number }) => d.amount >= 100))) as Donation[]
 }

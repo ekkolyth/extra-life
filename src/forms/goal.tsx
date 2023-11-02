@@ -4,8 +4,7 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { DollarSignIcon } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
-// @ts-ignore
-import { experimental_useFormState as useFormState } from 'react-dom'
+import { useFormState } from 'react-dom'
 
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'

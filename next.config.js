@@ -1,10 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['assets.donordrive.com']
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'assets.donordrive.com',
+        port: ''
+      }
+    ]
   },
   experimental: {
-    serverActions: true,
     serverComponentsExternalPackages: ['@prisma/client']
   }
 }

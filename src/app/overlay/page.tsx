@@ -1,7 +1,8 @@
 'use client'
 
+import type { Goal } from '@prisma/client'
+
 import dayjs from 'dayjs'
-import { Goal } from '@prisma/client'
 import Confetti from 'react-confetti'
 import { useQuery } from 'react-query'
 import { useEffect, useState } from 'react'
@@ -12,14 +13,18 @@ import TopRotator from 'src/components/overlay/top-rotator'
 import ProgressBar from 'src/components/overlay/progress-bar'
 import { WheelSpins } from 'src/components/overlay/wheel-spins'
 import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
+import { Randomizer } from '@/components/overlay/randomizer'
 
 const Overlay = () => {
-  const [alerts, setAlerts] = useState<Donation[]>([])
+  // Rotator State
+  const [panel, setPanel] = useState('timeLeft')
   const [goals, setGoals] = useState<Goal[]>([])
+  const [alerts, setAlerts] = useState<Donation[]>([])
+
+  // Alerts
   const [donationAlert, setDonationAlert] = useState(false)
   const [confetti, setConfetti] = useState(false)
   const [timesUp, setTimesUp] = useState(false)
-  const [panel, setPanel] = useState('timeLeft')
 
   useQuery(
     ['extralife', 'latestDonations', 'alerts'],
@@ -76,7 +81,8 @@ const Overlay = () => {
       setDonationAlert(true)
       setTimeout(() => {
         setDonationAlert(false)
-        alerts.pop()
+        // Remove the first alert from the queue
+        setAlerts(alerts => alerts.slice(1))
       }, 15000)
     }
   }, [alerts])
@@ -140,6 +146,8 @@ const Overlay = () => {
           <WheelSpins visible={panel === 'wheelSpins'} />
         </div>
       </div>
+      {/* Randomizer View */}
+      <Randomizer setConfetti={setConfetti} />
     </div>
   )
 }

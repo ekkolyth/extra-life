@@ -35,7 +35,7 @@ const ProgressBar = () => {
       </div> */}
       <Progress className='h-16 w-full' value={donationPercentage} />
       <div className='absolute inset-0 flex items-center justify-center'>
-        <p>{formatter.format(data?.sumDonations)}</p>P
+        <p>{formatter.format(data?.sumDonations)}</p>
       </div>
       <div className={cn(donationPercentage >= 100 ? 'w-32 h-32 right-48' : 'w-16 h-16 right-60', 'absolute bottom-0')}>
         <img src={donationPercentage >= 100 ? Scolei.src : LurkMerch.src} />
