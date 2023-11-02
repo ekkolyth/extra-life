@@ -4,7 +4,6 @@ import * as z from 'zod'
 
 import { prisma } from '@/lib/prisma'
 import { formSchema } from '@/forms/randomizer'
-import { RandomizerItem } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
 export async function getRandomizers() {
