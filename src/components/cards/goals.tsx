@@ -25,6 +25,15 @@ export const Goals = (props: GoalsProps) => {
     enabled: !!id,
     refetchInterval: 15000
   })
+  const { data: liveGoals } = useQuery(
+    'goals',
+    () => fetch('/api/goals').then(res => res.json()) as unknown as Goal[],
+    {
+      initialData: goals,
+      enabled: !!id,
+      refetchInterval: 15000
+    }
+  )
 
   const nextGoalIndex = data?.sumDonations ? goals.findIndex(goal => goal.amount > data.sumDonations) : 0
 
@@ -42,7 +51,7 @@ export const Goals = (props: GoalsProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {goals.map((goal, index) => (
+            {liveGoals?.map((goal, index) => (
               <TableRow key={goal.id}>
                 <TableCell>
                   {nextGoalIndex > index ? (
