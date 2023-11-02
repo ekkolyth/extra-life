@@ -17,33 +17,35 @@ export function useSegments(segments?: Segment[]) {
   }, [])
 
   useEffect(() => {
-    const current = segments?.find(segment => {
-      const start = set(now, {
-        hours: Number(segment.startsAt.split(':')[0]),
-        minutes: Number(segment.startsAt.split(':')[1]),
-        seconds: 0
-      })
-      const end = set(now, {
-        hours: Number(segment.startsAt.split(':')[0]) + Number(segment.duration) / 2,
-        minutes: Number(segment.startsAt.split(':')[1]) + (Number(segment.duration) % 2) * 30,
-        seconds: 0
-      })
+    if (segments && segments.length) {
+      const current = segments?.find(segment => {
+        const start = set(now, {
+          hours: Number(segment.startsAt.split(':')[0]),
+          minutes: Number(segment.startsAt.split(':')[1]),
+          seconds: 0
+        })
+        const end = set(now, {
+          hours: Number(segment.startsAt.split(':')[0]) + Number(segment.duration) / 2,
+          minutes: Number(segment.startsAt.split(':')[1]) + (Number(segment.duration) % 2) * 30,
+          seconds: 0
+        })
 
-      if (now > start && now < end) return true
-    })
-
-    const next = segments?.find(segment => {
-      const start = set(now, {
-        hours: Number(segment.startsAt.split(':')[0]),
-        minutes: Number(segment.startsAt.split(':')[1]),
-        seconds: 0
+        if (now > start && now < end) return true
       })
 
-      if (now < start) return true
-    })
+      const next = segments?.find(segment => {
+        const start = set(now, {
+          hours: Number(segment.startsAt.split(':')[0]),
+          minutes: Number(segment.startsAt.split(':')[1]),
+          seconds: 0
+        })
 
-    setCurrentSegment(current ?? null)
-    setNextSegment(next ?? null)
+        if (now < start) return true
+      })
+
+      setCurrentSegment(current ?? null)
+      setNextSegment(next ?? null)
+    }
   }, [now, segments])
 
   return { currentSegment, nextSegment }

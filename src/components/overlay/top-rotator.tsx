@@ -39,7 +39,8 @@ const TopRotator = (props: TopRotatorProps) => {
   const { currentSegment, nextSegment } = useSegments(segments)
   const [bonusTextIndex, setBonusTextIndex] = useState<number>(0)
   const [hashtagIndex, setHashtagIndex] = useState<number>(0)
-  const nextGoal = stats?.sumDonations ? goals.find(goal => goal.amount > stats?.sumDonations) : undefined
+  const nextGoal =
+    stats?.sumDonations && goals && goals.length ? goals?.find(goal => goal.amount > stats?.sumDonations) : undefined
 
   const bonusText: { label: string; text: string }[] = [
     {
