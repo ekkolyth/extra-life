@@ -33,15 +33,28 @@ export function useSegments(segments?: Segment[]) {
         if (now > start && now < end) return true
       })
 
-      const next = segments?.find(segment => {
-        const start = set(now, {
-          hours: Number(segment.startsAt.split(':')[0]),
-          minutes: Number(segment.startsAt.split(':')[1]),
-          seconds: 0
-        })
+      const next = segments
+        ?.sort((a, b) => {
+          const aHour = Number(a.startsAt.split(':')[0])
+          const aMinute = Number(a.startsAt.split(':')[1])
+          const bHour = Number(b.startsAt.split(':')[0])
+          const bMinute = Number(b.startsAt.split(':')[1])
 
-        if (now < start) return true
-      })
+          if (aHour > bHour) return 1
+          if (aHour < bHour) return -1
+          if (aMinute > bMinute) return 1
+          if (aMinute < bMinute) return -1
+          return 0
+        })
+        .find(segment => {
+          const start = set(now, {
+            hours: Number(segment.startsAt.split(':')[0]),
+            minutes: Number(segment.startsAt.split(':')[1]),
+            seconds: 0
+          })
+
+          if (now < start) return true
+        })
 
       setCurrentSegment(current ?? null)
       setNextSegment(next ?? null)
