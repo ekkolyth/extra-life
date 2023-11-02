@@ -2,7 +2,7 @@ import Navbar from 'src/components/navbar'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen app'>
       <Navbar />
       <main className='flex-1'>
         <div className='py-6'>

@@ -88,7 +88,7 @@ const Overlay = () => {
   }, [alerts])
 
   return (
-    <div style={{ width: 1920, height: 1080 }} className='relative bg-green-500'>
+    <div style={{ width: 1920, height: 1080 }} className='relative'>
       <Transition
         show={confetti}
         enter='transition-opacity duration-75'

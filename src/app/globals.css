@@ -56,8 +56,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-transparent;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  .app {
+    @apply bg-background text-foreground;
   }
 }
 
