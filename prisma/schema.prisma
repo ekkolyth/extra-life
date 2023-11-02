@@ -104,3 +104,8 @@ model Config {
   key   String
   value String
 }
+
+model Rotator {
+  id   String @id @default(cuid())
+  text String
+}

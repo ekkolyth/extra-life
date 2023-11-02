@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { createGoal, updateGoal } from '@/actions/goals'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { DialogClose } from '@/components/ui/dialog'
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -99,7 +100,9 @@ export function GoalForm(props: GoalFormProps) {
             </FormItem>
           )}
         />
-        <Button type='submit'>Submit</Button>
+        <DialogClose asChild>
+          <Button type='submit'>Submit</Button>
+        </DialogClose>
       </form>
     </Form>
   )

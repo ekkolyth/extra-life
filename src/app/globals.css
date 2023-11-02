@@ -56,11 +56,18 @@
     @apply border-border;
   }
   body {
-    @apply bg-transparent;
+    @apply bg-transparent text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
   .app {
-    @apply bg-background text-foreground;
+    @apply bg-background;
+  }
+  .no-scrollbars {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .no-scrollbars::-webkit-scrollbar {
+    display: none;
   }
 }
 
