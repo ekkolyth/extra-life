@@ -1,10 +1,11 @@
 'use client'
 
-import type { AblyMessage, NestedRandomizer } from '@/types'
+import type { NestedRandomizer } from '@/types'
+
+import * as Ably from 'ably'
 import { Transition } from '@headlessui/react'
 
 import { useChannel } from 'ably/react'
-import { loadBindings } from 'next/dist/build/swc'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
 import TextTransition, { presets } from 'react-text-transition'
@@ -30,13 +31,17 @@ export function Randomizer(props: RandomizerProps) {
     }
   })
 
-  // Realtime
-  const { channel } = useChannel('randomizers', (message: AblyMessage) => {
-    function SpinTheWheel(randomizer: NestedRandomizer) {
+  const { channel } = useChannel('randomizers', (message: Ably.Types.Message) => {
+    function spinTheWheel(randomizer: NestedRandomizer) {
+      if (!channel) {
+        console.error('No channel is available to spin the wheel.')
+        return
+      }
+
       // Determine the answer and let the channel know
       const random = Math.floor(Math.random() * randomizer.items.length)
       channel.publish({
-        name: 'randomizer',
+        name: 'randomizer-end',
         data: {
           id: randomizer.id,
           name: randomizer.name,
@@ -83,18 +88,18 @@ export function Randomizer(props: RandomizerProps) {
         setChoices([])
       }, 10000)
     }
-
     switch (message.name) {
-      case 'randomizer':
+      case 'randomizer-start':
         const randomizer = randomizers.find(randomizer => randomizer.id === message.data)
         if (randomizer) {
           setVisible(true)
           setTimeout(() => {
-            SpinTheWheel(randomizer)
+            spinTheWheel(randomizer)
           }, 1000)
         }
         break
       default:
+        console.log('Unknown message type:', message)
         break
     }
   })
@@ -109,7 +114,7 @@ export function Randomizer(props: RandomizerProps) {
       leaveFrom='opacity-100'
       leaveTo='opacity-0'>
       <div className='flex items-center justify-center h-screen'>
-        <div className='bg-gray-900 rounded-lg shadow overflow-hidden p-12 w-full max-w-xl'>
+        <div className='bg-gray-900 rounded-lg shadow overflow-hidden p-12 w-full max-w-4xl'>
           {spinning ? (
             <TextTransition springConfig={presets.wobbly}>
               <p className='text-4xl font-bold'>{choices[choiceIndex % choices.length]}</p>

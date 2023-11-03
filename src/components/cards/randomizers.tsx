@@ -1,12 +1,14 @@
 'use client'
 
-import { FerrisWheelIcon } from 'lucide-react'
-import Card from './card'
-import { Randomizer } from '@prisma/client'
 import Link from 'next/link'
-import { useChannel } from 'ably/react'
+import { useEffect, useState } from 'react'
+import { Randomizer } from '@prisma/client'
+import { FerrisWheelIcon } from 'lucide-react'
+
+import Card from './card'
+import * as Ably from 'ably'
+import { ably } from '@/lib/ably'
 import { Button } from '@/components/ui/button'
-import { AblyMessage } from '@/types'
 
 interface RandomizerCardProps {
   randomizers: Randomizer[]
@@ -14,25 +16,33 @@ interface RandomizerCardProps {
 
 export function RandomizerCard(props: RandomizerCardProps) {
   const { randomizers } = props
+  const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
 
-  const { channel } = useChannel('randomizers', (message: AblyMessage) => {
-    switch (message.name) {
-      case 'randomizer':
-        console.log(message.data)
-        fetch(`/api/randomizers/items`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            id: message.data.answer.id
-          })
-        })
-        break
-      default:
-        console.log('Unknown message type:', message)
+  useEffect(() => {
+    if (channel) {
+      channel.subscribe((message: Ably.Types.Message) => {
+        switch (message.name) {
+          case 'randomizer-end':
+            console.log('randomizer-end', message.data)
+            fetch(`/api/randomizers/items`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                id: message.data.answer.id
+              })
+            })
+            break
+          case 'randomizer-start':
+            console.log('randomizer-start', message.data)
+            break
+          default:
+            console.log('Unknown message type:', message)
+        }
+      })
     }
-  })
+  }, [channel])
 
   return (
     <Card title='Randomizers' icon={<FerrisWheelIcon />}>
@@ -44,16 +54,18 @@ export function RandomizerCard(props: RandomizerCardProps) {
           randomizers.map(randomizer => (
             <li key={randomizer.id} className='flex justify-between items-center'>
               <p>{randomizer.name}</p>
-              <Button
-                variant='link'
-                onClick={() =>
-                  channel.publish({
-                    name: 'randomizer',
-                    data: randomizer.id
-                  })
-                }>
-                Trigger
-              </Button>
+              {channel && (
+                <Button
+                  variant='link'
+                  onClick={() =>
+                    channel.publish({
+                      name: 'randomizer-start',
+                      data: randomizer.id
+                    })
+                  }>
+                  Trigger
+                </Button>
+              )}
             </li>
           ))
         ) : (
