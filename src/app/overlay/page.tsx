@@ -6,7 +6,7 @@ import * as Ably from 'ably'
 import dayjs from 'dayjs'
 import Confetti from 'react-confetti'
 import { useQuery } from 'react-query'
-import ReactPlayer from 'react-player'
+import ReactPlayer from 'react-player/lazy'
 import { useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useSearchParams } from 'next/navigation'
@@ -90,15 +90,23 @@ const Overlay = () => {
   useEffect(() => {
     if (timesUp) {
       setConfetti(true)
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setConfetti(false)
       }, 30000)
+
+      return () => clearTimeout(timeout)
     }
   }, [timesUp])
 
   // If there are any alerts in the queue, enable the donation
   // alert for each one one at a time for 20 seconds each
   useEffect(() => {
+    function handleVideoEnd() {
+      setPlaying(false)
+      setDonationAlert(false)
+      setAlerts(alerts => alerts.slice(1))
+    }
+
     if (alerts.length > 0) {
       // Filter alerts to only show one per user
       const uniqueAlerts = alerts.filter(
@@ -106,7 +114,21 @@ const Overlay = () => {
       )
       setAlerts(uniqueAlerts)
       setDonationAlert(true)
-      setPlaying(true)
+
+      // After a half second, start the video
+      const playingTimeout = setTimeout(() => {
+        setPlaying(true)
+      }, 500)
+
+      // After 20 seconds, stop the video
+      const endTimeout = setTimeout(() => {
+        handleVideoEnd()
+      }, 20000)
+
+      return () => {
+        clearTimeout(playingTimeout)
+        clearTimeout(endTimeout)
+      }
     }
   }, [alerts.length])
 
@@ -134,8 +156,8 @@ const Overlay = () => {
         show={donationAlert}
         enter='transition-opacity duration-1000'
         enterFrom='opacity-0'
-        enterTo='opacity-100 z-10'
-        leave='transition-opacity duration-200'
+        enterTo='opacity-100'
+        leave='transition-opacity duration-1000'
         leaveFrom='opacity-100'
         leaveTo='opacity-0'>
         <div>
@@ -149,19 +171,17 @@ const Overlay = () => {
               </div>
             )}
           </div>
-          <ReactPlayer
-            className='z-50'
-            loop={false}
-            playing={playing}
-            onEnded={() => {
-              setPlaying(false)
-              setDonationAlert(false)
-              setAlerts(alerts => alerts.slice(1))
-            }}
-            url='http://localhost:3000/assets/vid/big-alert.webm'
-            width={1920}
-            height={1080}
-          />
+          <video width='1920' height='1080' autoPlay>
+            <source src='http://localhost:3000/assets/vid/big-alert.webm' type='video/webm' />
+          </video>
+          {/* <ReactPlayer
+            controls={true}
+            className='z-50 bg-black'
+            // playing={true}
+            url='assets/vid/big-alert.webm'
+            // width={1920}
+            // height={1080}
+          /> */}
         </div>
       </Transition>
       {/* Top Rotator */}
