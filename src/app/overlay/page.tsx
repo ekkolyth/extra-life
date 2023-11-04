@@ -19,8 +19,6 @@ import ProgressBar from 'src/components/overlay/progress-bar'
 import { WheelSpins } from 'src/components/overlay/wheel-spins'
 import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
 
-let renders = 0
-
 const Overlay = () => {
   const searchParams = useSearchParams()
   const limited = searchParams.get('limited') === 'true'
@@ -39,7 +37,6 @@ const Overlay = () => {
   // Ably
   const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
   useEffect(() => {
-    renders++
     channel?.subscribe('donation', (msg: Ably.Types.Message) => {
       switch (msg.name) {
         case 'donation':
@@ -115,7 +112,6 @@ const Overlay = () => {
 
   return (
     <div style={{ width: 1920, height: 1080 }} className='relative'>
-      <p className='absolute top-0 right-0 p-0.5 bg-black'>{renders}</p>
       {/* Confetti */}
       {!limited && (
         <Transition
