@@ -5,12 +5,6 @@ import { useQuery } from 'react-query'
 import { fetchWheelSpinDonations } from '../../utils/donor-drive'
 
 export const WheelSpins = ({ visible }: { visible: boolean }) => {
-  // trpc.useQuery(['wheelSpins.getAll'], {
-  //   refetchInterval: 5000,
-  //   onSuccess(data) {
-  //     setLeft(total - data)
-  //   }
-  // })
   useQuery(
     ['extralife', 'wheelSpinDonations'],
     () => fetchWheelSpinDonations(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
@@ -22,7 +16,7 @@ export const WheelSpins = ({ visible }: { visible: boolean }) => {
     }
   )
   // Any donation over 20.22 and under 99.99 counts as 1 spin
-  const [left, setLeft] = useState(0)
+  const [left, setLeft] = useState(6)
   const [total, setTotal] = useState(0)
 
   return (
