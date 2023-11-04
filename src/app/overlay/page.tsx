@@ -171,17 +171,14 @@ const Overlay = () => {
               </div>
             )}
           </div>
-          <video width='1920' height='1080' autoPlay>
-            <source src='/assets/vid/big-alert.webm' type='video/webm' />
-          </video>
-          {/* <ReactPlayer
-            controls={true}
-            className='z-50 bg-black'
-            // playing={true}
-            url='assets/vid/big-alert.webm'
-            // width={1920}
-            // height={1080}
-          /> */}
+          <ReactPlayer
+            // controls={true}
+            className='z-50'
+            playing={playing}
+            url='/assets/vid/big-alert.webm'
+            width={1920}
+            height={1080}
+          />
         </div>
       </Transition>
       {/* Top Rotator */}
