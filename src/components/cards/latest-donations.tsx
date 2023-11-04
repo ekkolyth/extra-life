@@ -40,7 +40,9 @@ export const LatestDonations = (props: LatestDonationsProps) => {
           data?.map(d => (
             <li key={d.donationID} className='flex flex-wrap py-3'>
               <div className='mr-2 flex items-center'>
-                <Image height={32} width={32} alt='Top Donor' className='rounded-full' src={d.avatarImageURL} />
+                {d.avatarImageURL && (
+                  <Image height={32} width={32} alt='Top Donor' className='rounded-full' src={d.avatarImageURL} />
+                )}
               </div>
               <div className='flex flex-grow justify-between items-center'>
                 <div>
