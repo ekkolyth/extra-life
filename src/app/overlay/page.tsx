@@ -161,7 +161,7 @@ const Overlay = () => {
         leaveFrom='opacity-100'
         leaveTo='opacity-0'>
         <div>
-          <div className='absolute inset-0 flex items-start justify-center pt-52'>
+          <div className='absolute inset-0 flex items-start justify-center pt-52 bg-black/10'>
             {alerts.length > 0 && (
               <div className='font-display'>
                 <h1 className='text-6xl text-center font-bold text-primary'>
