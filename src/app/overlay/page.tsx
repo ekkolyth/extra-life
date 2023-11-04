@@ -19,6 +19,8 @@ import ProgressBar from 'src/components/overlay/progress-bar'
 import { WheelSpins } from 'src/components/overlay/wheel-spins'
 import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
 
+let renders = 0
+
 const Overlay = () => {
   const searchParams = useSearchParams()
   const limited = searchParams.get('limited') === 'true'
@@ -37,6 +39,7 @@ const Overlay = () => {
   // Ably
   const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
   useEffect(() => {
+    renders++
     channel?.subscribe('donation', (msg: Ably.Types.Message) => {
       switch (msg.name) {
         case 'donation':
@@ -100,18 +103,19 @@ const Overlay = () => {
   // alert for each one one at a time for 20 seconds each
   useEffect(() => {
     if (alerts.length > 0) {
+      // Filter alerts to only show one per user
+      const uniqueAlerts = alerts.filter(
+        (alert, index, self) => index === self.findIndex(t => t.displayName === alert.displayName)
+      )
+      setAlerts(uniqueAlerts)
       setDonationAlert(true)
       setPlaying(true)
-      setTimeout(() => {
-        setDonationAlert(false)
-        // Remove the first alert from the queue
-        setAlerts(alerts => alerts.slice(1))
-      }, 15000)
     }
-  }, [alerts])
+  }, [alerts.length])
 
   return (
     <div style={{ width: 1920, height: 1080 }} className='relative'>
+      <p className='absolute top-0 right-0 p-0.5 bg-black'>{renders}</p>
       {/* Confetti */}
       {!limited && (
         <Transition
@@ -129,47 +133,40 @@ const Overlay = () => {
           />
         </Transition>
       )}
-      {/* Small donation Alert */}
-      <Transition
-        show={donationAlert}
-        enter='transition-opacity duration-1000 delay-alert'
-        enterFrom='opacity-0'
-        enterTo='opacity-100'
-        leave='transition-opacity duration-200'
-        leaveFrom='opacity-100'
-        leaveTo='opacity-0'>
-        <div className='absolute inset-0 flex items-start justify-center pt-52'>
-          {alerts.length > 0 && (
-            <div className='font-display'>
-              <h1 className='text-6xl text-center font-bold text-primary'>
-                {alerts[0]?.displayName} donated {formatter.format(alerts[0]?.amount ?? 0)}!
-              </h1>
-              <p className='text-3xl text-center text-gray-900'>{alerts[0]?.message}</p>
-            </div>
-          )}
-        </div>
-      </Transition>
-      {/* Big donation alert */}
+      {/* donation alert */}
       <Transition
         show={donationAlert}
         enter='transition-opacity duration-1000'
         enterFrom='opacity-0'
-        enterTo='opacity-100'
+        enterTo='opacity-100 z-10'
         leave='transition-opacity duration-200'
         leaveFrom='opacity-100'
         leaveTo='opacity-0'>
-        {donationAlert && (
-          <>
-            <ReactPlayer
-              loop={false}
-              playing={playing}
-              onEnded={() => setPlaying(false)}
-              url='/assets/vid/big-alert.webm'
-              width={1920}
-              height={1080}
-            />
-          </>
-        )}
+        <div>
+          <div className='absolute inset-0 flex items-start justify-center pt-52'>
+            {alerts.length > 0 && (
+              <div className='font-display'>
+                <h1 className='text-6xl text-center font-bold text-primary'>
+                  {alerts[0]?.displayName} donated {formatter.format(alerts[0]?.amount ?? 0)}!
+                </h1>
+                <p className='text-3xl text-center text-gray-900'>{alerts[0]?.message}</p>
+              </div>
+            )}
+          </div>
+          <ReactPlayer
+            className='z-50'
+            loop={false}
+            playing={playing}
+            onEnded={() => {
+              setPlaying(false)
+              setDonationAlert(false)
+              setAlerts(alerts => alerts.slice(1))
+            }}
+            url='http://localhost:3000/assets/vid/big-alert.webm'
+            width={1920}
+            height={1080}
+          />
+        </div>
       </Transition>
       {/* Top Rotator */}
       {!limited && (
