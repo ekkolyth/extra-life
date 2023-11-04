@@ -2,29 +2,51 @@
 
 import type { Goal } from '@prisma/client'
 
+import * as Ably from 'ably'
 import dayjs from 'dayjs'
 import Confetti from 'react-confetti'
 import { useQuery } from 'react-query'
+import ReactPlayer from 'react-player'
 import { useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
+import { useSearchParams } from 'next/navigation'
 
+import { ably } from '@/lib/ably'
 import TimeLeft from 'src/components/overlay/time-left'
 import TopRotator from 'src/components/overlay/top-rotator'
+import { Randomizer } from '@/components/overlay/randomizer'
 import ProgressBar from 'src/components/overlay/progress-bar'
 import { WheelSpins } from 'src/components/overlay/wheel-spins'
 import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
-import { Randomizer } from '@/components/overlay/randomizer'
 
 const Overlay = () => {
+  const searchParams = useSearchParams()
+  const limited = searchParams.get('limited') === 'true'
+
   // Rotator State
   const [panel, setPanel] = useState('timeLeft')
   const [goals, setGoals] = useState<Goal[]>([])
   const [alerts, setAlerts] = useState<Donation[]>([])
 
   // Alerts
+  const [playing, setPlaying] = useState(false)
   const [donationAlert, setDonationAlert] = useState(false)
   const [confetti, setConfetti] = useState(false)
   const [timesUp, setTimesUp] = useState(false)
+
+  // Ably
+  const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
+  useEffect(() => {
+    channel?.subscribe('donation', (msg: Ably.Types.Message) => {
+      switch (msg.name) {
+        case 'donation':
+          setAlerts(alerts => [...alerts, msg.data])
+          break
+        default:
+          console.log(msg.name)
+      }
+    })
+  }, [])
 
   useQuery(
     ['extralife', 'latestDonations', 'alerts'],
@@ -79,6 +101,7 @@ const Overlay = () => {
   useEffect(() => {
     if (alerts.length > 0) {
       setDonationAlert(true)
+      setPlaying(true)
       setTimeout(() => {
         setDonationAlert(false)
         // Remove the first alert from the queue
@@ -89,20 +112,24 @@ const Overlay = () => {
 
   return (
     <div style={{ width: 1920, height: 1080 }} className='relative'>
-      <Transition
-        show={confetti}
-        enter='transition-opacity duration-75'
-        enterFrom='opacity-0'
-        enterTo='opacity-100'
-        leave='transition-opacity duration-1000'
-        leaveFrom='opacity-100'
-        leaveTo='opacity-0'>
-        <Confetti
-          width={1920}
-          height={1080}
-          colors={['#5D41DE', '#0E0E10', '#1D4C6C', '#47C2E2', '#6B4BFF', '#5D41DE']}
-        />
-      </Transition>
+      {/* Confetti */}
+      {!limited && (
+        <Transition
+          show={confetti}
+          enter='transition-opacity duration-75'
+          enterFrom='opacity-0'
+          enterTo='opacity-100'
+          leave='transition-opacity duration-1000'
+          leaveFrom='opacity-100'
+          leaveTo='opacity-0'>
+          <Confetti
+            width={1920}
+            height={1080}
+            colors={['#5D41DE', '#0E0E10', '#1D4C6C', '#47C2E2', '#6B4BFF', '#5D41DE']}
+          />
+        </Transition>
+      )}
+      {/* Small donation Alert */}
       <Transition
         show={donationAlert}
         enter='transition-opacity duration-1000 delay-alert'
@@ -111,7 +138,7 @@ const Overlay = () => {
         leave='transition-opacity duration-200'
         leaveFrom='opacity-100'
         leaveTo='opacity-0'>
-        <div className='absolute top-0 left-0 w-full h-full flex items-start justify-center pt-44'>
+        <div className='absolute inset-0 flex items-start justify-center pt-52'>
           {alerts.length > 0 && (
             <div className='font-display'>
               <h1 className='text-6xl text-center font-bold text-primary'>
@@ -122,6 +149,7 @@ const Overlay = () => {
           )}
         </div>
       </Transition>
+      {/* Big donation alert */}
       <Transition
         show={donationAlert}
         enter='transition-opacity duration-1000'
@@ -130,24 +158,42 @@ const Overlay = () => {
         leave='transition-opacity duration-200'
         leaveFrom='opacity-100'
         leaveTo='opacity-0'>
-        <video width='1920' height='1080' autoPlay>
-          <source src='/assets/vid/big-alert.webm' type='video/webm' />
-        </video>
+        {donationAlert && (
+          <>
+            <ReactPlayer
+              loop={false}
+              playing={playing}
+              onEnded={() => setPlaying(false)}
+              url='/assets/vid/big-alert.webm'
+              width={1920}
+              height={1080}
+            />
+          </>
+        )}
       </Transition>
-      <div className='absolute top-12 left-0 right-0 w-full flex justify-center'>
-        <TopRotator goals={goals} />
-      </div>
-      <div className='absolute bottom-12 left-0 right-0 w-full flex justify-center'>
-        <ProgressBar />
-      </div>
-      <div className='absolute bottom-14 right-12'>
-        <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow-super relative'>
-          <TimeLeft visible={panel === 'timeLeft'} timesUp={value => setTimesUp(value)} />
-          <WheelSpins visible={panel === 'wheelSpins'} />
+      {/* Top Rotator */}
+      {!limited && (
+        <div className='absolute top-12 left-0 right-0 w-full flex justify-center'>
+          <TopRotator goals={goals} />
         </div>
-      </div>
+      )}
+      {/* Progress Bar */}
+      {!limited && (
+        <div className='absolute bottom-12 left-0 right-0 w-full flex justify-center'>
+          <ProgressBar />
+        </div>
+      )}
+      {/* Bottom Right Panel */}
+      {!limited && (
+        <div className='absolute bottom-14 right-12'>
+          <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow-super relative'>
+            <TimeLeft visible={panel === 'timeLeft'} timesUp={value => setTimesUp(value)} />
+            <WheelSpins visible={panel === 'wheelSpins'} />
+          </div>
+        </div>
+      )}
       {/* Randomizer View */}
-      <Randomizer setConfetti={setConfetti} />
+      {!limited && <Randomizer setConfetti={setConfetti} />}
     </div>
   )
 }

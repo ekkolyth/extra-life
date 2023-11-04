@@ -41,20 +41,20 @@ export type Donor = {
 
 export type Donation = {
   displayName: string
-  donorID: string
-  links: {
+  donorID?: string
+  links?: {
     recipient: string
   }
-  eventID: number
-  createdDateUTC: string
-  recipientName: string
-  message: string | null
-  participantID: number
+  eventID?: number
+  createdDateUTC?: string
+  recipientName?: string
+  message?: string | null
+  participantID?: number
   amount: number
-  donorIsRecipient: boolean
-  avatarImageURL: string
-  teamID: number
-  donationID: string
+  donorIsRecipient?: boolean
+  avatarImageURL?: string
+  teamID?: number
+  donationID?: string
 }
 
 export const fetchStats = async (id: string) => {

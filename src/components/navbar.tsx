@@ -18,9 +18,9 @@ const Navbar = () => {
     { name: 'Schedule', href: '/admin/schedule', icon: CalendarIcon, current: route === '/admin/schedule' },
     { name: 'Goals', href: '/admin/goals', icon: TrophyIcon, current: route === '/admin/goals' },
     { name: 'Randomizer', href: '/admin/randomizer', icon: FerrisWheelIcon, current: route === '/admin/randomizer' },
-    { name: 'Rotator', href: '/admin/rotator', icon: HistoryIcon, current: route === '/admin/rotator' }
+    { name: 'Rotator', href: '/admin/rotator', icon: HistoryIcon, current: route === '/admin/rotator' },
     // { name: 'Config', href: '/admin/config', icon: CogIcon, current: route === '/admin/config' },
-    // { name: 'Debug', href: '/admin/debug', icon: BugIcon, current: route === '/admin/debug' }
+    { name: 'Debug', href: '/admin/debug', icon: BugIcon, current: route === '/admin/debug' }
   ]
 
   return (
