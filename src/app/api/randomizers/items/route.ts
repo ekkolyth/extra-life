@@ -12,5 +12,15 @@ export async function PUT(request: Request) {
     }
   })
 
+  await prisma.wheelRedemption.create({
+    data: {
+      randomizer: {
+        connect: {
+          id: data.randomizerId
+        }
+      }
+    }
+  })
+
   return Response.json(data)
 }

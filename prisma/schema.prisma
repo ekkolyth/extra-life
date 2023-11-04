@@ -79,9 +79,10 @@ model Segment {
 }
 
 model Randomizer {
-  id    String           @id @default(cuid())
-  name  String
-  items RandomizerItem[]
+  id          String            @id @default(cuid())
+  name        String
+  items       RandomizerItem[]
+  redemptions WheelRedemption[]
 }
 
 model RandomizerItem {
@@ -94,9 +95,11 @@ model RandomizerItem {
 }
 
 model WheelRedemption {
-  id        String   @id @default(cuid())
-  wheelType String
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  randomizerId String
+  createdAt    DateTime @default(now())
+
+  randomizer Randomizer @relation(fields: [randomizerId], references: [id], onDelete: Cascade)
 }
 
 model Config {
