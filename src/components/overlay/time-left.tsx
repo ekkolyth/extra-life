@@ -1,3 +1,5 @@
+'use client'
+
 // Display the current countdown to November 13 at 10am in hours, minutes, and seconds
 // Bonus fun when we reach zero
 import { useEffect, useState } from 'react'

@@ -1,14 +1,14 @@
 'use client'
 
-import { CalendarIcon } from '@heroicons/react/24/outline'
-import { ControllerIcon } from 'src/components/icons/controller'
-import { usePathname } from 'next/navigation'
-import { Button } from './ui/button'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { TrophyIcon } from '@heroicons/react/24/solid'
-import { BugIcon, CogIcon, FerrisWheelIcon, HistoryIcon } from 'lucide-react'
+import { BugIcon, CogIcon, FerrisWheelIcon, HistoryIcon, CalendarIcon } from 'lucide-react'
+
+import { Button } from './ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { ControllerIcon } from 'src/components/icons/controller'
 
 const Navbar = () => {
   const { data } = useSession()
