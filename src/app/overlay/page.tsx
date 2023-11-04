@@ -172,7 +172,7 @@ const Overlay = () => {
             )}
           </div>
           <video width='1920' height='1080' autoPlay>
-            <source src='http://localhost:3000/assets/vid/big-alert.webm' type='video/webm' />
+            <source src='/assets/vid/big-alert.webm' type='video/webm' />
           </video>
           {/* <ReactPlayer
             controls={true}
