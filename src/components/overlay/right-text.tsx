@@ -28,7 +28,9 @@ export function RightText(props: TopRotatorProps) {
     refetchInterval: 5000
   })
   const nextGoal =
-    stats?.sumDonations && goals && goals.length ? goals?.find(goal => goal.amount > stats?.sumDonations) : undefined
+    stats && stats !== 'Rate limited' && goals && goals.length
+      ? goals?.find(goal => goal.amount > stats.sumDonations)
+      : undefined
 
   // Segments
   const { data: segments } = useQuery(
@@ -51,15 +53,17 @@ export function RightText(props: TopRotatorProps) {
     },
     {
       label: 'top donation',
-      text: `${topDonation?.displayName ?? 'Your Mom'} - $${topDonation?.amount ?? '69'}`
+      text: `${typeof topDonation !== 'string' ? topDonation?.displayName : 'Your Mom'} - $${
+        typeof topDonation !== 'string' ? topDonation?.amount : '69'
+      }`
     },
     {
       label: 'top donator',
-      text: `${topDonor?.displayName ?? 'Your Mom'}`
+      text: `${typeof topDonor !== 'string' ? topDonor?.displayName : 'Your Mom'}`
     },
     {
       label: 'next goal unlock',
-      text: `${nextGoal?.title}${nextGoal?.endOfStream ? ` - End Of Stream` : ''}` ?? 'complete!'
+      text: `${nextGoal?.title}${nextGoal?.endOfStream ? ` - End Of Stream` : ''}`
     }
   ]
   const visibleIndex = index % bonusText.length

@@ -20,7 +20,7 @@ const ProgressBar = () => {
     console.log('Fetching Donor Data Failed!\n', error)
   }, [error])
 
-  if (data?.sumDonations === undefined) {
+  if (data === 'Rate limited' || data?.sumDonations === undefined) {
     return null
   }
 
@@ -38,6 +38,7 @@ const ProgressBar = () => {
         <p>{formatter.format(data?.sumDonations)}</p>
       </div>
       <div className={cn(donationPercentage >= 100 ? 'w-32 h-32 right-48' : 'w-16 h-16 right-60', 'absolute bottom-0')}>
+        {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
         <img src={donationPercentage >= 100 ? Scolei.src : LurkMerch.src} />
       </div>
     </div>

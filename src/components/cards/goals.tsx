@@ -35,7 +35,8 @@ export const Goals = (props: GoalsProps) => {
     }
   )
 
-  const nextGoalIndex = data?.sumDonations ? goals.findIndex(goal => goal.amount > data.sumDonations) : 0
+  const nextGoalIndex =
+    data && typeof data !== 'string' && data.sumDonations ? goals.findIndex(goal => goal.amount > data.sumDonations) : 0
 
   return (
     <Card title='Goals' icon={<ChartBarIcon />}>
@@ -51,22 +52,23 @@ export const Goals = (props: GoalsProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {liveGoals?.map((goal, index) => (
-              <TableRow key={goal.id}>
-                <TableCell>
-                  {nextGoalIndex > index ? (
-                    <CheckBadgeIcon className='w-4 h-4 text-green-600' />
-                  ) : (
-                    <ClockIcon className='w-4 h-4 text-gray-400' />
-                  )}
-                </TableCell>
-                <TableCell>
-                  <p className='text-sm'>{goal.title}</p>
-                  <p className='text-primary text-xs font-semibold'>{goal.endOfStream ? 'End Of Stream' : null}</p>
-                </TableCell>
-                <TableCell>{USDollar.format(goal.amount)}</TableCell>
-              </TableRow>
-            ))}
+            {typeof liveGoals !== 'string' &&
+              liveGoals?.map((goal, index) => (
+                <TableRow key={goal.id}>
+                  <TableCell>
+                    {nextGoalIndex > index ? (
+                      <CheckBadgeIcon className='w-4 h-4 text-green-600' />
+                    ) : (
+                      <ClockIcon className='w-4 h-4 text-gray-400' />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <p className='text-sm'>{goal.title}</p>
+                    <p className='text-primary text-xs font-semibold'>{goal.endOfStream ? 'End Of Stream' : null}</p>
+                  </TableCell>
+                  <TableCell>{USDollar.format(goal.amount)}</TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>

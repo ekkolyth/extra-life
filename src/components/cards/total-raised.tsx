@@ -23,16 +23,16 @@ export const TotalRaised = (props: TotalRaisedProps) => {
     refetchInterval: 15000
   })
 
-  if (data === undefined) {
+  if (data === undefined || data === 'Rate limited') {
     return null
   }
 
-  const calculatedPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
+  const calculatedPercentage = percentage(data.sumDonations, data.fundraisingGoal)
 
   return (
     <Card title='Total Raised YTD' icon={<ChartPieIcon />}>
       <div className='flex flex-col items-center justify-center gap-2'>
-        <p className='text-4xl'>{formatter.format(data?.sumDonations)}</p>
+        <p className='text-4xl'>{formatter.format(data.sumDonations)}</p>
         <div className='relative w-full'>
           <Progress className='h-6 w-full' title={`${calculatedPercentage}%`} value={calculatedPercentage} />
           <p className='absolute inset-0 text-center'>{calculatedPercentage}%</p>

@@ -10,6 +10,7 @@ import { Schedule } from '@/components/cards/segments'
 import { getSegments } from '@/actions/segments'
 import { RandomizerCard } from '@/components/cards/randomizers'
 import { getRandomizers } from '@/actions/randomizer'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function AdminPage() {
   const id = process.env.NEXT_PUBLIC_DONORDRIVE_ID
@@ -36,19 +37,38 @@ export default async function AdminPage() {
   return (
     <div className='grid grid-cols-3 gap-4'>
       <div className='flex flex-col gap-y-4'>
-        <TotalRaised data={stats} />
+        {typeof stats !== 'string' ? <TotalRaised data={stats} /> : <RateLimitedCard />}
         <QuickResources />
       </div>
       <div className='flex flex-col gap-y-4'>
         <Schedule segments={segments} />
-        <RandomizerCard randomizers={randomizers} />
-        <LatestDonations data={donations} />
+        {typeof donations !== 'string' ? <RandomizerCard randomizers={randomizers} /> : <RateLimitedCard />}
+        {typeof donations !== 'string' ? <LatestDonations data={donations} /> : <RateLimitedCard />}
       </div>
       <div className='flex flex-col gap-y-4'>
-        <TopDonor data={topDonor} />
-        <NextGoal data={stats} goals={goals} />
-        <Goals data={stats} goals={goals} />
+        {typeof topDonor !== 'string' ? <TopDonor data={topDonor} /> : <RateLimitedCard />}
+        {typeof goals !== 'string' && typeof stats !== 'string' ? (
+          <>
+            <NextGoal data={stats} goals={goals} />
+            <Goals data={stats} goals={goals} />
+          </>
+        ) : (
+          <>
+            <RateLimitedCard />
+            <RateLimitedCard />
+          </>
+        )}
       </div>
     </div>
+  )
+}
+
+function RateLimitedCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className='text-center'>Rate Limited</CardTitle>
+      </CardHeader>
+    </Card>
   )
 }

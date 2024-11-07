@@ -55,9 +55,13 @@ const Overlay = () => {
       refetchInterval: 30000,
       onSuccess(data) {
         // If any of the donations are over $100, add them to the alerts queue
-        const newAlerts = data.filter(
-          donation => donation.amount >= 100 && dayjs(donation.createdDateUTC).isAfter(dayjs().subtract(30, 'seconds'))
-        )
+        const newAlerts =
+          typeof data !== 'string'
+            ? data.filter(
+                donation =>
+                  donation.amount >= 100 && dayjs(donation.createdDateUTC).isAfter(dayjs().subtract(30, 'seconds'))
+              )
+            : []
         setAlerts(alerts => [...alerts, ...newAlerts])
       }
     }

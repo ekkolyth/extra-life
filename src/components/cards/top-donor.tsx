@@ -25,7 +25,7 @@ export const TopDonor = (props: TopDonorProps) => {
     currency: 'USD'
   })
 
-  return (
+  return typeof data !== 'string' ? (
     <Card title='Top Donor' icon={<BanknotesIcon />}>
       <div className='flex items-center'>
         <div className='mr-2 flex items-center'>
@@ -39,6 +39,10 @@ export const TopDonor = (props: TopDonorProps) => {
           <p className='text-xl font-semibold'>{formatter.format(data?.sumDonations ?? 0)}</p>
         </div>
       </div>
+    </Card>
+  ) : (
+    <Card title='Top Donor' icon={<BanknotesIcon />}>
+      <p className='text-3xl font-bold text-primary text-center'>No donations data</p>
     </Card>
   )
 }

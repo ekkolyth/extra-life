@@ -35,9 +35,9 @@ export const LatestDonations = (props: LatestDonationsProps) => {
   return (
     <Card title='Latest Donations' icon={<CurrencyDollarIcon />}>
       <ol className='my-4 flex flex-col divide-y divide-border'>
-        {data &&
+        {Array.isArray(data) &&
           data.length &&
-          data?.map(d => (
+          data.map(d => (
             <li key={d.donationID} className='flex flex-wrap py-3'>
               <div className='mr-2 flex items-center'>
                 {d.avatarImageURL && (

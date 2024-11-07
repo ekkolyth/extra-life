@@ -57,8 +57,48 @@ export type Donation = {
   donationID?: string
 }
 
+let blockedAt: Date | null = null
+
+function isBlocked(id: string) {
+  if (blockedAt === null) {
+    console.log(`ID: ${id}: Not blocked`)
+    return false
+  }
+
+  // 5 minutes
+  const blockedTime = 5 * 60 * 1000
+  const now = new Date().getTime()
+  const blocked = new Date(blockedAt).getTime() + blockedTime
+
+  const blockedTimestamp = Number(blocked)
+  const blockedDate = new Date(blockedTimestamp * 1000) // Convert to milliseconds
+  const humanReadableDate = blockedDate.toLocaleString() // Format to a human-readable string
+
+  // Set blockedAt to null if the block has expired
+  if (now >= blocked) {
+    blockedAt = null
+    return false
+  }
+
+  console.log(`Blocked until ${humanReadableDate}\nID: ${id}`)
+
+  return now < blocked
+}
+
 export const fetchStats = async (id: string) => {
-  return (await fetch(`https://extra-life.org/api/participants/${id}`).then(res => res.json())) as StatsResult
+  if (isBlocked('fetchStats')) {
+    return 'Rate limited'
+  }
+
+  const response = await fetch(`https://extra-life.org/api/participants/${id}`)
+
+  if (response.status === 429) {
+    blockedAt = new Date()
+    console.log(`Rate limited. ${response.status}\n${await response.text()}`)
+    return 'Rate limited'
+  }
+
+  return (await response.json()) as StatsResult
 }
 
 export const formatter = new Intl.NumberFormat('en-US', {
@@ -69,33 +109,87 @@ export const formatter = new Intl.NumberFormat('en-US', {
 export const percentage = (donations: number, goal: number) => Math.floor((donations / goal) * 100)
 
 export const fetchTopDonor = async (id: string) => {
-  return (await fetch(
+  if (isBlocked('fetchTopDonor')) {
+    return 'Rate limited'
+  }
+
+  const response = await fetch(
     `https://extra-life.org/api/participants/${id}/donors?limit=1&orderBy=sumDonations%20DESC&where=amountVisibility%20%3D%20ALL%20AND%20sumDonations%20%3E%200`
   )
-    .then(res => res.json())
-    .then(json => json[0])) as Donor
+
+  if (response.status === 429) {
+    blockedAt = new Date()
+    return 'Rate limited'
+  }
+
+  return (await response.json())[0] as Donor
 }
 
 export const fetchTopDonation = async (id: string) => {
-  return (await fetch(`https://extra-life.org/api/participants/${id}/donations?limit=1&orderBy=amount%20DESC`)
-    .then(res => res.json())
-    .then(json => json[0])) as Donation
+  if (isBlocked('fetchTopDonation')) {
+    return 'Rate limited'
+  }
+
+  const response = await fetch(`https://extra-life.org/api/participants/${id}/donations?limit=1&orderBy=amount%20DESC`)
+  if (response.status === 429) {
+    blockedAt = new Date()
+    return 'Rate limited'
+  }
+
+  return (await response.json())[0] as Donation
 }
 
 export const fetchLatestDonations = async (id: string, limit: number) => {
-  return (await fetch(
+  if (isBlocked('fetchLatestDonations')) {
+    return 'Rate limited'
+  }
+
+  const response = await fetch(
     `https://extra-life.org/api/participants/${id}/donations?limit=${limit}&orderBy=createdDateUTC%20DESC`
-  ).then(res => res.json())) as Donation[]
+  )
+
+  if (response.status === 429) {
+    blockedAt = new Date()
+    return 'Rate limited'
+  }
+
+  return (await response.json()) as Donation[]
 }
 
 export const fetchWheelSpinDonations = async (id: string) => {
-  return (await fetch(`https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`)
-    .then(res => res.json())
-    .then(data => data.filter((d: { amount: number }) => d.amount >= 20 && d.amount <= 99.99))) as Donation[]
+  if (isBlocked('fetchWheelSpinDonations')) {
+    return 'Rate limited'
+  }
+
+  return 'demo'
+  // const response = await fetch(
+  //   `https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`
+  // )
+
+  // if (response.status === 429) {
+  //   blockedAt = new Date()
+  //   console.log(`Rate limited. Waiting ${blockedAt}`)
+  //   return 'Rate limited'
+  // }
+
+  // const json = await response.json()
+  // return json.filter((d: { amount: number }) => d.amount >= 20 && d.amount <= 99.99) as Donation[]
 }
 
 export const fetchBigWheelSpinDonations = async (id: string) => {
-  return (await fetch(`https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`)
-    .then(res => res.json())
-    .then(data => data.filter((d: { amount: number }) => d.amount >= 100))) as Donation[]
+  if (isBlocked('fetchBigWheelSpinDonations')) {
+    return 'Rate limited'
+  }
+
+  const response = await fetch(
+    `https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`
+  )
+
+  if (response.status === 429) {
+    blockedAt = new Date()
+    return 'Rate limited'
+  }
+
+  const json = await response.json()
+  return json.filter((d: { amount: number }) => d.amount >= 100) as Donation[]
 }
