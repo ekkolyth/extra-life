@@ -98,7 +98,9 @@ export const fetchStats = async (id: string) => {
     return 'Rate limited'
   }
 
-  return (await response.json()) as StatsResult
+  const data = (await response.json()) as StatsResult
+
+  return data
 }
 
 export const formatter = new Intl.NumberFormat('en-US', {

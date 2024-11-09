@@ -24,7 +24,7 @@ export function RightText(props: TopRotatorProps) {
   const { data: topDonor } = useQuery(['topDonor'], () => fetchTopDonor(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)))
 
   // Goals
-  const { data: stats } = useQuery(['donors'], () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)), {
+  const { data: stats } = useQuery(['stats'], () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)), {
     refetchInterval: 5000
   })
   const nextGoal =
@@ -66,6 +66,10 @@ export function RightText(props: TopRotatorProps) {
     {
       label: 'next goal unlock',
       text: `${nextGoal?.title}${nextGoal?.endOfStream ? ` - End Of Stream` : ''}`
+    },
+    {
+      label: 'HEY',
+      text: `FUCK YOU`
     }
   ]
   const visibleIndex = index % bonusText.length
