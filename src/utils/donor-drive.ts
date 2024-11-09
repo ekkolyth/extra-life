@@ -161,19 +161,18 @@ export const fetchWheelSpinDonations = async (id: string) => {
     return 'Rate limited'
   }
 
-  return 'demo'
-  // const response = await fetch(
-  //   `https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`
-  // )
+  const response = await fetch(
+    `https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`
+  )
 
-  // if (response.status === 429) {
-  //   blockedAt = new Date()
-  //   console.log(`Rate limited. Waiting ${blockedAt}`)
-  //   return 'Rate limited'
-  // }
+  if (response.status === 429) {
+    blockedAt = new Date()
+    console.log(`Rate limited. Waiting ${blockedAt}`)
+    return 'Rate limited'
+  }
 
-  // const json = await response.json()
-  // return json.filter((d: { amount: number }) => d.amount >= 20 && d.amount <= 99.99) as Donation[]
+  const json = await response.json()
+  return json.filter((d: { amount: number }) => d.amount >= 20 && d.amount <= 99.99) as Donation[]
 }
 
 export const fetchBigWheelSpinDonations = async (id: string) => {

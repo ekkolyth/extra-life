@@ -20,7 +20,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
   const { randomizers } = props
   const [left, setLeft] = useState(0)
   const [total, setTotal] = useState(0)
-  const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
+  const [channel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
 
   useQuery(
     ['extralife', 'wheelSpinDonations'],
