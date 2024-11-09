@@ -11,6 +11,7 @@ import { getSegments } from '@/actions/segments'
 import { RandomizerCard } from '@/components/cards/randomizers'
 import { getRandomizers } from '@/actions/randomizer'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
+import WheelSpins from '@/components/cards/wheel-spins'
 
 export default async function AdminPage() {
   const id = process.env.NEXT_PUBLIC_DONORDRIVE_ID

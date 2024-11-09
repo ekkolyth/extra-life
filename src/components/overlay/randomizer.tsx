@@ -1,6 +1,7 @@
 'use client'
 
 import type { NestedRandomizer } from '@/types'
+import type { RandomizerItem } from '@prisma/client'
 
 import * as Ably from 'ably'
 import { Transition } from '@headlessui/react'
@@ -32,38 +33,24 @@ export function Randomizer(props: RandomizerProps) {
   })
 
   const { channel } = useChannel('randomizers', (message: Ably.Types.Message) => {
-    function spinTheWheel(randomizer: NestedRandomizer) {
-      if (!channel) {
-        console.error('No channel is available to spin the wheel.')
-        return
-      }
-
-      // Determine the answer and let the channel know
-      const random = Math.floor(Math.random() * randomizer.items.length)
-      channel.publish({
-        name: 'randomizer-end',
-        data: {
-          id: randomizer.id,
-          name: randomizer.name,
-          answer: {
-            id: randomizer.items[random].id,
-            name: randomizer.items[random].name
-          }
-        }
-      })
-
-      setSpinning(true)
-      setChoices(randomizer.items.map(item => item.name))
-
+    if (message.name === 'wheel-spin') {
+      // Set the choices
+      setChoices(message.data.randomizer.items.map((item: RandomizerItem) => item.name))
       const interval = setInterval(() => {
         setChoiceIndex(choiceIndex => choiceIndex + 1)
       }, 100)
 
+      // Show the spinner
+      setVisible(true)
+      setSpinning(true)
+
       // After 3 seconds, make the choice visible and run confetti
       setTimeout(() => {
         clearInterval(interval)
+        setChoiceIndex(
+          message.data.randomizer.items.findIndex((item: RandomizerItem) => item.id === message.data.answer.id)
+        )
         setConfetti(true)
-        setChoiceIndex(random)
       }, 3000)
 
       // After 4 seconds, stop spinning
@@ -87,20 +74,6 @@ export function Randomizer(props: RandomizerProps) {
         setChoiceIndex(0)
         setChoices([])
       }, 10000)
-    }
-    switch (message.name) {
-      case 'randomizer-start':
-        const randomizer = randomizers.find(randomizer => randomizer.id === message.data)
-        if (randomizer) {
-          setVisible(true)
-          setTimeout(() => {
-            spinTheWheel(randomizer)
-          }, 1000)
-        }
-        break
-      default:
-        console.log('Unknown message type:', message)
-        break
     }
   })
 

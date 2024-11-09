@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Randomizer } from '@prisma/client'
+import { Randomizer, RandomizerItem } from '@prisma/client'
 import { FerrisWheelIcon } from 'lucide-react'
 
 import Card from './card'
@@ -12,8 +12,12 @@ import { Button } from '@/components/ui/button'
 import { useQuery } from 'react-query'
 import { fetchWheelSpinDonations } from '@/utils/donor-drive'
 
+interface RandomizerWithItems extends Randomizer {
+  items: RandomizerItem[]
+}
+
 interface RandomizerCardProps {
-  randomizers: Randomizer[]
+  randomizers: RandomizerWithItems[]
 }
 
 export function RandomizerCard(props: RandomizerCardProps) {
@@ -45,31 +49,40 @@ export function RandomizerCard(props: RandomizerCardProps) {
     }
   )
 
-  useEffect(() => {
-    if (channel) {
-      channel.subscribe((message: Ably.Types.Message) => {
-        switch (message.name) {
-          case 'randomizer-end':
-            console.log('randomizer-end', message.data)
-            fetch(`/api/randomizers/items`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                id: message.data.answer.id
-              })
-            })
-            break
-          case 'randomizer-start':
-            console.log('randomizer-start', message.data)
-            break
-          default:
-            console.log('Unknown message type:', message)
-        }
-      })
+  function handleWheelSpin(id: string) {
+    // Get options for the given wheel
+    const items = randomizers.find(randomizer => randomizer.id === id)?.items
+
+    // Pick one at random that has available redemptions
+    const availableItems = items?.filter(item => item.redeemed < item.limit)
+    const winner = availableItems?.[Math.floor(Math.random() * availableItems.length)]
+
+    if (!winner) {
+      console.error('No winner found')
+      return
     }
-  }, [channel])
+
+    // Redeem the item on the backend
+    fetch(`/api/randomizers/items`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: winner.id
+      })
+    })
+
+    // Publish the winner
+    channel?.publish({
+      name: 'wheel-spin',
+      data: {
+        id,
+        answer: winner,
+        randomizer: randomizers.find(randomizer => randomizer.id === id)
+      }
+    })
+  }
 
   return (
     <Card title='Randomizers' icon={<FerrisWheelIcon />}>
@@ -94,14 +107,15 @@ export function RandomizerCard(props: RandomizerCardProps) {
               <p>{randomizer.name}</p>
               {channel && (
                 <Button
-                  disabled={left === 0}
+                  // disabled={left === 0}
                   variant='link'
-                  onClick={() =>
-                    channel.publish({
-                      name: 'randomizer-start',
-                      data: randomizer.id
-                    })
-                  }>
+                  onClick={() => {
+                    handleWheelSpin(randomizer.id)
+                    // channel.publish({
+                    //   name: 'randomizer-start',
+                    //   data: randomizer.id
+                    // })
+                  }}>
                   Trigger
                 </Button>
               )}

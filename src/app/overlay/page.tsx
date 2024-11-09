@@ -37,7 +37,7 @@ const Overlay = () => {
   const [timesUp, setTimesUp] = useState(false)
 
   // Ably
-  const [channel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
+  const [channel] = useState<Ably.Types.RealtimeChannelPromise | null>(() => ably.channels.get('randomizers'))
   useEffect(() => {
     channel?.subscribe('donation', (msg: Ably.Types.Message) => {
       switch (msg.name) {

@@ -28,7 +28,7 @@ export const WheelSpins = ({ visible }: { visible: boolean }) => {
   )
 
   // Any donation over 20.22 and under 99.99 counts as 1 spin
-  const [left, setLeft] = useState(6)
+  const [left, setLeft] = useState(0)
   const [total, setTotal] = useState(0)
 
   return (
