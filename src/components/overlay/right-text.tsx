@@ -15,31 +15,37 @@ interface TopRotatorProps {
 export function RightText(props: TopRotatorProps) {
   const { goals } = props
   const [index, setIndex] = useState(0)
+  const [nextGoal, setNextGoal] = useState<Goal | null>(null)
 
   // Donations
-  const { data: topDonation } = useQuery(['topDonation'], () =>
-    fetchTopDonation(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID))
-  )
-  const { data: topDonor } = useQuery(['topDonor'], () => fetchTopDonor(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)))
+  const { data: topDonation } = useQuery({
+    queryKey: ['topDonation'],
+    queryFn: () => fetchTopDonation(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID))
+  })
+  const { data: topDonor } = useQuery({
+    queryKey: ['topDonor'],
+    queryFn: () => fetchTopDonor(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID))
+  })
 
   // Goals
-  const { data: stats } = useQuery(['stats'], () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)), {
+  const { data: stats } = useQuery({
+    queryKey: ['stats'],
+    queryFn: () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
     refetchInterval: 5000
   })
-  const nextGoal = () => {
+
+  useEffect(() => {
     if (stats && stats !== 'Rate limited' && goals && goals.length) {
-      return goals?.find(goal => goal.amount > stats.sumDonations)
+      setNextGoal(goals?.find(goal => goal.amount > stats.sumDonations) ?? null)
     }
-  }
+  }, [stats, goals])
 
   // Segments
-  const { data: segments } = useQuery(
-    ['segments'],
-    () => fetch('/api/segments').then(res => res.json()) as Promise<Segment[]>,
-    {
-      refetchInterval: 5000
-    }
-  )
+  const { data: segments } = useQuery({
+    queryKey: ['segments'],
+    queryFn: () => fetch('/api/segments').then(res => res.json()) as Promise<Segment[]>,
+    refetchInterval: 5000
+  })
   const { currentSegment, nextSegment } = useSegments(segments ?? [])
 
   const bonusText: { label: string; text: string }[] = [
@@ -65,12 +71,12 @@ export function RightText(props: TopRotatorProps) {
     },
     {
       label: 'next goal unlock',
-      text: nextGoal() ? `${nextGoal()?.title}${nextGoal()?.endOfStream ? ` - End Of Stream` : ''}` : ''
+      text: nextGoal ? `${nextGoal?.title}${nextGoal?.endOfStream ? ` - End Of Stream` : ''}` : ''
     }
   ]
   const visibleIndex = index % bonusText.length
 
-  // Every 3 seconds increment the index
+  // Every 7 seconds increment the index
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex(prevIndex => prevIndex + 1)
