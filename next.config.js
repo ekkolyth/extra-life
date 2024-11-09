@@ -6,6 +6,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'assets.donordrive.com',
         port: ''
+      },
+      {
+        protocol: 'https',
+        hostname: 'donordrivecontent.com',
+        port: ''
       }
     ]
   },
