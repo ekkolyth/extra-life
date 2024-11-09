@@ -3,63 +3,44 @@ import type { Segment } from '@prisma/client'
 import { set } from 'date-fns'
 import { useEffect, useState } from 'react'
 
-export function useSegments(segments?: Segment[]) {
-  const [now, setNow] = useState(new Date())
+export function useSegments(segments: Segment[]) {
   const [currentSegment, setCurrentSegment] = useState<Segment | null>(null)
   const [nextSegment, setNextSegment] = useState<Segment | null>(null)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date())
-    }, 5000)
+    const updateSegments = () => {
+      const now = new Date()
+      let current: Segment | null = null
+      let next: Segment | null = null
 
-    return () => clearInterval(timer)
-  }, [])
+      for (let i = 0; i < segments.length; i++) {
+        const event = segments[i]
+        const [hours, minutes] = event.startsAt.split(':').map(Number)
+        const eventStart = new Date(now)
+        eventStart.setHours(hours, minutes, 0, 0)
 
-  useEffect(() => {
-    if (segments && segments.length) {
-      const current = segments?.find(segment => {
-        const start = set(now, {
-          hours: Number(segment.startsAt.split(':')[0]),
-          minutes: Number(segment.startsAt.split(':')[1]),
-          seconds: 0
-        })
-        const end = set(now, {
-          hours: Number(segment.startsAt.split(':')[0]) + Number(segment.duration) / 2,
-          minutes: Number(segment.startsAt.split(':')[1]) + (Number(segment.duration) % 2) * 30,
-          seconds: 0
-        })
+        const eventEnd = new Date(eventStart)
+        eventEnd.setMinutes(eventEnd.getMinutes() + event.duration * 30)
 
-        if (now > start && now < end) return true
-      })
+        if (now >= eventStart && now < eventEnd) {
+          current = event
+          next = segments[i + 1] || null
+          break
+        } else if (now < eventStart) {
+          next = event
+          break
+        }
+      }
 
-      const next = segments
-        ?.sort((a, b) => {
-          const aHour = Number(a.startsAt.split(':')[0])
-          const aMinute = Number(a.startsAt.split(':')[1])
-          const bHour = Number(b.startsAt.split(':')[0])
-          const bMinute = Number(b.startsAt.split(':')[1])
-
-          if (aHour > bHour) return 1
-          if (aHour < bHour) return -1
-          if (aMinute > bMinute) return 1
-          if (aMinute < bMinute) return -1
-          return 0
-        })
-        .find(segment => {
-          const start = set(now, {
-            hours: Number(segment.startsAt.split(':')[0]),
-            minutes: Number(segment.startsAt.split(':')[1]),
-            seconds: 0
-          })
-
-          if (now < start) return true
-        })
-
-      setCurrentSegment(current ?? null)
-      setNextSegment(next ?? null)
+      setCurrentSegment(current)
+      setNextSegment(next)
     }
-  }, [now, segments])
+
+    updateSegments()
+    const interval = setInterval(updateSegments, 60000) // Update every minute
+
+    return () => clearInterval(interval)
+  }, [segments])
 
   return { currentSegment, nextSegment }
 }

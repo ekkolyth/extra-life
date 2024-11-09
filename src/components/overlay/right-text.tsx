@@ -41,7 +41,7 @@ export function RightText(props: TopRotatorProps) {
       refetchInterval: 5000
     }
   )
-  const { currentSegment, nextSegment } = useSegments(segments)
+  const { currentSegment, nextSegment } = useSegments(segments ?? [])
 
   const bonusText: { label: string; text: string }[] = [
     {
