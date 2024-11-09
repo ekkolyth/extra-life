@@ -19,6 +19,8 @@ import ProgressBar from 'src/components/overlay/progress-bar'
 import { WheelSpins } from 'src/components/overlay/wheel-spins'
 import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive'
 
+import 'src/app/overlay.css'
+
 const Overlay = () => {
   const searchParams = useSearchParams()
   const limited = searchParams.get('limited') === 'true'
