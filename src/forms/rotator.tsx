@@ -32,7 +32,7 @@ export function RotatorForm(props: RotatorFormProps) {
   const [, startTransition] = useTransition()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { items } ?? { items: [] }
+    defaultValues: { items }
   })
   const { fields, append, remove } = useFieldArray({
     control: form.control,
