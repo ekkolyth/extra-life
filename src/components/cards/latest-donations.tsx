@@ -46,7 +46,7 @@ export const LatestDonations = (props: LatestDonationsProps) => {
               </div>
               <div className='flex flex-grow justify-between items-center'>
                 <div>
-                  <p className='font-semibold'>{d.displayName}</p>
+                  <p className='font-semibold'>{d.displayName ?? 'Anonymous'}</p>
                   <p className='text-xs -mt-1 text-primary'>{dayjs(d.createdDateUTC).fromNow()}</p>
                 </div>
                 <p className='font-semibold'>{formatter.format(d.amount)}</p>

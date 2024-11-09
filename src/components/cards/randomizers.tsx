@@ -76,11 +76,16 @@ export function RandomizerCard(props: RandomizerCardProps) {
       <p className='text-destructive font-bold text-xs -mt-6 mb-4'>
         Do not close this page once a randomizer is triggered, until it is finished spinning.
       </p>
-      <div>
+      <div className='flex flex-col items-start'>
         <h3>Spins</h3>
-        <p className='font-bold text-4xl text-white'>
-          {left} / {total}
-        </p>
+        <div className='grid grid-cols-3 items-center justify-center'>
+          <p className='font-bold text-4xl text-white'>{left}</p>
+          <p className='px-2 text-xl'>/</p>
+          <p className='font-bold text-4xl text-white'>{total}</p>
+          <p className='text-xs text-muted-foreground'>Left</p>
+          <p></p>
+          <p className='text-xs text-muted-foreground'>Total</p>
+        </div>
       </div>
       <ul>
         {randomizers.length > 0 ? (
@@ -89,6 +94,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
               <p>{randomizer.name}</p>
               {channel && (
                 <Button
+                  disabled={left === 0}
                   variant='link'
                   onClick={() =>
                     channel.publish({

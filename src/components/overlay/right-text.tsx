@@ -45,21 +45,23 @@ export function RightText(props: TopRotatorProps) {
   const bonusText: { label: string; text: string }[] = [
     {
       label: 'right now',
-      text: currentSegment?.title ?? 'loading...'
+      text: currentSegment?.title ?? ''
     },
     {
       label: 'up next',
-      text: nextSegment?.title ?? 'loading...'
+      text: nextSegment?.title ?? ''
     },
     {
       label: 'top donation',
-      text: `${typeof topDonation !== 'string' ? topDonation?.displayName : 'Your Mom'} - $${
-        typeof topDonation !== 'string' ? topDonation?.amount : '69'
-      }`
+      text: topDonation
+        ? `${typeof topDonation !== 'string' ? topDonation?.displayName ?? 'Anonymous' : 'Your Mom'} - $${
+            typeof topDonation !== 'string' ? topDonation?.amount : '69'
+          }`
+        : ''
     },
     {
       label: 'top donator',
-      text: `${typeof topDonor !== 'string' ? topDonor?.displayName : 'Your Mom'}`
+      text: topDonor ? `${typeof topDonor !== 'string' ? topDonor?.displayName : 'Your Mom'}` : ''
     },
     {
       label: 'next goal unlock',

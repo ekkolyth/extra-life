@@ -46,6 +46,7 @@ const Overlay = () => {
           console.log(msg.name)
       }
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useQuery(
@@ -134,7 +135,7 @@ const Overlay = () => {
         clearTimeout(endTimeout)
       }
     }
-  }, [alerts.length])
+  }, [alerts])
 
   return (
     <div style={{ width: 1920, height: 1080 }} className='relative'>
