@@ -15,7 +15,6 @@ interface TopRotatorProps {
 export function RightText(props: TopRotatorProps) {
   const { goals } = props
   const [index, setIndex] = useState(0)
-  const [text, setText] = useState<{ label: string; text: string }[]>([])
 
   // Donations
   const { data: topDonation } = useQuery(['topDonation'], () =>

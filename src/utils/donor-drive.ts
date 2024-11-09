@@ -61,7 +61,6 @@ let blockedAt: Date | null = null
 
 function isBlocked(id: string) {
   if (blockedAt === null) {
-    console.log(`ID: ${id}: Not blocked`)
     return false
   }
 
