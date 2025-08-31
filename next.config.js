@@ -14,10 +14,7 @@ const nextConfig = {
       }
     ]
   },
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
-    serverComponentsExternalPackages: ['convex']
-  }
+  serverExternalPackages: ['convex']
 }
 
 module.exports = nextConfig

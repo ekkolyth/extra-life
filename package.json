@@ -52,7 +52,7 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.291.0",
-    "next": "^14.2.32",
+    "next": "^15.5.0",
     "next-themes": "^0.4.6",
     "react": "^18.3.1",
     "react-confetti": "^6.4.0",
@@ -79,9 +79,10 @@
     "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.32",
+    "eslint-config-next": "^15.5.0",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/postcss": "^4.1.0",
     "typescript": "^5.9.2"
   },
   "packageManager": "pnpm@9.0.0"
