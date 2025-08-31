@@ -1,30 +1,32 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { Randomizer, RandomizerItem } from '@/types/db'
-import { FerrisWheelIcon } from 'lucide-react'
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { Randomizer, RandomizerItem } from '@/types/db';
+import { FerrisWheelIcon } from 'lucide-react';
 
-import Card from './card'
-import * as Ably from 'ably'
-import { ably } from '@/lib/ably'
-import { Button } from '@/components/ui/button'
-import { useQuery } from 'react-query'
-import { fetchWheelSpinDonations } from '@/utils/donor-drive'
+import Card from './card';
+import * as Ably from 'ably';
+import { ably } from '@/lib/ably';
+import { Button } from '@/components/ui/button';
+import { useQuery } from 'react-query';
+import { fetchWheelSpinDonations } from '@/utils/donor-drive';
 
 interface RandomizerWithItems extends Randomizer {
-  items: RandomizerItem[]
+  items: RandomizerItem[];
 }
 
 interface RandomizerCardProps {
-  randomizers: RandomizerWithItems[]
+  randomizers: RandomizerWithItems[];
 }
 
 export function RandomizerCard(props: RandomizerCardProps) {
-  const { randomizers } = props
-  const [left, setLeft] = useState(0)
-  const [total, setTotal] = useState(0)
-  const [channel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
+  const { randomizers } = props;
+  const [left, setLeft] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [channel] = useState<Ably.Types.RealtimeChannelPromise | null>(
+    ably?.channels.get('randomizers') || null
+  );
 
   useQuery(
     ['extralife', 'wheelSpinDonations'],
@@ -32,46 +34,46 @@ export function RandomizerCard(props: RandomizerCardProps) {
     {
       refetchInterval: 5000,
       onSuccess(data) {
-        setTotal(data.length)
-      }
+        setTotal(data.length);
+      },
     }
-  )
+  );
   useQuery(
     ['redemptions'],
-    () => fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`).then(res => res.json()),
+    () => fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`).then((res) => res.json()),
     {
       cacheTime: 0,
       refetchInterval: 5000,
       onSuccess(data) {
-        console.log('redemptions', data)
-        setLeft(total - data.length)
-      }
+        console.log('redemptions', data);
+        setLeft(total - data.length);
+      },
     }
-  )
+  );
 
   function handleWheelSpin(id: string) {
     // Get options for the given wheel
-    const items = randomizers.find(randomizer => randomizer.id === id)?.items
+    const items = randomizers.find((randomizer) => randomizer.id === id)?.items;
 
     // Pick one at random that has available redemptions
-    const availableItems = items?.filter(item => item.redeemed < item.limit)
-    const winner = availableItems?.[Math.floor(Math.random() * availableItems.length)]
+    const availableItems = items?.filter((item) => item.redeemed < item.limit);
+    const winner = availableItems?.[Math.floor(Math.random() * availableItems.length)];
 
     if (!winner) {
-      console.error('No winner found')
-      return
+      console.error('No winner found');
+      return;
     }
 
     // Redeem the item on the backend
     fetch(`/api/randomizers/items`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: winner.id
-      })
-    })
+        id: winner.id,
+      }),
+    });
 
     // Publish the winner
     channel?.publish({
@@ -79,9 +81,9 @@ export function RandomizerCard(props: RandomizerCardProps) {
       data: {
         id,
         answer: winner,
-        randomizer: randomizers.find(randomizer => randomizer.id === id)
-      }
-    })
+        randomizer: randomizers.find((randomizer) => randomizer.id === id),
+      },
+    });
   }
 
   return (
@@ -102,7 +104,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
       </div>
       <ul>
         {randomizers.length > 0 ? (
-          randomizers.map(randomizer => (
+          randomizers.map((randomizer) => (
             <li key={randomizer.id} className='flex justify-between items-center'>
               <p>{randomizer.name}</p>
               {channel && (
@@ -110,12 +112,13 @@ export function RandomizerCard(props: RandomizerCardProps) {
                   // disabled={left === 0}
                   variant='link'
                   onClick={() => {
-                    handleWheelSpin(randomizer.id)
+                    handleWheelSpin(randomizer.id);
                     // channel.publish({
                     //   name: 'randomizer-start',
                     //   data: randomizer.id
                     // })
-                  }}>
+                  }}
+                >
                   Trigger
                 </Button>
               )}
@@ -131,5 +134,5 @@ export function RandomizerCard(props: RandomizerCardProps) {
         )}
       </ul>
     </Card>
-  )
+  );
 }

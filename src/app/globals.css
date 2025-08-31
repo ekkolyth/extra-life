@@ -55,7 +55,15 @@
     --destructive-foreground: 210 20% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
-    --ring: 258 90% 66%; /* TailwindCSS violet 500 */ --sidebar-background: 240 5.9% 10%; --sidebar-foreground: 240 4.8% 95.9%; --sidebar-primary: 224.3 76.3% 48%; --sidebar-primary-foreground: 0 0% 100%; --sidebar-accent: 240 3.7% 15.9%; --sidebar-accent-foreground: 240 4.8% 95.9%; --sidebar-border: 240 3.7% 15.9%; --sidebar-ring: 217.2 91.2% 59.8%;
+    --ring: 258 90% 66%; /* TailwindCSS violet 500 */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -65,7 +73,9 @@
   }
   body {
     @apply bg-transparent text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
   .app {
     @apply bg-background;
@@ -83,7 +93,9 @@
   font-family: 'Heavitas Regular';
   font-style: normal;
   font-weight: normal;
-  src: local('Heavitas Regular'), url('/assets/fonts/Heavitas.woff') format('woff');
+  src:
+    local('Heavitas Regular'),
+    url('/assets/fonts/Heavitas.woff') format('woff');
 }
 
 .shadow-super {
@@ -99,4 +111,4 @@
   }
 }
 
-@import "@clerk/themes/shadcn.css"
+@import '@clerk/themes/shadcn.css';

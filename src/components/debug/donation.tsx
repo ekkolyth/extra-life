@@ -1,35 +1,44 @@
-'use client'
+'use client';
 
-import { z } from 'zod'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import * as Ably from 'ably'
-import { ably } from '@/lib/ably'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import * as Ably from 'ably';
+import { ably } from '@/lib/ably';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 const formSchema = z.object({
   displayName: z.string(),
-  amount: z.coerce.number()
-})
+  amount: z.coerce.number(),
+});
 
 export function DonationTrigger() {
-  const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(ably.channels.get('randomizers'))
+  const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(
+    ably?.channels.get('randomizers') || null
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       displayName: '',
-      amount: 0
-    }
-  })
+      amount: 0,
+    },
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    channel?.publish('donation', values)
-    form.reset()
+    channel?.publish('donation', values);
+    form.reset();
   }
 
   return (
@@ -67,5 +76,5 @@ export function DonationTrigger() {
         </form>
       </Form>
     </section>
-  )
+  );
 }
