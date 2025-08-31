@@ -2,12 +2,12 @@
 
 import * as z from 'zod'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 import { formSchema } from '@/forms/randomizer'
 import { revalidatePath } from 'next/cache'
 
 export async function getRandomizers() {
-  const randomizers = await prisma.randomizer.findMany({
+  const randomizers = await db.randomizer.findMany({
     include: {
       items: true
     }
@@ -17,7 +17,7 @@ export async function getRandomizers() {
 
 export async function createRandomizer(data: z.infer<typeof formSchema>) {
   const { name, items } = data
-  await prisma.randomizer.create({
+  await db.randomizer.create({
     data: {
       name,
       items: {
@@ -31,7 +31,7 @@ export async function createRandomizer(data: z.infer<typeof formSchema>) {
 
 export async function updateRandomizer(id: string, data: z.infer<typeof formSchema>) {
   const { name, items } = data
-  await prisma.randomizer.update({
+  await db.randomizer.update({
     where: {
       id
     },
@@ -50,7 +50,7 @@ export async function updateRandomizer(id: string, data: z.infer<typeof formSche
 export async function deleteRandomizer(id: string) {
   console.log(id)
 
-  await prisma.randomizer.delete({
+  await db.randomizer.delete({
     where: {
       id: id.toString()
     }

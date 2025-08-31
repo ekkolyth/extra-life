@@ -1,4 +1,4 @@
-import type { Segment } from '@prisma/client'
+import type { Segment } from '@/types/db'
 
 import { set } from 'date-fns'
 import { useEffect, useState } from 'react'

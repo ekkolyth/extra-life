@@ -1,6 +1,6 @@
 'use client'
 
-import { Segment } from '@prisma/client'
+import { Segment } from '@/types/db'
 import { CalendarIcon } from 'lucide-react'
 
 import Card from './card'

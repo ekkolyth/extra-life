@@ -1,18 +1,18 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function getSegments() {
-  const segments = await prisma.segment.findMany()
+  const segments = await db.segment.findMany()
 
   revalidatePath('/admin/schedule')
   return segments
 }
 
 export async function createSegment(prevState: any, formData: FormData) {
-  await prisma.segment.create({
+  await db.segment.create({
     data: {
       title: String(formData.get('title')),
       startsAt: String(formData.get('startsAt')),
@@ -27,7 +27,7 @@ export async function createSegment(prevState: any, formData: FormData) {
 export async function deleteSegment(formData: FormData) {
   const id = String(formData.get('id'))
 
-  await prisma.segment.delete({
+  await db.segment.delete({
     where: {
       id
     }

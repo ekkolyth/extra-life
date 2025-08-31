@@ -1,6 +1,6 @@
 'use client'
 
-import type { Goal, Segment } from '@prisma/client'
+import type { Goal, Segment } from '@/types/db'
 
 import { useQuery } from 'react-query'
 import { useEffect, useState } from 'react'

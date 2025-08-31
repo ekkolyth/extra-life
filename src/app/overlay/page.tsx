@@ -1,6 +1,6 @@
 'use client'
 
-import type { Goal } from '@prisma/client'
+import type { Goal } from '@/types/db'
 
 import * as Ably from 'ably'
 import dayjs from 'dayjs'

@@ -1,5 +1,6 @@
 import { getRandomizers } from '@/actions/randomizer'
 import { RandomizerForm } from '@/forms/randomizer'
+import type { Randomizer } from '@/types/db'
 
 export default async function RandomizerPage() {
   const randomizersData = getRandomizers()
@@ -8,7 +9,7 @@ export default async function RandomizerPage() {
 
   return (
     <div className='space-y-6'>
-      {randomizers.map(randomizer => (
+      {randomizers.map((randomizer: Randomizer) => (
         <RandomizerForm key={randomizer.id} randomizer={randomizer} />
       ))}
       <RandomizerForm />

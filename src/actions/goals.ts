@@ -1,11 +1,11 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function getGoals() {
-  const goals = await prisma.goal.findMany({
+  const goals = await db.goal.findMany({
     orderBy: {
       amount: 'asc'
     }
@@ -19,7 +19,7 @@ export async function createGoal(prevState: any, formData: FormData) {
   const amount = Number(formData.get('amount'))
   const endOfStream = Boolean(formData.get('endOfStream'))
 
-  await prisma.goal.create({
+  await db.goal.create({
     data: {
       title: title,
       amount: amount,
@@ -37,7 +37,7 @@ export async function updateGoal(prevState: any, formData: FormData) {
   const amount = Number(formData.get('amount'))
   const endOfStream = Boolean(formData.get('endOfStream'))
 
-  await prisma.goal.update({
+  await db.goal.update({
     where: { id },
     data: {
       title: title,
@@ -53,7 +53,7 @@ export async function updateGoal(prevState: any, formData: FormData) {
 export async function deleteGoal(formData: FormData) {
   const id = String(formData.get('id'))
 
-  await prisma.goal.delete({
+  await db.goal.delete({
     where: { id }
   })
 

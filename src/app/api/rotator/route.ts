@@ -1,7 +1,7 @@
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 
 export async function GET() {
-  const rotators = await prisma.rotator.findMany({})
+  const rotators = await db.rotator.findMany()
 
   return Response.json(rotators)
 }

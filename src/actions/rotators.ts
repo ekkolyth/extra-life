@@ -1,7 +1,7 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { Rotator } from '@prisma/client'
+import { db } from '@/lib/convex'
+import type { Rotator } from '@/types/db'
 import { revalidatePath } from 'next/cache'
 
 interface UpdateRotatorsPayload {
@@ -14,10 +14,10 @@ export async function updateRotators(data: UpdateRotatorsPayload) {
   if (!items) throw new Error('No items provided')
 
   // Delete existing rotator items
-  await prisma.rotator.deleteMany({})
+  await db.rotator.deleteMany()
 
   // // Create new rotator items
-  await prisma.rotator.createMany({
+  await db.rotator.createMany({
     data: items
       .filter(items => items.text !== '')
       .map((item: any) => ({

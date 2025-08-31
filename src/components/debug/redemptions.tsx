@@ -1,6 +1,6 @@
 'use client'
 
-import type { Randomizer } from '@prisma/client'
+import type { Randomizer } from '@/types/db'
 
 import { Button } from '../ui/button'
 

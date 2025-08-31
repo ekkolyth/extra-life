@@ -1,7 +1,7 @@
 'use client'
 
 import type { NestedRandomizer } from '@/types'
-import type { RandomizerItem } from '@prisma/client'
+import type { RandomizerItem } from '@/types/db'
 
 import * as Ably from 'ably'
 import { Transition } from '@headlessui/react'

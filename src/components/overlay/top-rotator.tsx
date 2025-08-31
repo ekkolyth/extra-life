@@ -1,6 +1,6 @@
 'use client'
 
-import type { Goal } from '@prisma/client'
+import type { Goal } from '@/types/db'
 
 import ELControllerDice from '@/assets/img/EL_controllerdice.png'
 import { LeftText } from './left-text'

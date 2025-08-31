@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button'
 import { createGoal, updateGoal } from '@/actions/goals'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { DialogClose } from '@/components/ui/dialog'
-import { useActionState } from 'react'
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -31,7 +30,7 @@ interface GoalFormProps {
 
 export function GoalForm(props: GoalFormProps) {
   const { defaultValues } = props
-  const [state, formAction] = useActionState(defaultValues ? updateGoal : createGoal, initialState as any)
+  const [state, formAction] = useFormState(defaultValues ? updateGoal : createGoal, initialState as any)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

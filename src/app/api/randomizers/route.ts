@@ -1,18 +1,18 @@
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 
 export async function GET(request: Request) {
-  const data = await prisma.randomizer
+  const data = await db.randomizer
     .findMany({
       include: {
         items: true
       }
     })
-    .then(r =>
-      r.map(r => ({
-        ...r,
-        items: r.items.filter(i => i.limit > i.redeemed)
-      }))
-    )
+      .then((r: any[]) =>
+        r.map((r: any) => ({
+          ...r,
+          items: r.items.filter((i: any) => i.limit > i.redeemed)
+        }))
+      )
 
   return Response.json(data)
 }

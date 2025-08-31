@@ -1,8 +1,6 @@
 import type { AuthOptions } from 'next-auth'
 
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import TwitchProvider from 'next-auth/providers/twitch'
-import { prisma } from './prisma'
 
 const admins = [
   {
@@ -31,7 +29,6 @@ export const authConfig: AuthOptions = {
   session: {
     strategy: 'jwt'
   },
-  adapter: PrismaAdapter(prisma),
   providers: [
     TwitchProvider({
       clientId: String(process.env.TWITCH_CLIENT_ID),

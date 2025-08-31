@@ -1,4 +1,4 @@
-import type { Randomizer, RandomizerItem } from '@prisma/client'
+import type { Randomizer, RandomizerItem } from '@/types/db'
 
 export type AblyMessage = {
   name: string

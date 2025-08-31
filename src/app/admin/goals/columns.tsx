@@ -1,6 +1,6 @@
 'use client'
 
-import type { Goal } from '@prisma/client'
+import type { Goal } from '@/types/db'
 
 import { ColumnDef } from '@tanstack/react-table'
 import { PencilIcon, TrashIcon } from 'lucide-react'

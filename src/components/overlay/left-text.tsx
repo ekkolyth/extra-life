@@ -1,6 +1,6 @@
 'use client'
 
-import type { Rotator } from '@prisma/client'
+import type { Rotator } from '@/types/db'
 
 import { useQuery } from 'react-query'
 import { useEffect, useState } from 'react'

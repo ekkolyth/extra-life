@@ -3,7 +3,7 @@
 import { Fragment } from 'react'
 import { TrashIcon } from 'lucide-react'
 import { useQuery } from 'react-query'
-import { Segment } from '@prisma/client'
+import { Segment } from '@/types/db'
 import { set, subMinutes } from 'date-fns'
 
 import { cn } from '@/utils/style'

@@ -1,6 +1,6 @@
 'use client'
 
-import type { Rotator } from '@prisma/client'
+import type { Rotator } from '@/types/db'
 
 import * as z from 'zod'
 import { TrashIcon } from 'lucide-react'

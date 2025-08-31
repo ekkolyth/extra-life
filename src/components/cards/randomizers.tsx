@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Randomizer, RandomizerItem } from '@prisma/client'
+import { Randomizer, RandomizerItem } from '@/types/db'
 import { FerrisWheelIcon } from 'lucide-react'
 
 import Card from './card'

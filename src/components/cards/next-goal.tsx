@@ -1,6 +1,6 @@
 'use client'
 
-import type { Goal } from '@prisma/client'
+import type { Goal } from '@/types/db'
 
 import { useQuery } from 'react-query'
 import { FlagIcon } from '@heroicons/react/24/outline'

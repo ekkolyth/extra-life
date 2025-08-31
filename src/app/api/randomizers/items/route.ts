@@ -1,9 +1,9 @@
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 
 export async function PUT(request: Request) {
   const { id } = await request.json()
 
-  const data = await prisma.randomizerItem.update({
+  const data = await db.randomizerItem.update({
     where: { id },
     data: {
       redeemed: {
@@ -12,7 +12,7 @@ export async function PUT(request: Request) {
     }
   })
 
-  await prisma.wheelRedemption.create({
+  await db.wheelRedemption.create({
     data: {
       randomizer: {
         connect: {

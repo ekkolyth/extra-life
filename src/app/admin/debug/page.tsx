@@ -1,9 +1,9 @@
 import { DonationTrigger } from '@/components/debug/donation'
 import { Redemptions } from '@/components/debug/redemptions'
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 
 export default async function DebugPage() {
-  const randomizers = await prisma.randomizer.findMany()
+  const randomizers = await db.randomizer.findMany()
 
   return (
     <div className='space-y-8'>

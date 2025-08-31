@@ -1,8 +1,8 @@
 import { RotatorForm } from '@/forms/rotator'
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 
 export default async function RotatorPage() {
-  const data = await prisma.rotator.findMany()
+  const data = await db.rotator.findMany()
 
   return <RotatorForm items={data} />
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import type { Goal } from '@prisma/client'
+import type { Goal } from '@/types/db'
 
 import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { CheckBadgeIcon, ClockIcon } from '@heroicons/react/24/solid'

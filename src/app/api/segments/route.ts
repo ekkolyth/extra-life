@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server'
 
 import { getServerSession } from 'next-auth'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/convex'
 import { authConfig } from '@/lib/auth'
 import { getSegments } from '@/actions/segments'
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   let data = await req.json()
 
-  const segment = await prisma.segment.create({
+  const segment = await db.segment.create({
     data: {
       ...data,
       duration: Number(data.duration)
@@ -37,7 +37,7 @@ export async function DELETE(req: NextRequest) {
 
   const data = await req.json()
 
-  const segment = await prisma.segment.delete({
+  const segment = await db.segment.delete({
     where: {
       id: String(data.id)
     }
