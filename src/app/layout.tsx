@@ -6,7 +6,7 @@ import { ClerkProvider } from '@/components/clerk-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Extra Life Dashboard'
+  title: 'Extra Life Dashboard',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

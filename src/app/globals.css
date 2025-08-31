@@ -70,16 +70,17 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-transparent text-foreground;
+    @apply bg-transparent;
+    color: hsl(var(--foreground));
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
   }
   .app {
-    @apply bg-background;
+    background-color: hsl(var(--background));
   }
   .no-scrollbars {
     -ms-overflow-style: none; /* IE and Edge */
