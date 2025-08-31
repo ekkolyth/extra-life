@@ -1,6 +1,12 @@
+import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/convex'
 
 export async function PUT(request: Request) {
+  const { userId } = auth()
+  if (!userId) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
   const { id } = await request.json()
 
   const data = await db.randomizerItem.update({

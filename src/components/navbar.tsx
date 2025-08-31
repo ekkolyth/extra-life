@@ -2,16 +2,17 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
+import { useClerk, useUser } from '@clerk/nextjs'
 import { TrophyIcon } from '@heroicons/react/24/solid'
-import { BugIcon, CogIcon, FerrisWheelIcon, HistoryIcon, CalendarIcon } from 'lucide-react'
+import { BugIcon, FerrisWheelIcon, HistoryIcon, CalendarIcon } from 'lucide-react'
 
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { ControllerIcon } from 'src/components/icons/controller'
 
 const Navbar = () => {
-  const { data } = useSession()
+  const { user } = useUser()
+  const { signOut } = useClerk()
   const route = usePathname()
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: ControllerIcon, current: route === '/admin' },
@@ -19,7 +20,6 @@ const Navbar = () => {
     { name: 'Goals', href: '/admin/goals', icon: TrophyIcon, current: route === '/admin/goals' },
     { name: 'Randomizer', href: '/admin/randomizer', icon: FerrisWheelIcon, current: route === '/admin/randomizer' },
     { name: 'Rotator', href: '/admin/rotator', icon: HistoryIcon, current: route === '/admin/rotator' },
-    // { name: 'Config', href: '/admin/config', icon: CogIcon, current: route === '/admin/config' },
     { name: 'Debug', href: '/admin/debug', icon: BugIcon, current: route === '/admin/debug' }
   ]
 
@@ -32,11 +32,11 @@ const Navbar = () => {
           </div>
           <div className='flex gap-4 -mb-8 mt-2'>
             <Avatar>
-              <AvatarImage src={data?.user?.image ?? ''} />
-              <AvatarFallback>{data?.user?.name?.slice(1)}</AvatarFallback>
+              <AvatarImage src={user?.imageUrl ?? ''} />
+              <AvatarFallback>{user?.fullName?.slice(0, 1)}</AvatarFallback>
             </Avatar>
             <div>
-              <p className='font-semibold'>{data?.user?.name}</p>
+              <p className='font-semibold'>{user?.fullName}</p>
               <Button size='sm' variant='link' onClick={() => signOut()}>
                 Sign out
               </Button>

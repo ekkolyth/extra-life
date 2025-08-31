@@ -13,6 +13,12 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as goals from "../goals.js";
+import type * as randomizer from "../randomizer.js";
+import type * as randomizerItem from "../randomizerItem.js";
+import type * as rotator from "../rotator.js";
+import type * as segment from "../segment.js";
+import type * as wheelRedemption from "../wheelRedemption.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -22,7 +28,14 @@ import type {
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-declare const fullApi: ApiFromModules<{}>;
+declare const fullApi: ApiFromModules<{
+  goals: typeof goals;
+  randomizer: typeof randomizer;
+  randomizerItem: typeof randomizerItem;
+  rotator: typeof rotator;
+  segment: typeof segment;
+  wheelRedemption: typeof wheelRedemption;
+}>;
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
