@@ -1,8 +1,9 @@
+@import 'react-toastify/dist/ReactToastify.css';
+@import '@clerk/themes/shadcn.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import 'react-toastify/dist/ReactToastify.css';
 
 @layer base {
   :root {
@@ -101,14 +102,3 @@
 .shadow-super {
   box-shadow: 0.65rem 0.65rem 0 0 rgba(0, 0, 0, 1);
 }
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-@import '@clerk/themes/shadcn.css';
