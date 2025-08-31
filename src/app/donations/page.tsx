@@ -4,13 +4,11 @@ import { useQuery } from 'react-query'
 import { fetchStats, formatter } from 'src/utils/donor-drive'
 
 export default function DonationsPage() {
-  const rotationInterval = 10000
-
   const { data: stats } = useQuery(
-    ['extralife', 'donors'],
+    'stats',
     () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
     {
-      refetchInterval: rotationInterval
+      refetchInterval: 15000
     }
   )
 

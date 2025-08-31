@@ -29,9 +29,9 @@ export function RightText(props: TopRotatorProps) {
 
   // Goals
   const { data: stats } = useQuery({
-    queryKey: ['stats'],
+    queryKey: 'stats',
     queryFn: () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
-    refetchInterval: 5000
+    refetchInterval: 15000
   })
 
   useEffect(() => {

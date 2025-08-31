@@ -9,10 +9,10 @@ import { Progress } from '../ui/progress'
 
 const ProgressBar = () => {
   const { data, error } = useQuery(
-    ['extralife', 'donors'],
+    'stats',
     () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
     {
-      refetchInterval: 5000
+      refetchInterval: 15000
     }
   )
 

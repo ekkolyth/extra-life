@@ -6,8 +6,6 @@ import { revalidatePath } from 'next/cache'
 
 export async function getSegments() {
   const segments = await db.segment.findMany()
-
-  revalidatePath('/admin/schedule')
   return segments
 }
 
