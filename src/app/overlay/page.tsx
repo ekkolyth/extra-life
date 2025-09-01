@@ -19,7 +19,6 @@ import ProgressBar from 'src/components/overlay/progress-bar';
 import { WheelSpins } from 'src/components/overlay/wheel-spins';
 import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive';
 
-import 'src/app/overlay.css';
 
 const Overlay = () => {
   const searchParams = useSearchParams();
@@ -143,7 +142,7 @@ const Overlay = () => {
   }, [alerts]);
 
   return (
-    <div style={{ width: 1920, height: 1080 }} className='relative'>
+    <div className='relative w-[1920px] h-[1080px]'>
       {/* Confetti */}
       {!limited && (
         <Transition
@@ -175,7 +174,7 @@ const Overlay = () => {
         <div>
           <div className='absolute inset-0 flex items-start justify-center pt-52 bg-black/10'>
             {alerts.length > 0 && (
-              <div className='font-display'>
+              <div>
                 <h1 className='text-6xl text-center font-bold text-primary'>
                   {alerts[0]?.displayName} donated {formatter.format(alerts[0]?.amount ?? 0)}!
                 </h1>
@@ -208,7 +207,7 @@ const Overlay = () => {
       {/* Bottom Right Panel */}
       {!limited && (
         <div className='absolute bottom-14 right-12'>
-          <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow-super relative'>
+          <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow relative'>
             <TimeLeft visible={panel === 'timeLeft'} timesUp={(value) => setTimesUp(value)} />
             <WheelSpins visible={panel === 'wheelSpins'} />
           </div>

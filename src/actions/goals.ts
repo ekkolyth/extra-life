@@ -1,6 +1,7 @@
 'use server';
 
-import { revalidatePath, redirect } from 'next/cache';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { db } from '@/lib/convex';
 
 export async function getGoals() {
