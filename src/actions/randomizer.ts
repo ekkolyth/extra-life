@@ -1,60 +1,57 @@
-'use server'
+'use server';
 
-import * as z from 'zod'
-
-import { db } from '@/lib/convex'
-import { formSchema } from '@/forms/randomizer'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from 'next/cache';
+import { db } from '@/lib/convex';
 
 export async function getRandomizers() {
-  const randomizers = await db.randomizer.findMany({
+  return await db.randomizer.findMany({
     include: {
-      items: true
-    }
-  })
-  return randomizers
+      items: true,
+    },
+  });
 }
 
-export async function createRandomizer(data: z.infer<typeof formSchema>) {
-  const { name, items } = data
+export async function createRandomizer(formData: FormData) {
+  const name = formData.get('name') as string;
+  const description = formData.get('description') as string;
+
+  if (!name) {
+    throw new Error('Missing required fields');
+  }
+
   await db.randomizer.create({
     data: {
       name,
-      items: {
-        create: items
-      }
-    }
-  })
+      description,
+    },
+  });
 
-  revalidatePath('/admin/randomizer')
+  revalidatePath('/dashboard/randomizer');
 }
 
-export async function updateRandomizer(id: string, data: z.infer<typeof formSchema>) {
-  const { name, items } = data
+export async function updateRandomizer(id: string, formData: FormData) {
+  const name = formData.get('name') as string;
+  const description = formData.get('description') as string;
+
+  if (!name) {
+    throw new Error('Missing required fields');
+  }
+
   await db.randomizer.update({
-    where: {
-      id
-    },
+    where: { id },
     data: {
       name,
-      items: {
-        deleteMany: {},
-        create: items
-      }
-    }
-  })
+      description,
+    },
+  });
 
-  revalidatePath('/admin/randomizer')
+  revalidatePath('/dashboard/randomizer');
 }
 
 export async function deleteRandomizer(id: string) {
-  console.log(id)
-
   await db.randomizer.delete({
-    where: {
-      id: id.toString()
-    }
-  })
+    where: { id },
+  });
 
-  revalidatePath('/admin/randomizer')
+  revalidatePath('/dashboard/randomizer');
 }

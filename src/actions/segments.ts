@@ -1,36 +1,36 @@
-'use server'
+'use server';
 
-import { db } from '@/lib/convex'
-import { redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, redirect } from 'next/cache';
+import { db } from '@/lib/convex';
 
 export async function getSegments() {
-  const segments = await db.segment.findMany()
-  return segments
+  return await db.segment.findMany();
 }
 
-export async function createSegment(prevState: any, formData: FormData) {
+export async function createSegment(formData: FormData) {
+  const title = formData.get('title') as string;
+  const duration = Number(formData.get('duration'));
+
+  if (!title || !duration) {
+    throw new Error('Missing required fields');
+  }
+
   await db.segment.create({
     data: {
-      title: String(formData.get('title')),
-      startsAt: String(formData.get('startsAt')),
-      duration: Number(formData.get('duration'))
-    }
-  })
+      title,
+      duration,
+    },
+  });
 
-  revalidatePath('/admin/schedule')
-  redirect('/admin/schedule')
+  revalidatePath('/dashboard/schedule');
+  redirect('/dashboard/schedule');
 }
 
-export async function deleteSegment(formData: FormData) {
-  const id = String(formData.get('id'))
-
+export async function deleteSegment(id: string) {
   await db.segment.delete({
-    where: {
-      id
-    }
-  })
+    where: { id },
+  });
 
-  revalidatePath('/admin/schedule')
-  redirect('/admin/schedule')
+  revalidatePath('/dashboard/schedule');
+  redirect('/dashboard/schedule');
 }

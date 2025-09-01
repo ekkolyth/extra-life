@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useClerk, useUser } from '@clerk/nextjs'
-import { TrophyIcon } from '@heroicons/react/24/solid'
-import { BugIcon, FerrisWheelIcon, HistoryIcon, CalendarIcon } from 'lucide-react'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useClerk, useUser } from '@clerk/nextjs';
+import { TrophyIcon } from '@heroicons/react/24/solid';
+import { BugIcon, FerrisWheelIcon, HistoryIcon, CalendarIcon } from 'lucide-react';
 
-import { Button } from './ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { ControllerIcon } from 'src/components/icons/controller'
+import { Button } from './ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { ControllerIcon } from 'src/components/icons/controller';
 
 function UserMenu() {
-  const { user } = useUser()
-  const { signOut } = useClerk()
+  const { user } = useUser();
+  const { signOut } = useClerk();
   return (
     <div className='flex gap-4 -mb-8 mt-2'>
       <Avatar>
@@ -26,19 +26,49 @@ function UserMenu() {
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 const Navbar = () => {
-  const route = usePathname()
+  const route = usePathname();
   const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: ControllerIcon, current: route === '/admin' },
-    { name: 'Schedule', href: '/admin/schedule', icon: CalendarIcon, current: route === '/admin/schedule' },
-    { name: 'Goals', href: '/admin/goals', icon: TrophyIcon, current: route === '/admin/goals' },
-    { name: 'Randomizer', href: '/admin/randomizer', icon: FerrisWheelIcon, current: route === '/admin/randomizer' },
-    { name: 'Rotator', href: '/admin/rotator', icon: HistoryIcon, current: route === '/admin/rotator' },
-    { name: 'Debug', href: '/admin/debug', icon: BugIcon, current: route === '/admin/debug' }
-  ]
+    {
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: ControllerIcon,
+      current: route === '/dashboard',
+    },
+    {
+      name: 'Schedule',
+      href: '/dashboard/schedule',
+      icon: CalendarIcon,
+      current: route === '/dashboard/schedule',
+    },
+    {
+      name: 'Goals',
+      href: '/dashboard/goals',
+      icon: TrophyIcon,
+      current: route === '/dashboard/goals',
+    },
+    {
+      name: 'Randomizer',
+      href: '/dashboard/randomizer',
+      icon: FerrisWheelIcon,
+      current: route === '/dashboard/randomizer',
+    },
+    {
+      name: 'Rotator',
+      href: '/dashboard/rotator',
+      icon: HistoryIcon,
+      current: route === '/dashboard/rotator',
+    },
+    {
+      name: 'Debug',
+      href: '/dashboard/debug',
+      icon: BugIcon,
+      current: route === '/dashboard/debug',
+    },
+  ];
 
   return (
     <div className='border-b'>
@@ -50,7 +80,7 @@ const Navbar = () => {
           {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? <UserMenu /> : null}
         </div>
         <nav className='flex gap-2 overflow-x-scroll no-scrollbars'>
-          {navigation.map(item => (
+          {navigation.map((item) => (
             <Button key={item.name} variant={item.current ? 'outline' : 'link'} size='sm' asChild>
               <Link href={item.href} className='flex gap-3'>
                 <item.icon className='h-6 w-6' aria-hidden='true' />
@@ -61,7 +91,7 @@ const Navbar = () => {
         </nav>
       </header>
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

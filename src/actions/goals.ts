@@ -1,62 +1,60 @@
-'use server'
+'use server';
 
-import { db } from '@/lib/convex'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { revalidatePath, redirect } from 'next/cache';
+import { db } from '@/lib/convex';
 
 export async function getGoals() {
-  const goals = await db.goal.findMany({
-    orderBy: {
-      amount: 'asc'
-    }
-  })
-
-  return goals
+  return await db.goal.findMany();
 }
 
-export async function createGoal(prevState: any, formData: FormData) {
-  const title = String(formData.get('title'))
-  const amount = Number(formData.get('amount'))
-  const endOfStream = Boolean(formData.get('endOfStream'))
+export async function createGoal(formData: FormData) {
+  const title = formData.get('title') as string;
+  const amount = Number(formData.get('amount'));
+  const endOfStream = formData.get('endOfStream') === 'on';
+
+  if (!title || !amount) {
+    throw new Error('Missing required fields');
+  }
 
   await db.goal.create({
     data: {
-      title: title,
-      amount: amount,
-      endOfStream: endOfStream
-    }
-  })
+      title,
+      amount,
+      endOfStream,
+    },
+  });
 
-  revalidatePath('/admin/goals')
-  redirect('/admin/goals')
+  revalidatePath('/dashboard/goals');
+  redirect('/dashboard/goals');
 }
 
-export async function updateGoal(prevState: any, formData: FormData) {
-  const id = String(formData.get('id'))
-  const title = String(formData.get('title'))
-  const amount = Number(formData.get('amount'))
-  const endOfStream = Boolean(formData.get('endOfStream'))
+export async function updateGoal(id: string, formData: FormData) {
+  const title = formData.get('title') as string;
+  const amount = Number(formData.get('amount'));
+  const endOfStream = formData.get('endOfStream') === 'on';
+
+  if (!title || !amount) {
+    throw new Error('Missing required fields');
+  }
 
   await db.goal.update({
     where: { id },
     data: {
-      title: title,
-      amount: amount,
-      endOfStream: endOfStream
-    }
-  })
+      title,
+      amount,
+      endOfStream,
+    },
+  });
 
-  revalidatePath('/admin/goals')
-  redirect('/admin/goals')
+  revalidatePath('/dashboard/goals');
+  redirect('/dashboard/goals');
 }
 
-export async function deleteGoal(formData: FormData) {
-  const id = String(formData.get('id'))
-
+export async function deleteGoal(id: string) {
   await db.goal.delete({
-    where: { id }
-  })
+    where: { id },
+  });
 
-  revalidatePath('/admin/goals')
-  redirect('/admin/goals')
+  revalidatePath('/dashboard/goals');
+  redirect('/dashboard/goals');
 }

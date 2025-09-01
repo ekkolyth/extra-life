@@ -1,29 +1,19 @@
-'use server'
+'use server';
 
-import { db } from '@/lib/convex'
-import type { Rotator } from '@/types/db'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from 'next/cache';
+import { db } from '@/lib/convex';
 
-interface UpdateRotatorsPayload {
-  items: Partial<Rotator>[]
+export async function getRotators() {
+  return await db.rotator.findMany();
 }
 
-export async function updateRotators(data: UpdateRotatorsPayload) {
-  const { items } = data
+export async function createRotators(formData: FormData) {
+  const rotators = JSON.parse(formData.get('rotators') as string);
 
-  if (!items) throw new Error('No items provided')
-
-  // Delete existing rotator items
-  await db.rotator.deleteMany()
-
-  // // Create new rotator items
+  await db.rotator.deleteMany();
   await db.rotator.createMany({
-    data: items
-      .filter(items => items.text !== '')
-      .map((item: any) => ({
-        text: item.text
-      }))
-  })
+    data: rotators,
+  });
 
-  revalidatePath('/admin/rotator')
+  revalidatePath('/dashboard/rotator');
 }
