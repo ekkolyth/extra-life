@@ -1,6 +1,8 @@
-import { getSegments } from '@/actions/segments'
-import { Calendar } from './calendar'
-import { SegmentForm } from '@/forms/segment'
+import { getSegments } from '@/actions/segments';
+import { Calendar } from './calendar';
+import { SegmentForm } from '@/forms/segment';
+
+export const dynamic = 'force-dynamic';
 
 export default async function SchedulePage() {
   const segmentData = getSegments()

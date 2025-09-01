@@ -1,8 +1,16 @@
 import { Button } from '@/components/ui/button';
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs';
 import Link from 'next/link';
 
 export function Header() {
+  const hasClerk = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
   return (
     <header className='flex h-16 items-center justify-between gap-4 border-b px-4'>
       <Link href='/dashboard' className='flex items-center gap-x-4'>
@@ -14,19 +22,21 @@ export function Header() {
         </svg>
         <span className='font-semibold'>ExtraLife Dashboard</span>
       </Link>
-      <div className='flex items-center gap-x-4'>
-        <SignedOut>
-          <SignInButton>
-            <Button variant='ghost'>Sign in</Button>
-          </SignInButton>
-          <SignUpButton>
-            <Button>Sign up</Button>
-          </SignUpButton>
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
-      </div>
+      {hasClerk && (
+        <div className='flex items-center gap-x-4'>
+          <SignedOut>
+            <SignInButton>
+              <Button variant='ghost'>Sign in</Button>
+            </SignInButton>
+            <SignUpButton>
+              <Button>Sign up</Button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </div>
+      )}
     </header>
   );
 }

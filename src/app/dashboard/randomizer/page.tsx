@@ -1,6 +1,8 @@
-import { getRandomizers } from '@/actions/randomizer'
-import { RandomizerForm } from '@/forms/randomizer'
-import type { Randomizer } from '@/types/db'
+import { getRandomizers } from '@/actions/randomizer';
+import { RandomizerForm } from '@/forms/randomizer';
+import type { Randomizer } from '@/types/db';
+
+export const dynamic = 'force-dynamic';
 
 export default async function RandomizerPage() {
   const randomizersData = getRandomizers()

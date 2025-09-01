@@ -14,6 +14,8 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import WheelSpins from '@/components/cards/wheel-spins';
 import { EnvCheck } from '@/components/env-check';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPage() {
   const id = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
   if (id === undefined) {

@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import Confetti from 'react-confetti';
 import { useQuery } from 'react-query';
 import ReactPlayer from 'react-player/lazy';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Transition } from '@headlessui/react';
 import { useSearchParams } from 'next/navigation';
 
@@ -21,7 +21,7 @@ import { Donation, fetchLatestDonations, formatter } from 'src/utils/donor-drive
 
 import 'src/app/overlay.css';
 
-const Overlay = () => {
+function OverlayContent() {
   const searchParams = useSearchParams();
   const limited = searchParams.get('limited') === 'true';
 
@@ -218,5 +218,12 @@ const Overlay = () => {
       {!limited && <Randomizer setConfetti={setConfetti} />}
     </div>
   );
-};
-export default Overlay;
+}
+
+export default function OverlayPage() {
+  return (
+    <Suspense>
+      <OverlayContent />
+    </Suspense>
+  );
+}

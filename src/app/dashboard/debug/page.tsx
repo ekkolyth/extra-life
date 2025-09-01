@@ -1,6 +1,8 @@
-import { DonationTrigger } from '@/components/debug/donation'
-import { Redemptions } from '@/components/debug/redemptions'
-import { db } from '@/lib/convex'
+import { DonationTrigger } from '@/components/debug/donation';
+import { Redemptions } from '@/components/debug/redemptions';
+import { db } from '@/lib/convex';
+
+export const dynamic = 'force-dynamic';
 
 export default async function DebugPage() {
   const randomizers = await db.randomizer.findMany()

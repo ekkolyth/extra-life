@@ -1,9 +1,11 @@
-import { DataTable } from '@/components/data-table'
-import { columns } from './columns'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { GoalForm } from '@/forms/goal'
-import { Button } from '@/components/ui/button'
-import { getGoals } from '@/actions/goals'
+import { DataTable } from '@/components/data-table';
+import { columns } from './columns';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { GoalForm } from '@/forms/goal';
+import { Button } from '@/components/ui/button';
+import { getGoals } from '@/actions/goals';
+
+export const dynamic = 'force-dynamic';
 
 export default async function GoalsPage() {
   const goalsData = getGoals()
