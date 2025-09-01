@@ -2,35 +2,52 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { db } from '@/lib/convex';
 
 export async function getSegments() {
-  return await db.segment.findMany();
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/segments`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch segments');
+  }
+  return response.json();
 }
 
 export async function createSegment(formData: FormData) {
   const title = formData.get('title') as string;
+  const startsAt = formData.get('startsAt') as string;
   const duration = Number(formData.get('duration'));
 
-  if (!title || !duration) {
+  if (!title || !startsAt || !duration) {
     throw new Error('Missing required fields');
   }
 
-  await db.segment.create({
-    data: {
-      title,
-      duration,
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/segments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      title,
+      startsAt,
+      duration,
+    }),
   });
+
+  if (!response.ok) {
+    throw new Error('Failed to create segment');
+  }
 
   revalidatePath('/dashboard/schedule');
   redirect('/dashboard/schedule');
 }
 
 export async function deleteSegment(id: string) {
-  await db.segment.delete({
-    where: { id },
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/segments?id=${id}`, {
+    method: 'DELETE',
   });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete segment');
+  }
 
   revalidatePath('/dashboard/schedule');
   redirect('/dashboard/schedule');

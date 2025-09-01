@@ -1,8 +1,8 @@
 import { RotatorForm } from '@/components/original/forms/rotator';
-import { db } from '@/lib/convex';
+import { getRotators } from '@/actions/rotators';
 
 export default async function RotatorPage() {
-  const data = await db.rotator.findMany();
+  const data = await getRotators();
 
   return <RotatorForm items={data} />;
 }

@@ -5,12 +5,17 @@ import { TotalRaised } from '@/components/original/cards/total-raised';
 import { QuickResources } from '@/components/original/cards/quick-resources';
 import { LatestDonations } from '@/components/original/cards/latest-donations';
 import { fetchLatestDonations, fetchStats, fetchTopDonor } from '@/utils/donor-drive';
+import { getRandomizers } from '@/actions/randomizer';
+import { getSegments } from '@/actions/segments';
+import { getGoals } from '@/actions/goals';
 
 import { Schedule } from '@/components/original/cards/segments';
 import { RandomizerCard } from '@/components/original/cards/randomizers';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import WheelSpins from '@/components/original/cards/wheel-spins';
 import { EnvCheck } from '@/components/original/env-check';
+import { DonationActivity } from '@/components/dashboard/donation-activity';
+import { Overview } from '@/components/dashboard/overview';
 
 export default async function AdminPage() {
   const id = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
@@ -28,9 +33,9 @@ export default async function AdminPage() {
   }
 
   try {
-    // const randomizersData = getRandomizers();
-    // const segmentsData = getSegments();
-    // const goalsData = getGoals();
+    const randomizersData = getRandomizers();
+    const segmentsData = getSegments();
+    const goalsData = getGoals();
     const statsData = fetchStats(id);
     const donationsData = fetchLatestDonations(id, 10);
     const topDonorData = fetchTopDonor(id);
@@ -90,6 +95,8 @@ export default async function AdminPage() {
             )}
           </div>
         </div>
+        <Overview />
+        <DonationActivity />
       </div>
     );
   } catch (error) {

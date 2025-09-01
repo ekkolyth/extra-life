@@ -1,14 +1,13 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { db } from '@/lib/convex';
 
 export async function getRandomizers() {
-  return await db.randomizer.findMany({
-    include: {
-      items: true,
-    },
-  });
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/randomizers`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch randomizers');
+  }
+  return response.json();
 }
 
 export async function createRandomizer(formData: FormData) {
@@ -19,12 +18,20 @@ export async function createRandomizer(formData: FormData) {
     throw new Error('Missing required fields');
   }
 
-  await db.randomizer.create({
-    data: {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/randomizers`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
       name,
       description,
-    },
+    }),
   });
+
+  if (!response.ok) {
+    throw new Error('Failed to create randomizer');
+  }
 
   revalidatePath('/dashboard/randomizer');
 }
@@ -37,21 +44,33 @@ export async function updateRandomizer(id: string, formData: FormData) {
     throw new Error('Missing required fields');
   }
 
-  await db.randomizer.update({
-    where: { id },
-    data: {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/randomizers`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id,
       name,
       description,
-    },
+    }),
   });
+
+  if (!response.ok) {
+    throw new Error('Failed to update randomizer');
+  }
 
   revalidatePath('/dashboard/randomizer');
 }
 
 export async function deleteRandomizer(id: string) {
-  await db.randomizer.delete({
-    where: { id },
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/randomizers?id=${id}`, {
+    method: 'DELETE',
   });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete randomizer');
+  }
 
   revalidatePath('/dashboard/randomizer');
 }
