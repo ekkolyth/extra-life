@@ -1,6 +1,7 @@
 'use server';
 
-import { revalidatePath, redirect } from 'next/cache';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { db } from '@/lib/convex';
 
 export async function getGoals() {
@@ -50,7 +51,8 @@ export async function updateGoal(id: string, formData: FormData) {
   redirect('/dashboard/goals');
 }
 
-export async function deleteGoal(id: string) {
+export async function deleteGoal(formData: FormData) {
+  const id = formData.get('id') as string;
   await db.goal.delete({
     where: { id },
   });
