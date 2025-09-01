@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as donorDriveDebug from "../donorDriveDebug.js";
 import type * as goals from "../goals.js";
 import type * as randomizer from "../randomizer.js";
 import type * as randomizerItem from "../randomizerItem.js";
@@ -29,6 +30,7 @@ import type * as wheelRedemption from "../wheelRedemption.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  donorDriveDebug: typeof donorDriveDebug;
   goals: typeof goals;
   randomizer: typeof randomizer;
   randomizerItem: typeof randomizerItem;

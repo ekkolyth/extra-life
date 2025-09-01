@@ -1,21 +1,25 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchStats } from '@/utils/donor-drive';
+import { fetchStatsWithDebug } from '@/utils/donor-drive-debug';
+import { useDonorDriveDebug } from '@/utils/donor-drive-debug';
 import { Progress } from '../ui/progress';
 
 const ProgressBar = () => {
+  const debugMutation = useDonorDriveDebug();
+
   // Use TanStack Query to fetch donation stats from donor-drive
   // This will respect the 15-second rate limiting
   const { data: stats } = useQuery({
     queryKey: ['donationStats'],
-    queryFn: () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
+    queryFn: () =>
+      fetchStatsWithDebug(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID), debugMutation),
     refetchInterval: 15000, // 15 seconds as requested
   });
 
   // Use real data if available, fallback to demo data
   const donations = stats && stats !== 'Rate limited' ? stats.sumDonations : 5000;
-  const goal = stats && stats !== 'Rate limited' ? stats.goalAmount : 10000;
+  const goal = stats && stats !== 'Rate limited' ? stats.fundraisingGoal : 10000;
   const donationPercentage = (donations / goal) * 100;
 
   return (

@@ -5,7 +5,12 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useQuery as useConvexQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { fetchTopDonation, fetchTopDonor, fetchStats } from '@/utils/donor-drive';
+import {
+  fetchTopDonationWithDebug,
+  fetchTopDonorWithDebug,
+  fetchStatsWithDebug,
+  useDonorDriveDebug,
+} from '@/utils/donor-drive-debug';
 
 interface TopRotatorProps {
   goals: Goal[];
@@ -15,19 +20,23 @@ export function RightText(props: TopRotatorProps) {
   const { goals } = props;
   const [index, setIndex] = useState(0);
   const [nextGoal, setNextGoal] = useState<Goal | null>(null);
+  const debugMutation = useDonorDriveDebug();
 
   // Use TanStack Query for external API calls (donor-drive)
   const { data: topDonation } = useQuery({
     queryKey: ['topDonation'],
-    queryFn: () => fetchTopDonation(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
+    queryFn: () =>
+      fetchTopDonationWithDebug(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID), debugMutation),
   });
   const { data: topDonor } = useQuery({
     queryKey: ['topDonor'],
-    queryFn: () => fetchTopDonor(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
+    queryFn: () =>
+      fetchTopDonorWithDebug(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID), debugMutation),
   });
   const { data: stats } = useQuery({
     queryKey: 'stats',
-    queryFn: () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
+    queryFn: () =>
+      fetchStatsWithDebug(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID), debugMutation),
     refetchInterval: 15000,
   });
 

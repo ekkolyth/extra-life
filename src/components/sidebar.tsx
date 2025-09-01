@@ -11,6 +11,7 @@ import {
   DollarSign,
   Settings,
   ExternalLink,
+  Bug,
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
@@ -54,6 +55,12 @@ const tools = [
     name: 'Stream Settings',
     href: '/config',
     icon: Settings,
+  },
+  {
+    name: 'Debug',
+    href: '/debug',
+    icon: Bug,
+    external: false,
   },
 ];
 

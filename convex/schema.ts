@@ -28,4 +28,12 @@ export default defineSchema({
     randomizerId: v.string(),
     createdAt: v.string(),
   }),
+  donorDriveDebug: defineTable({
+    timestamp: v.string(),
+    stats: v.any(),
+    topDonation: v.any(),
+    topDonor: v.any(),
+    latestDonations: v.any(),
+    apiEndpoint: v.string(),
+  }).index('by_timestamp', ['timestamp']),
 });

@@ -9,7 +9,12 @@ import { LatestDonations } from '@/components/original/cards/latest-donations';
 import { useQuery } from 'convex/react';
 import { useQuery as useTanStackQuery } from '@tanstack/react-query';
 import { api } from '@/convex/_generated/api';
-import { fetchStats, fetchLatestDonations, fetchTopDonor } from '@/utils/donor-drive';
+import {
+  fetchStatsWithDebug,
+  fetchLatestDonationsWithDebug,
+  fetchTopDonorWithDebug,
+  useDonorDriveDebug,
+} from '@/utils/donor-drive-debug';
 
 import { Schedule } from '@/components/original/cards/segments';
 import { RandomizerCard } from '@/components/original/cards/randomizers';
@@ -22,27 +27,28 @@ export default function AdminPage() {
   const convexRandomizers = useQuery(api.randomizer.list);
   const convexSegments = useQuery(api.segment.list);
   const convexGoals = useQuery(api.goals.list);
+  const debugMutation = useDonorDriveDebug();
 
   // Use TanStack Query for donor-drive API calls with proper rate limiting
   const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
 
   const { data: stats } = useTanStackQuery({
     queryKey: ['donationStats'],
-    queryFn: () => fetchStats(donorDriveId!),
+    queryFn: () => fetchStatsWithDebug(donorDriveId!, debugMutation),
     refetchInterval: 15000, // 15 seconds as requested
     enabled: !!donorDriveId, // Only run if we have the ID
   });
 
   const { data: donations } = useTanStackQuery({
     queryKey: ['latestDonations'],
-    queryFn: () => fetchLatestDonations(donorDriveId!, 10),
+    queryFn: () => fetchLatestDonationsWithDebug(donorDriveId!, 10, debugMutation),
     refetchInterval: 15000, // 15 seconds as requested
     enabled: !!donorDriveId, // Only run if we have the ID
   });
 
   const { data: topDonor } = useTanStackQuery({
     queryKey: ['topDonor'],
-    queryFn: () => fetchTopDonor(donorDriveId!),
+    queryFn: () => fetchTopDonorWithDebug(donorDriveId!, debugMutation),
     refetchInterval: 15000, // 15 seconds as requested
     enabled: !!donorDriveId, // Only run if we have the ID
   });
@@ -99,7 +105,7 @@ export default function AdminPage() {
       : {
           avatarImageURL: '',
           createdDateUTC: '',
-          displayName: 'Demo User',
+          displayName: 'Rate Limited',
           eventID: 0,
           eventName: 'Demo Event',
           fundraisingGoal: 0,
