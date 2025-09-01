@@ -1,13 +1,18 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server';
 
-import { getGoals } from '@/actions/goals'
+import { getGoals } from '@/actions/goals';
 
 export async function GET() {
-  const { userId } = await auth()
-  if (!userId) {
-    return new Response('Unauthorized', { status: 401 })
-  }
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  const data = await getGoals()
-  return Response.json(data)
+    const data = await getGoals();
+    return Response.json(data);
+  } catch (error) {
+    console.error('Goals API error:', error);
+    return Response.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

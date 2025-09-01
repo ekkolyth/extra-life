@@ -40,13 +40,23 @@ export function RandomizerCard(props: RandomizerCardProps) {
   );
   useQuery(
     ['redemptions'],
-    () => fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`).then((res) => res.json()),
+    async () => {
+      const res = await fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.json();
+    },
     {
       cacheTime: 0,
       refetchInterval: 5000,
+      retry: 1,
       onSuccess(data) {
         console.log('redemptions', data);
         setLeft(total - data.length);
+      },
+      onError(error) {
+        console.error('Failed to fetch redemptions:', error);
       },
     }
   );
