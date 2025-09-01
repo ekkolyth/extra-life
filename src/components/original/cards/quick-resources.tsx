@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { BookmarkIcon, ClipboardIcon } from 'lucide-react';
 
-import { Card } from '@/components/ui/card';
+import ContentCard from './card';
 import resources from '@/data/resources.json';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +19,7 @@ export const QuickResources = () => {
   }));
 
   return (
-    <Card title='Quick Resources' icon={<BookmarkIcon />}>
+    <ContentCard title='Quick Resources' icon={<BookmarkIcon />}>
       <ol className='divide-y'>
         {processedResources.map((r) => (
           <li key={r.name} className='flex justify-between py-2'>
@@ -46,6 +46,6 @@ export const QuickResources = () => {
           </li>
         ))}
       </ol>
-    </Card>
+    </ContentCard>
   );
 };

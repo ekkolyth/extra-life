@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (isLoaded && !isSignedIn && !hasRedirected) {
       setHasRedirected(true);
       const timer = setTimeout(() => {
-        router.push('/sign-in');
+        router.push('/auth/sign-in');
       }, 100);
       return () => clearTimeout(timer);
     }

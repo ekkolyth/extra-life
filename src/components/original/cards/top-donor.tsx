@@ -2,10 +2,10 @@
 
 import Image from 'next/image';
 import { BanknoteIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { Card } from '@/components/ui/card';
+import ContentCard from './card';
 import { Donor, fetchTopDonor } from '@/utils/donor-drive';
-import { useQuery } from 'convex/react';
 
 interface TopDonorProps {
   data: Donor;
@@ -13,13 +13,28 @@ interface TopDonorProps {
 
 export const TopDonor = (props: TopDonorProps) => {
   const { data: topDonor } = props;
+  const [data, setData] = useState<Donor>(topDonor);
 
   const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID);
-  const { data } = useQuery('topDonor', () => fetchTopDonor(id), {
-    initialData: topDonor,
-    enabled: !!id,
-    refetchInterval: 15000,
-  });
+
+  useEffect(() => {
+    if (id) {
+      const fetchData = async () => {
+        try {
+          const result = await fetchTopDonor(id);
+          if (typeof result !== 'string') {
+            setData(result);
+          }
+        } catch (error) {
+          console.error('Failed to fetch top donor:', error);
+        }
+      };
+
+      fetchData();
+      const interval = setInterval(fetchData, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [id]);
 
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -27,7 +42,7 @@ export const TopDonor = (props: TopDonorProps) => {
   });
 
   return typeof data !== 'string' ? (
-    <Card title='Top Donor' icon={<BanknoteIcon />}>
+    <ContentCard title='Top Donor' icon={<BanknoteIcon />}>
       <div className='flex items-center'>
         <div className='mr-2 flex items-center'>
           {data?.avatarImageURL && (
@@ -42,10 +57,10 @@ export const TopDonor = (props: TopDonorProps) => {
           <p className='text-xl font-semibold'>{formatter.format(data?.sumDonations ?? 0)}</p>
         </div>
       </div>
-    </Card>
+    </ContentCard>
   ) : (
-    <Card title='Top Donor' icon={<BanknoteIcon />}>
+    <ContentCard title='Top Donor' icon={<BanknoteIcon />}>
       <p className='text-3xl font-bold text-primary text-center'>No donations data</p>
-    </Card>
+    </ContentCard>
   );
 };

@@ -28,46 +28,56 @@ export default async function AdminPage() {
   }
 
   try {
-    const randomizersData = getRandomizers();
-    const segmentsData = getSegments();
-    const goalsData = getGoals();
+    // const randomizersData = getRandomizers();
+    // const segmentsData = getSegments();
+    // const goalsData = getGoals();
     const statsData = fetchStats(id);
     const donationsData = fetchLatestDonations(id, 10);
     const topDonorData = fetchTopDonor(id);
 
-    const [randomizers, segments, goals, stats, donations, topDonor] = await Promise.all([
-      randomizersData,
-      segmentsData,
-      goalsData,
+    const [stats, donations, topDonor] = await Promise.all([
       statsData,
       donationsData,
       topDonorData,
     ]);
+
+    // Set default values for missing data
+    const randomizers: any[] = [];
+    const segments: any[] = [];
+    const goals: any[] = [];
 
     return (
       <div className='space-y-4'>
         <EnvCheck />
         <div className='grid grid-cols-3 gap-4'>
           <div className='flex flex-col gap-y-4'>
-            {typeof stats !== 'string' ? <TotalRaised data={stats} /> : <RateLimitedCard />}
+            {stats && typeof stats !== 'string' ? (
+              <TotalRaised data={stats} />
+            ) : (
+              <RateLimitedCard />
+            )}
             <QuickResources />
           </div>
           <div className='flex flex-col gap-y-4'>
             <Schedule segments={segments} />
-            {typeof donations !== 'string' ? (
+            {donations && typeof donations !== 'string' ? (
               <RandomizerCard randomizers={randomizers} />
             ) : (
               <RateLimitedCard />
             )}
-            {typeof donations !== 'string' ? (
+            {donations && typeof donations !== 'string' ? (
               <LatestDonations data={donations} />
             ) : (
               <RateLimitedCard />
             )}
           </div>
           <div className='flex flex-col gap-y-4'>
-            {typeof topDonor !== 'string' ? <TopDonor data={topDonor} /> : <RateLimitedCard />}
-            {typeof goals !== 'string' && typeof stats !== 'string' ? (
+            {topDonor && typeof topDonor !== 'string' ? (
+              <TopDonor data={topDonor} />
+            ) : (
+              <RateLimitedCard />
+            )}
+            {goals && stats && typeof goals !== 'string' && typeof stats !== 'string' ? (
               <>
                 <NextGoal data={stats} goals={goals} />
                 <Goals data={stats} goals={goals} />

@@ -2,10 +2,9 @@
 
 import type { Goal } from '@/types/db';
 
-import { useQuery } from 'convex/react';
 import { FlagIcon } from 'lucide-react';
 
-import { Card } from '@/components/ui/card';
+import ContentCard from './card';
 import { StatsResult, fetchStats } from '@/utils/donor-drive';
 
 interface NextGoalProps {
@@ -16,24 +15,15 @@ interface NextGoalProps {
 export const NextGoal = (props: NextGoalProps) => {
   const { data: stats, goals } = props;
 
-  const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID);
-  const { data } = useQuery('stats', () => fetchStats(id), {
-    initialData: stats,
-    enabled: !!id,
-    refetchInterval: 15000,
-  });
-
-  if (data === undefined) {
+  if (typeof stats === 'string' || !stats || !goals || goals.length === 0) {
     return null;
   }
 
-  const nextGoal = goals.find(
-    (goal) => data !== 'Rate limited' && goal.amount > data?.sumDonations
-  );
+  const nextGoal = goals.find((goal) => goal.amount > stats.sumDonations);
 
   return (
-    <Card title='Next Goal' icon={<FlagIcon />}>
+    <ContentCard title='Next Goal' icon={<FlagIcon />}>
       <p className='text-3xl font-bold text-primary text-center'>{nextGoal?.title}</p>
-    </Card>
+    </ContentCard>
   );
 };

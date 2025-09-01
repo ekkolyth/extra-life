@@ -5,9 +5,8 @@ import { useEffect, useState } from 'react';
 import { Randomizer, RandomizerItem } from '@/types/db';
 import { FerrisWheelIcon } from 'lucide-react';
 
-import { Card } from '@/components/ui/card';
+import ContentCard from './card';
 import { Button } from '@/components/ui/button';
-import { useQuery } from 'convex/react';
 import { fetchWheelSpinDonations } from '@/utils/donor-drive';
 
 interface RandomizerWithItems extends Randomizer {
@@ -20,44 +19,60 @@ interface RandomizerCardProps {
 
 export function RandomizerCard(props: RandomizerCardProps) {
   const { randomizers } = props;
+
+  if (!randomizers || randomizers.length === 0) {
+    return (
+      <ContentCard title='Randomizers' icon={<FerrisWheelIcon />}>
+        <div className='text-center text-muted-foreground py-4'>
+          <p>No randomizers found</p>
+          <p className='text-sm'>Add some randomizers to get started</p>
+        </div>
+      </ContentCard>
+    );
+  }
+
   const [left, setLeft] = useState(0);
   const [total, setTotal] = useState(0);
-  const [channel] = useState<Ably.Types.RealtimeChannelPromise |   null>(
-    ably?.channels.get('randomizers') || null
-  );
+  const [channel, setChannel] = useState<any>(null);
 
-  useQuery(
-    ['extralife', 'wheelSpinDonations'],
-    () => fetchWheelSpinDonations(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
-    {
-      refetchInterval: 5000,
-      onSuccess(data) {
-        setTotal(data.length);
-      },
-    }
-  );
-  useQuery(
-    ['redemptions'],
-    async () => {
-      const res = await fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`);
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchWheelSpinDonations(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID));
+        if (typeof data !== 'string') {
+          setTotal(data.length);
+        }
+      } catch (error) {
+        console.error('Failed to fetch wheel spin donations:', error);
       }
-      return res.json();
-    },
-    {
-      cacheTime: 0,
-      refetchInterval: 5000,
-      retry: 1,
-      onSuccess(data) {
-        console.log('redemptions', data);
+    };
+
+    const fetchRedemptions = async () => {
+      try {
+        const res = await fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
         setLeft(total - data.length);
-      },
-      onError(error) {
+      } catch (error) {
         console.error('Failed to fetch redemptions:', error);
-      },
+      }
+    };
+
+    if (process.env.NEXT_PUBLIC_DONORDRIVE_ID) {
+      fetchData();
+      fetchRedemptions();
+
+      const dataInterval = setInterval(fetchData, 5000);
+      const redemptionsInterval = setInterval(fetchRedemptions, 5000);
+
+      return () => {
+        clearInterval(dataInterval);
+        clearInterval(redemptionsInterval);
+      };
     }
-  );
+  }, [total]);
 
   function handleWheelSpin(id: string) {
     // Get options for the given wheel
@@ -95,7 +110,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
   }
 
   return (
-    <Card title='Randomizers' icon={<FerrisWheelIcon />}>
+    <ContentCard title='Randomizers' icon={<FerrisWheelIcon />}>
       <p className='text-destructive font-bold text-xs -mt-6 mb-4'>
         Do not close this page once a randomizer is triggered, until it is finished spinning.
       </p>
@@ -141,6 +156,6 @@ export function RandomizerCard(props: RandomizerCardProps) {
           </li>
         )}
       </ul>
-    </Card>
+    </ContentCard>
   );
 }

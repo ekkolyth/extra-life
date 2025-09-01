@@ -1,4 +1,4 @@
-import { getRandomizers } from '@/components/original/actions/randomizer';
+import { getRandomizers } from '@/actions/randomizer';
 import { RandomizerForm } from '@/components/original/forms/randomizer';
 import type { Randomizer } from '@/types/db';
 

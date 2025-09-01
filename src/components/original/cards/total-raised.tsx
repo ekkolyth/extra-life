@@ -2,8 +2,9 @@
 
 import { ChartPieIcon, ChevronRightIcon } from 'lucide-react';
 import { StatsResult, fetchStats, formatter, percentage } from '@/utils/donor-drive';
+import { useEffect, useState } from 'react';
 
-import { Card } from '@/components/ui/card';
+import ContentCard from './card';
 import { Progress } from '@/components/ui/progress';
 import {
   Table,
@@ -15,7 +16,6 @@ import {
 } from '@/components/ui/table';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useQuery } from 'convex/react';
 
 interface TotalRaisedProps {
   data: StatsResult;
@@ -23,22 +23,37 @@ interface TotalRaisedProps {
 
 export const TotalRaised = (props: TotalRaisedProps) => {
   const { data: stats } = props;
+  const [data, setData] = useState<StatsResult>(stats);
 
   const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID);
-  const { data } = useQuery('stats', () => fetchStats(id), {
-    initialData: stats,
-    enabled: !!id,
-    refetchInterval: 15000,
-  });
 
-  if (data === undefined || data === 'Rate limited') {
+  useEffect(() => {
+    if (id) {
+      const fetchData = async () => {
+        try {
+          const result = await fetchStats(id);
+          if (typeof result !== 'string') {
+            setData(result);
+          }
+        } catch (error) {
+          console.error('Failed to fetch stats:', error);
+        }
+      };
+
+      fetchData();
+      const interval = setInterval(fetchData, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [id]);
+
+  if (typeof data === 'string' || !data) {
     return null;
   }
 
   const calculatedPercentage = percentage(data.sumDonations, data.fundraisingGoal);
 
   return (
-    <Card title='Total Raised YTD' icon={<ChartPieIcon />}>
+    <ContentCard title='Total Raised YTD' icon={<ChartPieIcon />}>
       <div className='flex flex-col items-center justify-center gap-2'>
         <p className='text-4xl'>{formatter.format(data.sumDonations)}</p>
         <div className='relative w-full'>
@@ -87,6 +102,6 @@ export const TotalRaised = (props: TotalRaisedProps) => {
           Go to Extra Life Profile <ChevronRightIcon className='w-4 h-4' />
         </Link>
       </Button>
-    </Card>
+    </ContentCard>
   );
 };
