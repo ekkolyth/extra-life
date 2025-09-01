@@ -10,9 +10,26 @@ import { Button } from './ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { ControllerIcon } from 'src/components/icons/controller'
 
-const Navbar = () => {
+function UserMenu() {
   const { user } = useUser()
   const { signOut } = useClerk()
+  return (
+    <div className='flex gap-4 -mb-8 mt-2'>
+      <Avatar>
+        <AvatarImage src={user?.imageUrl ?? ''} />
+        <AvatarFallback>{user?.fullName?.slice(0, 1)}</AvatarFallback>
+      </Avatar>
+      <div>
+        <p className='font-semibold'>{user?.fullName}</p>
+        <Button size='sm' variant='link' onClick={() => signOut()}>
+          Sign out
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+const Navbar = () => {
   const route = usePathname()
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: ControllerIcon, current: route === '/admin' },
@@ -30,18 +47,7 @@ const Navbar = () => {
           <div className='flex items-center gap-8'>
             <h1 className='scroll-m-20 text-3xl font-semibold tracking-tight'>ExtraLife Dash</h1>
           </div>
-          <div className='flex gap-4 -mb-8 mt-2'>
-            <Avatar>
-              <AvatarImage src={user?.imageUrl ?? ''} />
-              <AvatarFallback>{user?.fullName?.slice(0, 1)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className='font-semibold'>{user?.fullName}</p>
-              <Button size='sm' variant='link' onClick={() => signOut()}>
-                Sign out
-              </Button>
-            </div>
-          </div>
+          {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? <UserMenu /> : null}
         </div>
         <nav className='flex gap-2 overflow-x-scroll no-scrollbars'>
           {navigation.map(item => (

@@ -93,6 +93,13 @@ type CacheEntry = {
 
 const cache = new Map<string, CacheEntry>()
 
+const BASE_URL = 'https://www.extra-life.org/api'
+const API_VERSION = '1.3'
+
+function withVersion(path: string) {
+  return `${BASE_URL}${path}${path.includes('?') ? '&' : '?'}version=${API_VERSION}`
+}
+
 async function fetchWithCache<T>(key: string, url: string): Promise<T | 'Rate limited'> {
   const now = Date.now()
   const cached = cache.get(key)
@@ -118,7 +125,7 @@ async function fetchWithCache<T>(key: string, url: string): Promise<T | 'Rate li
 }
 
 export const fetchStats = async (id: string) =>
-  fetchWithCache<StatsResult>(`stats-${id}`, `https://extra-life.org/api/participants/${id}`)
+  fetchWithCache<StatsResult>(`stats-${id}`, withVersion(`/participants/${id}`))
 
 export const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -130,7 +137,9 @@ export const percentage = (donations: number, goal: number) => Math.floor((donat
 export const fetchTopDonor = async (id: string) => {
   const data = await fetchWithCache<Donor[]>(
     `topDonor-${id}`,
-    `https://extra-life.org/api/participants/${id}/donors?limit=1&orderBy=sumDonations%20DESC&where=amountVisibility%20%3D%20ALL%20AND%20sumDonations%20%3E%200`
+    withVersion(
+      `/participants/${id}/donors?limit=1&orderBy=sumDonations%20DESC&where=sumDonations%20%3E%200`
+    )
   )
   return Array.isArray(data) ? (data[0] as Donor) : data
 }
@@ -138,7 +147,7 @@ export const fetchTopDonor = async (id: string) => {
 export const fetchTopDonation = async (id: string) => {
   const data = await fetchWithCache<Donation[]>(
     `topDonation-${id}`,
-    `https://extra-life.org/api/participants/${id}/donations?limit=1&orderBy=amount%20DESC`
+    withVersion(`/participants/${id}/donations?limit=1&orderBy=amount%20DESC`)
   )
   return Array.isArray(data) ? (data[0] as Donation) : data
 }
@@ -146,13 +155,15 @@ export const fetchTopDonation = async (id: string) => {
 export const fetchLatestDonations = async (id: string, limit: number) =>
   fetchWithCache<Donation[]>(
     `latestDonations-${id}-${limit}`,
-    `https://extra-life.org/api/participants/${id}/donations?limit=${limit}&orderBy=createdDateUTC%20DESC`
+    withVersion(
+      `/participants/${id}/donations?limit=${limit}&orderBy=createdDateUTC%20DESC`
+    )
   )
 
 export const fetchWheelSpinDonations = async (id: string) => {
   const data = await fetchWithCache<Donation[]>(
     `wheelSpins-${id}`,
-    `https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`
+    withVersion(`/participants/${id}/donations?limit=100&orderBy=amount%20DESC`)
   )
   return Array.isArray(data)
     ? (data.filter((d: { amount: number }) => d.amount >= 20 && d.amount <= 99.99) as Donation[])
@@ -162,7 +173,7 @@ export const fetchWheelSpinDonations = async (id: string) => {
 export const fetchBigWheelSpinDonations = async (id: string) => {
   const data = await fetchWithCache<Donation[]>(
     `bigWheelSpins-${id}`,
-    `https://extra-life.org/api/participants/${id}/donations?limit=100&orderBy=amount%20DESC`
+    withVersion(`/participants/${id}/donations?limit=100&orderBy=amount%20DESC`)
   )
   return Array.isArray(data)
     ? (data.filter((d: { amount: number }) => d.amount >= 100) as Donation[])
