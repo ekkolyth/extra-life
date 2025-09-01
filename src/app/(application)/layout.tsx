@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!isLoaded) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center bg-background'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
           <p className='text-muted-foreground'>Loading authentication...</p>
@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!isSignedIn) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center bg-background'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
           <p className='text-muted-foreground'>Redirecting to sign in...</p>
@@ -44,11 +44,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className='h-screen flex'>
+    <div className='h-screen flex bg-background'>
       <Sidebar />
       <div className='flex-1 flex flex-col'>
         <Header />
-        <main className='flex-1 container py-6 overflow-auto'>{children}</main>
+        <main className='flex-1 container py-6 overflow-auto bg-background'>{children}</main>
       </div>
     </div>
   );
