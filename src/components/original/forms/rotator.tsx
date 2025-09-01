@@ -6,6 +6,8 @@ import * as z from 'zod';
 import { TrashIcon } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,8 +19,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { createRotators } from '@/actions/rotators';
-import { useTransition } from 'react';
 
 export const formSchema = z.object({
   items: z.array(
@@ -36,7 +36,10 @@ interface RotatorFormProps {
 export function RotatorForm(props: RotatorFormProps) {
   const { items } = props;
 
-  const [, startTransition] = useTransition();
+  const createRotator = useMutation(api.rotator.create);
+  const updateRotator = useMutation(api.rotator.update);
+  const deleteRotator = useMutation(api.rotator.delete);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { items },
@@ -46,12 +49,21 @@ export function RotatorForm(props: RotatorFormProps) {
     name: 'items',
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    startTransition(() => {
-      updateRotators(values);
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      // Process each item - create new ones, update existing ones
+      for (const item of values.items) {
+        if (item.id) {
+          // Update existing rotator
+          await updateRotator({ id: item.id, text: item.text });
+        } else {
+          // Create new rotator
+          await createRotator({ text: item.text });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save rotators:', error);
+    }
   }
 
   return (

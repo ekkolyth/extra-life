@@ -15,7 +15,15 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 export default function GoalsPage() {
-  const goals = useQuery(api.goals.list) || [];
+  const convexGoals = useQuery(api.goals.list) || [];
+
+  // Transform Convex data to match expected component types
+  const goals = convexGoals.map((g) => ({
+    id: g._id,
+    title: g.title,
+    amount: g.amount,
+    endOfStream: g.endOfStream,
+  }));
 
   return (
     <div className='flex flex-col gap-4'>

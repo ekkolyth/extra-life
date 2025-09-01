@@ -1,7 +1,5 @@
 'use client';
 
-import type { Goal } from '@/types/db';
-
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from 'convex/react';
@@ -23,7 +21,15 @@ const Overlay = () => {
   const [timesUp, setTimesUp] = useState(false);
 
   // Get goals from Convex
-  const goals = useQuery(api.goals.list) || [];
+  const convexGoals = useQuery(api.goals.list) || [];
+
+  // Transform Convex data to match expected component types
+  const goals = convexGoals.map((g) => ({
+    id: g._id,
+    title: g.title,
+    amount: g.amount,
+    endOfStream: g.endOfStream,
+  }));
 
   // Display time left for 5 seconds, then switch to wheel spins for 10 seconds, then repeat
   useEffect(() => {

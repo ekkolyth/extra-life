@@ -1,49 +1,77 @@
-'use client'
+'use client';
 
-import * as z from 'zod'
-import { useForm } from 'react-hook-form'
-import { DollarSignIcon } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useFormState } from 'react-dom'
+import * as z from 'zod';
+import { DollarSignIcon } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
-import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
-import { Button } from '@/components/ui/button'
-import { createGoal, updateGoal } from '@/actions/goals'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { DialogClose } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { DialogClose } from '@/components/ui/dialog';
 
 const formSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(2).max(50),
   amount: z.number().min(1).max(1000000),
-  endOfStream: z.boolean()
-})
-
-const initialState = {
-  message: null
-}
+  endOfStream: z.boolean(),
+});
 
 interface GoalFormProps {
-  defaultValues?: z.infer<typeof formSchema>
+  defaultValues?: z.infer<typeof formSchema>;
 }
 
 export function GoalForm(props: GoalFormProps) {
-  const { defaultValues } = props
-  const [state, formAction] = useFormState(defaultValues ? updateGoal : createGoal, initialState as any)
+  const { defaultValues } = props;
+
+  const createGoal = useMutation(api.goals.create);
+  const updateGoal = useMutation(api.goals.update);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
       title: '',
       amount: 0,
-      endOfStream: false
+      endOfStream: false,
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      if (values.id) {
+        // Update existing goal
+        await updateGoal({
+          id: values.id,
+          title: values.title,
+          amount: values.amount,
+          endOfStream: values.endOfStream,
+        });
+      } else {
+        // Create new goal
+        await createGoal({
+          title: values.title,
+          amount: values.amount,
+          endOfStream: values.endOfStream,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to save goal:', error);
     }
-  })
+  }
 
   return (
     <Form {...form}>
-      <form action={formAction} className='space-y-8'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         {defaultValues?.id && (
           <FormField
             control={form.control}
@@ -105,5 +133,5 @@ export function GoalForm(props: GoalFormProps) {
         </DialogClose>
       </form>
     </Form>
-  )
+  );
 }
