@@ -160,5 +160,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-@import '@clerk/themes/shadcn.css';
