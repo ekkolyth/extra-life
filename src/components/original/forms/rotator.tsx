@@ -38,7 +38,6 @@ export function RotatorForm(props: RotatorFormProps) {
 
   const createRotator = useMutation(api.rotator.create);
   const updateRotator = useMutation(api.rotator.update);
-  const deleteRotator = useMutation(api.rotator.delete);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -80,7 +79,7 @@ export function RotatorForm(props: RotatorFormProps) {
                 <FormControl>
                   <div className='flex gap-2'>
                     <Input placeholder='shadcn' {...field} />
-                    <Button variant='destructive' size='icon' onClick={() => remove(index)}>
+                    <Button variant='outline' size='icon' onClick={() => remove(index)}>
                       <TrashIcon />
                     </Button>
                   </div>
@@ -91,7 +90,7 @@ export function RotatorForm(props: RotatorFormProps) {
           />
         ))}
         <Button
-          variant='link'
+          variant='outline'
           type='button'
           onClick={() =>
             append({
@@ -102,7 +101,9 @@ export function RotatorForm(props: RotatorFormProps) {
           Add Item
         </Button>
         <div className='flex justify-end'>
-          <Button type='submit'>Save</Button>
+          <Button type='submit' variant='outline'>
+            Save
+          </Button>
         </div>
       </form>
     </Form>

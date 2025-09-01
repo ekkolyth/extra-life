@@ -1,6 +1,6 @@
 'use client';
 
-import { ChartPieIcon, ChevronRightIcon } from 'lucide-react';
+import { ChartPieIcon } from 'lucide-react';
 import { StatsResult, fetchStats, formatter, percentage } from '@/utils/donor-drive';
 import { useEffect, useState } from 'react';
 
@@ -97,10 +97,8 @@ export const TotalRaised = (props: TotalRaisedProps) => {
           </TableBody>
         </Table>
       </div>
-      <Button className='w-full' variant='link' asChild>
-        <Link href={data?.links.page} target='_blank' rel='noreferrer'>
-          Go to Extra Life Profile <ChevronRightIcon className='w-4 h-4' />
-        </Link>
+      <Button className='w-full' variant='outline' asChild>
+        <Link href='/donations'>View All Donations</Link>
       </Button>
     </ContentCard>
   );

@@ -1,17 +1,24 @@
-'use client'
+'use client';
 
-import type { Randomizer } from '@/types/db'
+import type { Randomizer } from '@/types/db';
 
-import * as z from 'zod'
-import { TrashIcon } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useFieldArray, useForm } from 'react-hook-form'
+import * as z from 'zod';
+import { TrashIcon } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { useTransition } from 'react'
-import { createRandomizer, deleteRandomizer, updateRandomizer } from '@/actions/randomizer'
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 export const formSchema = z.object({
   name: z.string().min(2),
@@ -19,54 +26,83 @@ export const formSchema = z.object({
     z.object({
       name: z.string(),
       limit: z.coerce.number().int().positive(),
-      redeemed: z.coerce.number().int().optional()
+      redeemed: z.coerce.number().int().optional(),
     })
-  )
-})
+  ),
+});
 
 interface RandomizerFormProps {
-  randomizer?: Randomizer
+  randomizer?: Randomizer;
 }
 
 export function RandomizerForm(props: RandomizerFormProps) {
-  const { randomizer } = props
+  const { randomizer } = props;
 
-  const updateRandomizerWithId = randomizer ? updateRandomizer.bind(null, randomizer.id) : undefined
-  const deleteRandomizerWithId = randomizer ? deleteRandomizer.bind(null, randomizer.id) : undefined
+  const createRandomizer = useMutation(api.randomizer.create);
+  const updateRandomizer = useMutation(api.randomizer.update);
+  const deleteRandomizer = useMutation(api.randomizer.delete);
 
-  const [, startTransition] = useTransition()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: randomizer ?? {
       name: '',
-      items: []
-    }
-  })
+      items: [],
+    },
+  });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'items'
-  })
+    name: 'items',
+  });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    startTransition(() => {
-      if (randomizer && updateRandomizerWithId) {
-        updateRandomizerWithId(values)
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      if (randomizer) {
+        // Update existing randomizer
+        await updateRandomizer({
+          id: randomizer.id,
+          name: values.name,
+          items: values.items.map((item) => ({
+            name: item.name,
+            limit: item.limit,
+            redeemed: item.redeemed || 0,
+          })),
+        });
       } else {
-        createRandomizer(values)
+        // Create new randomizer
+        await createRandomizer({
+          name: values.name,
+          items: values.items.map((item) => ({
+            name: item.name,
+            limit: item.limit,
+            redeemed: item.redeemed || 0,
+          })),
+        });
       }
-    })
+    } catch (error) {
+      console.error('Failed to save randomizer:', error);
+    }
+  }
+
+  async function handleDelete() {
+    if (!randomizer) return;
+
+    try {
+      await deleteRandomizer({ id: randomizer.id });
+    } catch (error) {
+      console.error('Failed to delete randomizer:', error);
+    }
   }
 
   return (
     <div className='border rounded p-4'>
       <header className='flex items-start justify-between'>
-        <h3 className='text-lg font-semibold pb-4'>{randomizer ? 'Edit Randomizer' : 'New Randomizer'}</h3>
+        <h3 className='text-lg font-semibold pb-4'>
+          {randomizer ? 'Edit Randomizer' : 'New Randomizer'}
+        </h3>
         {randomizer && (
-          <form action={deleteRandomizerWithId}>
-            <Button type='submit' size='sm' variant='outline'>
-              Delete {randomizer.name}
-            </Button>
-          </form>
+          <Button type='button' size='sm' variant='outline' onClick={handleDelete}>
+            Delete {randomizer.name}
+          </Button>
         )}
       </header>
       <Form {...form}>
@@ -128,7 +164,7 @@ export function RandomizerForm(props: RandomizerFormProps) {
                       </FormItem>
                     )}
                   />
-                  <Button type='button' size='icon' variant='destructive' onClick={() => remove(index)}>
+                  <Button type='button' size='icon' variant='outline' onClick={() => remove(index)}>
                     <span className='sr-only'>Remove</span>
                     <TrashIcon />
                   </Button>
@@ -136,17 +172,20 @@ export function RandomizerForm(props: RandomizerFormProps) {
               ))}
             <Button
               type='button'
-              variant='secondary'
+              variant='outline'
               onClick={() => append({ name: '', limit: 1, redeemed: 0 })}
-              className='mt-4'>
+              className='mt-4'
+            >
               Add Item
             </Button>
           </fieldset>
           <div className='flex justify-end'>
-            <Button type='submit'>Save</Button>
+            <Button type='submit' variant='outline'>
+              Save
+            </Button>
           </div>
         </form>
       </Form>
     </div>
-  )
+  );
 }

@@ -7,7 +7,7 @@ export function Header() {
       <div className='flex items-center gap-x-4'>
         <SignedOut>
           <SignInButton>
-            <Button variant='ghost'>Login</Button>
+            <Button variant='outline'>Login</Button>
           </SignInButton>
         </SignedOut>
         <SignedIn>

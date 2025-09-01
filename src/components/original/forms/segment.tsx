@@ -122,7 +122,9 @@ export function SegmentForm() {
               )}
             />
             <div className='flex justify-end'>
-              <Button type='submit'>Submit</Button>
+              <Button type='submit' variant='outline'>
+                Submit
+              </Button>
             </div>
           </div>
         </form>

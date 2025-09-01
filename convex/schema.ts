@@ -1,31 +1,31 @@
-import { defineSchema, defineTable } from 'convex/server'
-import { v } from 'convex/values'
+import { defineSchema, defineTable } from 'convex/server';
+import { v } from 'convex/values';
 
 export default defineSchema({
   goals: defineTable({
     title: v.string(),
     amount: v.number(),
-    endOfStream: v.boolean()
-  }),
+    endOfStream: v.boolean(),
+  }).index('by_title', ['title']),
   segments: defineTable({
     title: v.string(),
     startsAt: v.string(),
-    duration: v.number()
-  }),
+    duration: v.number(),
+  }).index('by_title', ['title']),
   rotator: defineTable({
-    text: v.string()
-  }),
+    text: v.string(),
+  }).index('by_text', ['text']),
   randomizers: defineTable({
-    name: v.string()
-  }),
+    name: v.string(),
+  }).index('by_name', ['name']),
   randomizerItems: defineTable({
     name: v.string(),
     limit: v.number(),
     redeemed: v.number(),
-    randomizerId: v.string()
+    randomizerId: v.string(),
   }),
   wheelRedemptions: defineTable({
     randomizerId: v.string(),
-    createdAt: v.string()
-  })
-})
+    createdAt: v.string(),
+  }),
+});

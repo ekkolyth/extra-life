@@ -152,8 +152,8 @@ export function RandomizerCard(props: RandomizerCardProps) {
         ) : (
           <li className='flex justify-between items-center'>
             <p>No randomizers found</p>
-            <Button variant='link' asChild>
-              <Link href='/dashboard/randomizer'>Add one</Link>
+            <Button variant='outline' asChild>
+              <Link href='/randomizer'>Manage Randomizers</Link>
             </Button>
           </li>
         )}

@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Sidebar />
       <div className='flex-1 flex flex-col'>
         <Header />
-        <main className='flex-1 container py-6 overflow-auto bg-background'>{children}</main>
+        <main className='flex-1 container p-4 overflow-auto bg-background'>{children}</main>
       </div>
     </div>
   );

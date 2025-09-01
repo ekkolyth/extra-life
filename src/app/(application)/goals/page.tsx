@@ -29,7 +29,9 @@ export default function GoalsPage() {
     <div className='flex flex-col gap-4'>
       <Dialog>
         <DialogTrigger asChild>
-          <Button className='self-end'>Create Goal</Button>
+          <Button className='self-end' variant='outline'>
+            Create Goal
+          </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>

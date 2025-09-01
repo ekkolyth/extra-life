@@ -63,9 +63,12 @@ export function GoalForm(props: GoalFormProps) {
           amount: values.amount,
           endOfStream: values.endOfStream,
         });
+        // Reset form after successful creation
+        form.reset();
       }
     } catch (error) {
       console.error('Failed to save goal:', error);
+      // You could add a toast notification here
     }
   }
 
@@ -107,7 +110,12 @@ export function GoalForm(props: GoalFormProps) {
               <div className='flex items-center gap-2'>
                 <DollarSignIcon />
                 <FormControl>
-                  <Input type='number' step={0.01} {...field} />
+                  <Input
+                    type='number'
+                    step={0.01}
+                    {...field}
+                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                  />
                 </FormControl>
               </div>
               <FormMessage />
@@ -129,7 +137,9 @@ export function GoalForm(props: GoalFormProps) {
           )}
         />
         <DialogClose asChild>
-          <Button type='submit'>Submit</Button>
+          <Button type='submit' variant='outline'>
+            Submit
+          </Button>
         </DialogClose>
       </form>
     </Form>

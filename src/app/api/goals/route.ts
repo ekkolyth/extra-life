@@ -49,7 +49,7 @@ export async function DELETE(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
     }
-    await convex.mutation(api.goals.delete, { id: id as any });
+    await convex.mutation(api.goals.removeGoal, { id: id as any });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to delete goal' }, { status: 500 });

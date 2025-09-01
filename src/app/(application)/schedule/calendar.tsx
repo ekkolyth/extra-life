@@ -17,7 +17,7 @@ interface CalendarProps {
 
 export function Calendar(props: CalendarProps) {
   const segments = useQuery(api.segment.list);
-  const deleteSegment = useMutation(api.segment.delete);
+  const deleteSegment = useMutation(api.segment.removeSegment);
 
   function getBackground(id: string) {
     let background = 'bg-secondary';

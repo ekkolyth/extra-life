@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { ChevronRightIcon, DollarSignIcon } from 'lucide-react';
+import { DollarSignIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import ContentCard from './card';
@@ -78,14 +78,8 @@ export const LatestDonations = (props: LatestDonationsProps) => {
             </li>
           ))}
       </ol>
-      <Button variant='link' className='w-full' asChild>
-        <Link
-          href='https://www.extra-life.org/index.cfm?fuseaction=portal.donations'
-          target='_blank'
-          rel='noreferrer'
-        >
-          Go to Extra Life Donations Page <ChevronRightIcon className='w-4 h-4' />
-        </Link>
+      <Button variant='outline' className='w-full' asChild>
+        <Link href='/donations'>View All Donations</Link>
       </Button>
     </ContentCard>
   );
