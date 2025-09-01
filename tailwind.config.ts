@@ -1,8 +1,6 @@
 import type { Config } from 'tailwindcss';
-import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config: Config = {
-  darkMode: 'class',
   content: [
     './src/pages/**/*.{ts,tsx}',
     './src/components/**/*.{ts,tsx}',
@@ -19,38 +17,38 @@ const config: Config = {
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        border: 'hsl(var(--color-border))',
+        input: 'hsl(var(--color-input))',
+        ring: 'hsl(var(--color-ring))',
+        background: 'hsl(var(--color-background))',
+        foreground: 'hsl(var(--color-foreground))',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'hsl(var(--color-primary))',
+          foreground: 'hsl(var(--color-primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: 'hsl(var(--color-secondary))',
+          foreground: 'hsl(var(--color-secondary-foreground))',
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: 'hsl(var(--color-destructive))',
+          foreground: 'hsl(var(--color-destructive-foreground))',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: 'hsl(var(--color-muted))',
+          foreground: 'hsl(var(--color-muted-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: 'hsl(var(--color-accent))',
+          foreground: 'hsl(var(--color-accent-foreground))',
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: 'hsl(var(--color-popover))',
+          foreground: 'hsl(var(--color-popover-foreground))',
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: 'hsl(var(--color-card))',
+          foreground: 'hsl(var(--color-card-foreground))',
         },
       },
       borderRadius: {
@@ -88,7 +86,7 @@ const config: Config = {
         '10xl': '16rem',
       },
       fontFamily: {
-        display: ['Heavitas Regular', ...defaultTheme.fontFamily.sans],
+        display: ['Heavitas Regular', 'sans-serif'],
       },
     },
   },
