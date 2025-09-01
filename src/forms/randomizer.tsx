@@ -49,10 +49,14 @@ export function RandomizerForm(props: RandomizerFormProps) {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(() => {
+      const formData = new FormData()
+      formData.append('name', values.name)
+      formData.append('description', JSON.stringify(values.items))
+
       if (randomizer && updateRandomizerWithId) {
-        updateRandomizerWithId(values)
+        updateRandomizerWithId(formData)
       } else {
-        createRandomizer(values)
+        createRandomizer(formData)
       }
     })
   }

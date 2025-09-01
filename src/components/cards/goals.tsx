@@ -39,7 +39,7 @@ export const Goals = (props: GoalsProps) => {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      return res.json() as Goal[];
+      return (await res.json()) as Goal[];
     },
     {
       initialData: goals,

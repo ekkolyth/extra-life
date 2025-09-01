@@ -43,7 +43,7 @@ export function RotatorForm(props: RotatorFormProps) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     startTransition(() => {
-      updateRotators(values)
+      updateRotators(values.items)
     })
   }
 
