@@ -1,61 +1,56 @@
-'use client'
+'use client';
 
-import { Fragment } from 'react'
-import { TrashIcon } from 'lucide-react'
-import { useQuery } from 'react-query'
-import { Segment } from '@/types/db'
-import { set, subMinutes } from 'date-fns'
+import { Fragment } from 'react';
+import { TrashIcon } from 'lucide-react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { Segment } from '@/types/db';
+import { set, subMinutes } from 'date-fns';
 
-import { cn } from '@/utils/style'
-import { queryClient } from '@/app/providers'
-import { Button } from '@/components/ui/button'
-import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time'
+import { cn } from '@/utils/style';
+import { Button } from '@/components/ui/button';
+import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time';
 
 interface CalendarProps {
-  segments: Segment[]
+  segments: Segment[];
 }
 
 export function Calendar(props: CalendarProps) {
-  const { data: segments } = useQuery(
-    'segments',
-    () => fetch('/api/segments').then(res => res.json() as Promise<Segment[]>),
-    {
-      initialData: props.segments
-    }
-  )
+  const segments = useQuery(api.segment.list);
+  const deleteSegment = useMutation(api.segment.delete);
 
   function getBackground(id: string) {
-    let background = 'bg-secondary'
-    if (!segments) return background
+    let background = 'bg-secondary';
+    if (!segments) return background;
 
-    const segment = segments?.find(s => s.id === id)
-    const startHour = Number(segment?.startsAt.split(':')[0] ?? '')
-    const startMinutes = Number(segment?.startsAt.split(':')[1] ?? '')
-    const endHour = startHour + Number(segment?.duration) / 2
-    const endMinutes = startMinutes + (Number(segment?.duration) % 2) * 30
+    const segment = segments?.find((s) => s.id === id);
+    const startHour = Number(segment?.startsAt.split(':')[0] ?? '');
+    const startMinutes = Number(segment?.startsAt.split(':')[1] ?? '');
+    const endHour = startHour + Number(segment?.duration) / 2;
+    const endMinutes = startMinutes + (Number(segment?.duration) % 2) * 30;
 
-    const now = new Date()
-    let start = new Date()
-    let end = new Date()
+    const now = new Date();
+    let start = new Date();
+    let end = new Date();
     start = set(start, {
       hours: startHour,
       minutes: startMinutes,
-      seconds: 0
-    })
+      seconds: 0,
+    });
     end = set(end, {
       hours: endHour,
       minutes: endMinutes,
-      seconds: 0
-    })
+      seconds: 0,
+    });
 
     // If the end is before now, make it grey
-    if (now > end) background = 'bg-secondary'
+    if (now > end) background = 'bg-secondary';
     // If the start is before now and the end is after now, make it green
-    else if (now > start && now < end) background = 'dark:bg-green-600'
+    else if (now > start && now < end) background = 'dark:bg-green-600';
     // If the start is within 30 minutes of now, make it yellow
-    else if (now >= subMinutes(start, 30)) background = 'dark:bg-yellow-600'
+    else if (now >= subMinutes(start, 30)) background = 'dark:bg-yellow-600';
 
-    return background
+    return background;
   }
 
   return (
@@ -67,7 +62,8 @@ export function Calendar(props: CalendarProps) {
             {/* Horizontal lines */}
             <div
               className='col-start-1 col-end-2 row-start-1 grid divide-y divide-foreground/30'
-              style={{ gridTemplateRows: 'repeat(48, minmax(2.5rem, 1fr))' }}>
+              style={{ gridTemplateRows: 'repeat(48, minmax(2.5rem, 1fr))' }}
+            >
               {Array.from({ length: 24 }).map((_, i) => (
                 <Fragment key={i}>
                   <div>
@@ -91,26 +87,27 @@ export function Calendar(props: CalendarProps) {
             {/* Events */}
             <ol
               className='col-start-1 col-end-2 row-start-1 grid grid-cols-1'
-              style={{ gridTemplateRows: 'repeat(48, minmax(2.5rem, 1fr))' }}>
-              {segments?.map(segment => (
+              style={{ gridTemplateRows: 'repeat(48, minmax(2.5rem, 1fr))' }}
+            >
+              {segments?.map((segment) => (
                 <li
                   key={segment.id}
                   className={cn('p-2 m-2 rounded flex justify-between', getBackground(segment.id))}
-                  style={{ gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${segment.duration}` }}>
+                  style={{
+                    gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${
+                      segment.duration
+                    }`,
+                  }}
+                >
                   <p>{segment.title}</p>
-                  <form
-                    onSubmit={e =>
-                      fetch('/api/segments', {
-                        method: 'DELETE',
-                        body: JSON.stringify({ id: segment.id })
-                      }).then(() => queryClient.invalidateQueries('segments'))
-                    }>
-                    <input type='hidden' value={segment.id} name='id' />
-                    <Button variant='ghost' size='sm'>
-                      <span className='sr-only'>Delete</span>
-                      <TrashIcon className='h-4 w-4' />
-                    </Button>
-                  </form>
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => deleteSegment({ id: segment.id })}
+                  >
+                    <span className='sr-only'>Delete</span>
+                    <TrashIcon className='h-4 w-4' />
+                  </Button>
                 </li>
               ))}
             </ol>
@@ -118,5 +115,5 @@ export function Calendar(props: CalendarProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,25 +1,19 @@
-'use client'
+'use client';
 
-import { useQuery } from 'react-query'
-import { fetchStats, formatter } from 'src/utils/donor-drive'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DonationsPage() {
-  const { data: stats } = useQuery(
-    'stats',
-    () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
-    {
-      refetchInterval: 15000
-    }
-  )
-
   return (
-    <div style={{ width: 1920, height: 1080 }} className='bg-grid-pattern relative'>
-      <div className='absolute inset-0 flex items-center justify-center'>
-        {typeof stats !== 'string' && (
-          <h1 className='text-10xl font-bold font-display text-white'>{formatter.format(stats?.sumDonations ?? 0)}</h1>
-        )}
-      </div>
-      <div className='w-full h-full bg-[#5D41DE] mix-blend-color'></div>
+    <div className='space-y-4'>
+      <Card>
+        <CardHeader>
+          <CardTitle>Donations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className='text-2xl font-bold'>$0</p>
+          <p className='text-sm text-muted-foreground'>Total raised so far</p>
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }

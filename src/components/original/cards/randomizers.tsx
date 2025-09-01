@@ -20,22 +20,13 @@ interface RandomizerCardProps {
 export function RandomizerCard(props: RandomizerCardProps) {
   const { randomizers } = props;
 
-  if (!randomizers || randomizers.length === 0) {
-    return (
-      <ContentCard title='Randomizers' icon={<FerrisWheelIcon />}>
-        <div className='text-center text-muted-foreground py-4'>
-          <p>No randomizers found</p>
-          <p className='text-sm'>Add some randomizers to get started</p>
-        </div>
-      </ContentCard>
-    );
-  }
-
   const [left, setLeft] = useState(0);
   const [total, setTotal] = useState(0);
   const [channel, setChannel] = useState<any>(null);
 
   useEffect(() => {
+    if (!randomizers || randomizers.length === 0) return;
+
     const fetchData = async () => {
       try {
         const data = await fetchWheelSpinDonations(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID));
@@ -49,7 +40,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
 
     const fetchRedemptions = async () => {
       try {
-        const res = await fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`);
+        const res = await fetch(`/api/randomizers/cloglmz700000lc08agvmot1/redemptions`);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -72,7 +63,18 @@ export function RandomizerCard(props: RandomizerCardProps) {
         clearInterval(redemptionsInterval);
       };
     }
-  }, [total]);
+  }, [total, randomizers]);
+
+  if (!randomizers || randomizers.length === 0) {
+    return (
+      <ContentCard title='Randomizers' icon={<FerrisWheelIcon />}>
+        <div className='text-center text-muted-foreground py-4'>
+          <p>No randomizers found</p>
+          <p className='text-sm'>Add some randomizers to get started</p>
+        </div>
+      </ContentCard>
+    );
+  }
 
   function handleWheelSpin(id: string) {
     // Get options for the given wheel

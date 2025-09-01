@@ -1,4 +1,6 @@
-import { DataTable } from '@/components/data-table';
+'use client';
+
+import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
 import {
   Dialog,
@@ -9,12 +11,11 @@ import {
 } from '@/components/ui/dialog';
 import { GoalForm } from '@/components/original/forms/goal';
 import { Button } from '@/components/ui/button';
-import { getGoals } from '@/actions/goals';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
-export default async function GoalsPage() {
-  const goalsData = getGoals();
-
-  const [goals] = await Promise.all([goalsData]);
+export default function GoalsPage() {
+  const goals = useQuery(api.goals.list) || [];
 
   return (
     <div className='flex flex-col gap-4'>

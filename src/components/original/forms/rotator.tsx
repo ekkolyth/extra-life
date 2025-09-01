@@ -1,50 +1,57 @@
-'use client'
+'use client';
 
-import type { Rotator } from '@/types/db'
+import type { Rotator } from '@/types/db';
 
-import * as z from 'zod'
-import { TrashIcon } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useFieldArray, useForm } from 'react-hook-form'
+import * as z from 'zod';
+import { TrashIcon } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useFieldArray, useForm } from 'react-hook-form';
 
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { updateRotators } from '@/actions/rotators'
-import { useTransition } from 'react'
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { createRotators } from '@/actions/rotators';
+import { useTransition } from 'react';
 
 export const formSchema = z.object({
   items: z.array(
     z.object({
       id: z.string().optional(),
-      text: z.string()
+      text: z.string(),
     })
-  )
-})
+  ),
+});
 
 interface RotatorFormProps {
-  items?: Rotator[]
+  items?: Rotator[];
 }
 
 export function RotatorForm(props: RotatorFormProps) {
-  const { items } = props
+  const { items } = props;
 
-  const [, startTransition] = useTransition()
+  const [, startTransition] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { items }
-  })
+    defaultValues: { items },
+  });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'items'
-  })
+    name: 'items',
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     startTransition(() => {
-      updateRotators(values)
-    })
+      updateRotators(values);
+    });
   }
 
   return (
@@ -76,9 +83,10 @@ export function RotatorForm(props: RotatorFormProps) {
           type='button'
           onClick={() =>
             append({
-              text: ''
+              text: '',
             })
-          }>
+          }
+        >
           Add Item
         </Button>
         <div className='flex justify-end'>
@@ -86,5 +94,5 @@ export function RotatorForm(props: RotatorFormProps) {
         </div>
       </form>
     </Form>
-  )
+  );
 }

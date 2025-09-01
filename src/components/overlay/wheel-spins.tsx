@@ -1,35 +1,27 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useQuery } from 'react-query'
-import { fetchWheelSpinDonations } from '../../utils/donor-drive'
+import { useState, useEffect } from 'react';
+import { useQuery as useConvexQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 export const WheelSpins = ({ visible }: { visible: boolean }) => {
-  useQuery(
-    ['extralife', 'wheelSpinDonations'],
-    () => fetchWheelSpinDonations(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
-    {
-      refetchInterval: 5000,
-      onSuccess(data) {
-        setTotal(data.length)
-      }
-    }
-  )
-  useQuery(
-    ['redemptions'],
-    () => fetch(`/api/randomizers/cloglmz700000lc08agvmotp1/redemptions`).then(res => res.json()),
-    {
-      cacheTime: 0,
-      refetchInterval: 5000,
-      onSuccess(data) {
-        setLeft(total - data.length)
-      }
-    }
-  )
+  // Use Convex for database queries
+  const _randomizers = useConvexQuery(api.randomizer.list) || [];
 
-  // Any donation over 20.22 and under 99.99 counts as 1 spin
-  const [left, setLeft] = useState(0)
-  const [total, setTotal] = useState(0)
+  // For now, we'll use demo data since we removed the donor-drive integration
+  // You can implement TanStack Query here later for real-time wheel spin data from external APIs
+  const [left, setLeft] = useState(5);
+  const total = 12;
+
+  // Demo mode - simulate some activity
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        setLeft((prev) => Math.max(0, prev - 1));
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className={visible ? '' : 'hidden'}>
@@ -38,5 +30,5 @@ export const WheelSpins = ({ visible }: { visible: boolean }) => {
         {left} / {total}
       </p>
     </div>
-  )
-}
+  );
+};

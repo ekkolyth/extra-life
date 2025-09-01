@@ -13,6 +13,8 @@ interface ScheduleProps {
 export const Schedule = (props: ScheduleProps) => {
   const { segments } = props;
 
+  const { currentSegment, nextSegment } = useSegments(segments);
+
   if (!segments || segments.length === 0) {
     return (
       <ContentCard title='Schedule' icon={<CalendarIcon />}>
@@ -29,8 +31,6 @@ export const Schedule = (props: ScheduleProps) => {
       </ContentCard>
     );
   }
-
-  const { currentSegment, nextSegment } = useSegments(segments);
 
   return (
     <ContentCard title='Schedule' icon={<CalendarIcon />}>

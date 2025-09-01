@@ -1,11 +1,11 @@
 'use client';
 
-import type { Goal } from '@/types/db';
+import { Goal } from '@/types/db';
 
-import { FlagIcon } from 'lucide-react';
+import { ClockIcon } from 'lucide-react';
 
 import ContentCard from './card';
-import { StatsResult, fetchStats } from '@/utils/donor-drive';
+import { StatsResult } from '@/utils/donor-drive';
 
 interface NextGoalProps {
   data: StatsResult;
@@ -22,7 +22,7 @@ export const NextGoal = (props: NextGoalProps) => {
   const nextGoal = goals.find((goal) => goal.amount > stats.sumDonations);
 
   return (
-    <ContentCard title='Next Goal' icon={<FlagIcon />}>
+    <ContentCard title='Next Goal' icon={<ClockIcon />}>
       <p className='text-3xl font-bold text-primary text-center'>{nextGoal?.title}</p>
     </ContentCard>
   );

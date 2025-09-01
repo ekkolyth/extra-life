@@ -1,48 +1,57 @@
-'use client'
+'use client';
 
-import * as z from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-// @ts-ignore
-import { experimental_useFormState as useFormState } from 'react-dom'
-
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { createSegment } from '@/actions/segments'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { revalidatePath } from 'next/cache'
-import { queryClient } from '@/app/providers'
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 const formSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(2).max(50),
   startsAt: z.string(),
-  duration: z.string()
-})
-
-const initialState = {
-  message: null
-}
+  duration: z.string(),
+});
 
 export function SegmentForm() {
+  const createSegment = useMutation(api.segment.create);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
       startsAt: '',
-      duration: '1'
-    }
-  })
+      duration: '1',
+    },
+  });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    fetch('/api/segments', {
-      method: 'POST',
-      body: JSON.stringify(values)
-    }).finally(() => {
-      queryClient.invalidateQueries('segments')
-      form.reset()
-    })
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await createSegment({
+        title: values.title,
+        startsAt: values.startsAt,
+        duration: parseInt(values.duration),
+      });
+      form.reset();
+    } catch (error) {
+      console.error('Failed to create segment:', error);
+    }
   }
 
   return (
@@ -83,7 +92,11 @@ export function SegmentForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Duration</FormLabel>
-                  <Select name={field.name} onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    name={field.name}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder='Select a verified email to display' />
@@ -115,5 +128,5 @@ export function SegmentForm() {
         </form>
       </Form>
     </div>
-  )
+  );
 }

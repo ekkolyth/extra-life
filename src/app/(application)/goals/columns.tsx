@@ -2,11 +2,9 @@
 
 import type { Goal } from '@/types/db';
 
-import { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 
 import { GoalForm } from '@/components/original/forms/goal';
-import { deleteGoal } from '@/actions/goals';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,7 +16,7 @@ import {
 import { USDollar } from '@/utils/currency';
 import { Badge } from '@/components/ui/badge';
 
-export const columns: ColumnDef<Goal>[] = [
+export const columns = [
   {
     accessorKey: 'title',
     header: 'Title',
@@ -26,23 +24,19 @@ export const columns: ColumnDef<Goal>[] = [
   {
     accessorKey: 'amount',
     header: 'Amount',
-    cell({ row }) {
-      return USDollar.format(row.original.amount);
-    },
+    cell: (row: { original: Goal }) => USDollar.format(row.original.amount),
   },
   {
     accessorKey: 'endOfStream',
     header: 'End of Stream',
-    cell({ row }) {
+    cell: (row: { original: Goal }) => {
       return row.original.endOfStream ? <Badge>End Of Stream</Badge> : undefined;
     },
   },
   {
     accessorKey: 'id',
-    header(props) {
-      return <span className='sr-only'>Actions</span>;
-    },
-    cell({ row }) {
+    header: () => <span className='sr-only'>Actions</span>,
+    cell: (row: { original: Goal }) => {
       return (
         <div className='flex justify-end gap-4'>
           <Dialog>
@@ -59,7 +53,12 @@ export const columns: ColumnDef<Goal>[] = [
               <GoalForm defaultValues={row.original} />
             </DialogContent>
           </Dialog>
-          <form action={deleteGoal}>
+          <form
+            action={async (formData) => {
+              // TODO: Implement Convex mutation for deleting goals
+              console.log('Delete goal:', row.original.id);
+            }}
+          >
             <input type='hidden' value={row.original.id} name='id' />
             <Button variant='destructive' size='icon'>
               <span className='sr-only'>Delete</span>

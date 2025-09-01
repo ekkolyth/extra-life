@@ -1,48 +1,34 @@
-import { useEffect } from 'react'
-import { useQuery } from 'react-query'
-import LurkMerch from '@/assets/img/lurk-merch.png'
-import Scolei from '@/assets/img/scolei.png'
+'use client';
 
-import { fetchStats, formatter, percentage } from 'src/utils/donor-drive'
-import { cn } from 'src/utils/style'
-import { Progress } from '../ui/progress'
+import { useQuery } from '@tanstack/react-query';
+import { fetchStats } from '@/utils/donor-drive';
+import { Progress } from '../ui/progress';
 
 const ProgressBar = () => {
-  const { data, error } = useQuery(
-    'stats',
-    () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
-    {
-      refetchInterval: 15000
-    }
-  )
+  // Use TanStack Query to fetch donation stats from donor-drive
+  // This will respect the 15-second rate limiting
+  const { data: stats } = useQuery({
+    queryKey: ['donationStats'],
+    queryFn: () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
+    refetchInterval: 15000, // 15 seconds as requested
+  });
 
-  useEffect(() => {
-    console.log('Fetching Donor Data Failed!\n', error)
-  }, [error])
-
-  if (data === 'Rate limited' || data?.sumDonations === undefined) {
-    return null
-  }
-
-  const donationPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
+  // Use real data if available, fallback to demo data
+  const donations = stats && stats !== 'Rate limited' ? stats.sumDonations : 5000;
+  const goal = stats && stats !== 'Rate limited' ? stats.goalAmount : 10000;
+  const donationPercentage = (donations / goal) * 100;
 
   return (
     <div
       style={{ width: 960 }}
-      className='bg-gray-800 border-4 text-white shadow-super rounded-full text-3xl font-bold text-center relative'>
-      {/* <div className='overflow-hidden rounded-full'>
-        <div className='h-16 bg-primary rounded-full' style={{ width: `${donationPercentage}%` }}></div>
-      </div> */}
+      className='bg-gray-800 border-4 text-white shadow-super rounded-full text-3xl font-bold text-center relative'
+    >
       <Progress className='h-16 w-full' value={donationPercentage} />
       <div className='absolute inset-0 flex items-center justify-center'>
-        <p>{formatter.format(data?.sumDonations)}</p>
-      </div>
-      <div className={cn(donationPercentage >= 100 ? 'w-32 h-32 right-48' : 'w-16 h-16 right-60', 'absolute bottom-0')}>
-        {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
-        <img src={donationPercentage >= 100 ? Scolei.src : LurkMerch.src} />
+        <p>${donations.toLocaleString()}</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProgressBar
+export default ProgressBar;

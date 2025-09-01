@@ -6,7 +6,7 @@ import { ChartBarIcon, CheckCircleIcon, ClockIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import ContentCard from './card';
-import { StatsResult, fetchStats } from '@/utils/donor-drive';
+import { StatsResult } from '@/utils/donor-drive';
 import {
   Table,
   TableBody,
@@ -26,22 +26,10 @@ export const Goals = (props: GoalsProps) => {
   const { data: stats, goals } = props;
   const [liveGoals, setLiveGoals] = useState<Goal[]>(goals || []);
   const [goalsError, setGoalsError] = useState<Error | null>(null);
-
-  if (!goals || goals.length === 0) {
-    return (
-      <ContentCard title='Goals' icon={<ChartBarIcon />}>
-        <div className='mt-4 text-center text-muted-foreground'>
-          <p>No goals found</p>
-          <p className='text-sm'>Add some goals to get started</p>
-        </div>
-      </ContentCard>
-    );
-  }
-
   const id = String(process.env.NEXT_PUBLIC_DONORDRIVE_ID);
 
   useEffect(() => {
-    if (id) {
+    if (id && goals && goals.length > 0) {
       const fetchGoals = async () => {
         try {
           const res = await fetch('/api/goals');
@@ -60,7 +48,18 @@ export const Goals = (props: GoalsProps) => {
       const interval = setInterval(fetchGoals, 15000);
       return () => clearInterval(interval);
     }
-  }, [id]);
+  }, [id, goals]);
+
+  if (!goals || goals.length === 0) {
+    return (
+      <ContentCard title='Goals' icon={<ChartBarIcon />}>
+        <div className='mt-4 text-center text-muted-foreground'>
+          <p>No goals found</p>
+          <p className='text-sm'>Add some goals to get started</p>
+        </div>
+      </ContentCard>
+    );
+  }
 
   const nextGoalIndex =
     stats && typeof stats !== 'string' && stats.sumDonations
