@@ -13,8 +13,7 @@ const nextConfig = {
         port: ''
       }
     ]
-  },
-  serverExternalPackages: ['convex']
+  }
 }
 
 module.exports = nextConfig

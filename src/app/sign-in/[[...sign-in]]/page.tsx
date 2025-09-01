@@ -1,3 +1,5 @@
+"use client";
+
 import { SignIn } from '@clerk/nextjs';
 
 export default function SignInPage() {
@@ -9,6 +11,7 @@ export default function SignInPage() {
           <p className='text-muted-foreground'>Sign in to manage your ExtraLife campaign</p>
         </div>
         <SignIn
+          afterSignInUrl='/dashboard'
           appearance={{
             elements: {
               rootBox: 'mx-auto',
