@@ -1,0 +1,48 @@
+import { useEffect } from 'react'
+import { useQuery } from 'react-query'
+import LurkMerch from '@/assets/img/lurk-merch.png'
+import Scolei from '@/assets/img/scolei.png'
+
+import { fetchStats, formatter, percentage } from 'src/utils/donor-drive'
+import { cn } from 'src/utils/style'
+import { Progress } from '../ui/progress'
+
+const ProgressBar = () => {
+  const { data, error } = useQuery(
+    'stats',
+    () => fetchStats(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID)),
+    {
+      refetchInterval: 15000
+    }
+  )
+
+  useEffect(() => {
+    console.log('Fetching Donor Data Failed!\n', error)
+  }, [error])
+
+  if (data === 'Rate limited' || data?.sumDonations === undefined) {
+    return null
+  }
+
+  const donationPercentage = percentage(data?.sumDonations, data?.fundraisingGoal)
+
+  return (
+    <div
+      style={{ width: 960 }}
+      className='bg-gray-800 border-4 text-white shadow-super rounded-full text-3xl font-bold text-center relative'>
+      {/* <div className='overflow-hidden rounded-full'>
+        <div className='h-16 bg-primary rounded-full' style={{ width: `${donationPercentage}%` }}></div>
+      </div> */}
+      <Progress className='h-16 w-full' value={donationPercentage} />
+      <div className='absolute inset-0 flex items-center justify-center'>
+        <p>{formatter.format(data?.sumDonations)}</p>
+      </div>
+      <div className={cn(donationPercentage >= 100 ? 'w-32 h-32 right-48' : 'w-16 h-16 right-60', 'absolute bottom-0')}>
+        {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+        <img src={donationPercentage >= 100 ? Scolei.src : LurkMerch.src} />
+      </div>
+    </div>
+  )
+}
+
+export default ProgressBar
