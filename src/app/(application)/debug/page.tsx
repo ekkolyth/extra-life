@@ -18,6 +18,7 @@ import {
 import { useState } from 'react';
 import { JSONViewer } from '@/components/ui/json-viewer';
 import { formatDistanceToNow } from 'date-fns';
+import React from 'react';
 
 export default function DebugPage() {
   const debugData = useQuery(api.donorDriveDebug.list);
@@ -140,7 +141,7 @@ export default function DebugPage() {
             </Card>
 
             {/* Logs Table */}
-            <Card className='bg-card border-border'>
+            <Card className='bg-zinc-950/=90 border-border'>
               <CardHeader className='border-b border-border'>
                 <CardTitle className='text-lg text-foreground'>API Call Logs</CardTitle>
               </CardHeader>
@@ -148,7 +149,6 @@ export default function DebugPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className='border-border hover:bg-muted/50'>
-                      <TableHead className='w-16 text-muted-foreground font-medium'>#</TableHead>
                       <TableHead className='text-muted-foreground font-medium'>Timestamp</TableHead>
                       <TableHead className='text-muted-foreground font-medium'>
                         API Endpoint
@@ -172,26 +172,20 @@ export default function DebugPage() {
                       const isExpanded = expandedRows.has(entry._id);
 
                       return (
-                        <>
+                        <React.Fragment key={entry._id}>
                           {/* Main Row */}
                           <TableRow
-                            key={entry._id}
                             className='border-border hover:bg-muted/50 cursor-pointer'
                             onClick={() => toggleRow(entry._id)}
                           >
-                            <TableCell className='font-mono text-sm text-muted-foreground'>
-                              #{debugData.length - index}
-                            </TableCell>
                             <TableCell>
                               <div className='space-y-1'>
-                                <p className='text-sm font-medium text-foreground'>
+                                <p className='text-sm font-semibold text-foreground'>
                                   {timestamp.toLocaleDateString()}
                                 </p>
                                 <p className='text-xs text-muted-foreground'>
-                                  {timestamp.toLocaleTimeString()}
-                                </p>
-                                <p className='text-xs text-primary'>
-                                  {formatDistanceToNow(timestamp, { addSuffix: true })}
+                                  {timestamp.toLocaleTimeString()} (
+                                  {formatDistanceToNow(timestamp, { addSuffix: true })})
                                 </p>
                               </div>
                             </TableCell>
@@ -204,7 +198,7 @@ export default function DebugPage() {
                               <Badge
                                 className={`${getDataTypeColor(
                                   dataType
-                                )} text-xs font-medium px-2 py-1`}
+                                )} text-xs text-accent border-accent font-medium bg-zinc-950 px-2 py-1`}
                               >
                                 {dataType}
                               </Badge>
@@ -214,7 +208,7 @@ export default function DebugPage() {
                                 <Button
                                   variant='ghost'
                                   size='sm'
-                                  className='h-6 w-6 p-0 text-muted-foreground hover:text-foreground hover:bg-muted'
+                                  className='size-6 p-0 text-muted-foreground hover:text-foreground hover:bg-muted'
                                 >
                                   {isExpanded ? (
                                     <ChevronDownIcon className='h-4 w-4' />
@@ -229,8 +223,8 @@ export default function DebugPage() {
                           {/* Expanded Data Row */}
                           {isExpanded && (
                             <TableRow key={`${entry._id}-expanded`} className='border-border'>
-                              <TableCell colSpan={5} className='p-0'>
-                                <div className='bg-muted border-t border-border p-6'>
+                              <TableCell colSpan={4} className='p-0'>
+                                <div className='bg-muted/50 border-t border-border p-6'>
                                   <div className='space-y-6'>
                                     {/* Stats */}
                                     {entry.stats && (
@@ -239,7 +233,7 @@ export default function DebugPage() {
                                           <div className='w-2 h-2 bg-primary rounded-full'></div>
                                           Stats
                                         </h4>
-                                        <div className='bg-card rounded-lg p-4 border border-border'>
+                                        <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
                                           <JSONViewer data={entry.stats} />
                                         </div>
                                       </div>
@@ -252,7 +246,7 @@ export default function DebugPage() {
                                           <div className='w-2 h-2 bg-primary rounded-full'></div>
                                           Top Donation
                                         </h4>
-                                        <div className='bg-card rounded-lg p-4 border border-border'>
+                                        <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
                                           <JSONViewer data={entry.topDonation} />
                                         </div>
                                       </div>
@@ -265,7 +259,7 @@ export default function DebugPage() {
                                           <div className='w-2 h-2 bg-primary rounded-full'></div>
                                           Top Donor
                                         </h4>
-                                        <div className='bg-card rounded-lg p-4 border border-border'>
+                                        <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
                                           <JSONViewer data={entry.topDonor} />
                                         </div>
                                       </div>
@@ -278,7 +272,7 @@ export default function DebugPage() {
                                           <div className='w-2 h-2 bg-primary rounded-full'></div>
                                           Latest Donations
                                         </h4>
-                                        <div className='bg-card rounded-lg p-4 border border-border'>
+                                        <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
                                           <JSONViewer data={entry.latestDonations} />
                                         </div>
                                       </div>
@@ -288,7 +282,7 @@ export default function DebugPage() {
                               </TableCell>
                             </TableRow>
                           )}
-                        </>
+                        </React.Fragment>
                       );
                     })}
                   </TableBody>

@@ -16,10 +16,10 @@ export const list = query({
 
 export const add = mutation({
   args: {
-    stats: v.any(),
-    topDonation: v.any(),
-    topDonor: v.any(),
-    latestDonations: v.any(),
+    stats: v.optional(v.any()),
+    topDonation: v.optional(v.any()),
+    topDonor: v.optional(v.any()),
+    latestDonations: v.optional(v.any()),
     apiEndpoint: v.string(),
   },
   handler: async (ctx, args) => {
