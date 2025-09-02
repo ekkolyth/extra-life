@@ -141,7 +141,7 @@ export default function DebugPage() {
             </Card>
 
             {/* Logs Table */}
-            <Card className='bg-zinc-950/=90 border-border'>
+            <Card className='bg-zinc-950/90 border-border'>
               <CardHeader className='border-b border-border'>
                 <CardTitle className='text-lg text-foreground'>API Call Logs</CardTitle>
               </CardHeader>

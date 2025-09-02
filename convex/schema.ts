@@ -1,10 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import {
-  statsValidator,
-  donorValidator,
-  donationValidator,
-} from './donor-drive-validators';
+import { statsValidator, donorValidator, donationValidator } from './donor_drive_validators';
 
 export default defineSchema({
   goals: defineTable({

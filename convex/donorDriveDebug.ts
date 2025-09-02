@@ -1,10 +1,6 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import {
-  statsValidator,
-  donorValidator,
-  donationValidator,
-} from './donor-drive-validators';
+import { statsValidator, donorValidator, donationValidator } from './donor_drive_validators';
 
 export const list = query({
   handler: async (ctx) => {

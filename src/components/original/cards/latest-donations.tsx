@@ -51,9 +51,12 @@ export const LatestDonations = (props: LatestDonationsProps) => {
     <ContentCard title='Latest Donations' icon={<DollarSignIcon />}>
       <ol className='my-4 flex flex-col divide-y divide-border'>
         {Array.isArray(data) &&
-          data.length &&
-          data.map((d) => (
-            <li key={d.donationID} className='flex flex-wrap py-3'>
+          data.length > 0 &&
+          data.map((d, index) => (
+            <li
+              key={d.donationID || `donation-${index}-${d.createdDateUTC}`}
+              className='flex flex-wrap py-3'
+            >
               <div className='mr-2 flex items-center'>
                 {d.avatarImageURL && (
                   <Image
@@ -67,7 +70,7 @@ export const LatestDonations = (props: LatestDonationsProps) => {
               </div>
               <div className='flex flex-grow justify-between items-center'>
                 <div>
-                  <p className='font-semibold'>{d.displayName ?? 'Anonymous'}</p>
+                  <p className='font-semibold'>{d.recipientName || d.displayName || 'Anonymous'}</p>
                   <p className='text-xs -mt-1 text-primary'>{dayjs(d.createdDateUTC).fromNow()}</p>
                 </div>
                 <p className='font-semibold'>{formatter.format(d.amount)}</p>
