@@ -51,7 +51,6 @@ export const update = mutation({
     id: v.id('randomizers'),
     name: v.string(),
     items: v.object({
-      deleteMany: v.any(),
       create: v.array(v.object({ name: v.string(), limit: v.number() })),
     }),
   },

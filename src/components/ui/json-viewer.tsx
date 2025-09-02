@@ -3,7 +3,7 @@
 import Editor from '@monaco-editor/react';
 
 interface JSONViewerProps {
-  data: any;
+  data: unknown;
   title?: string;
 }
 

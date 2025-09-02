@@ -13,7 +13,6 @@ import {
   ExternalLink,
   Bug,
 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 const navigationItems = [

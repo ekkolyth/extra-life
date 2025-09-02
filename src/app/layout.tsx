@@ -1,20 +1,10 @@
 import { ClerkProvider } from '@/components/clerk-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import type { CSSProperties, ReactNode } from 'react';
 import './globals.css';
 import ConvexClientProvider from '@/components/convex-client-provider';
 import { Providers } from './providers';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
 
 export const metadata: Metadata = {
   title: 'Clerk Next.js Quickstart',
@@ -24,13 +14,22 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
-    <html lang='en' className='h-full' suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} flex min-h-full flex-col antialiased`}
-      >
+    <html
+      lang='en'
+      className='h-full'
+      suppressHydrationWarning
+      style={{ '--font-satoshi': '"Satoshi", sans-serif' } as CSSProperties}
+    >
+      <head>
+        <link
+          rel='stylesheet'
+          href='https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap'
+        />
+      </head>
+      <body className='flex min-h-full flex-col antialiased font-sans'>
         <ClerkProvider>
           <ThemeProvider
             attribute='class'

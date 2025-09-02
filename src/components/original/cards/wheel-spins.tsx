@@ -4,13 +4,12 @@ import { EllipsisHorizontalIcon, GiftIcon } from '@heroicons/react/24/outline';
 import { Fragment, useState, useEffect } from 'react';
 import ContentCard from './card';
 import { fetchWheelSpinDonations } from '@/utils/donor-drive';
-import { toast } from 'react-toastify';
 import { Menu, Transition } from '@headlessui/react';
 import { cn } from '@/utils/style';
 
 const WheelSpins = () => {
   // Any donation over 20.22 and under 99.99 counts as 1 spin
-  const [left, setLeft] = useState(0);
+  const [left] = useState(0);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
@@ -73,7 +72,7 @@ const WheelSpins = () => {
             <Menu.Items className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
               <div className='py-1'>
                 <Menu.Item>
-                  {({ active }) => (
+                  {({ active }: { active: boolean }) => (
                     <button
                       onClick={() => undoWheelSpin()}
                       className={cn(
@@ -86,7 +85,7 @@ const WheelSpins = () => {
                   )}
                 </Menu.Item>
                 <Menu.Item>
-                  {({ active }) => (
+                  {({ active }: { active: boolean }) => (
                     <button
                       onClick={() => spinWheel()}
                       className={cn(

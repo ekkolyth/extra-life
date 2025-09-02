@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -54,7 +55,7 @@ export function RotatorForm(props: RotatorFormProps) {
       for (const item of values.items) {
         if (item.id) {
           // Update existing rotator
-          await updateRotator({ id: item.id, text: item.text });
+          await updateRotator({ id: item.id as Id<'rotator'>, text: item.text });
         } else {
           // Create new rotator
           await createRotator({ text: item.text });

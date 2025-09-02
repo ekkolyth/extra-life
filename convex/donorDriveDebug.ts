@@ -1,5 +1,10 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
+import {
+  statsValidator,
+  donorValidator,
+  donationValidator,
+} from './donor-drive-validators';
 
 export const list = query({
   handler: async (ctx) => {
@@ -16,10 +21,10 @@ export const list = query({
 
 export const add = mutation({
   args: {
-    stats: v.optional(v.any()),
-    topDonation: v.optional(v.any()),
-    topDonor: v.optional(v.any()),
-    latestDonations: v.optional(v.any()),
+    stats: v.union(statsValidator, v.null()),
+    topDonation: v.union(donationValidator, v.null()),
+    topDonor: v.union(donorValidator, v.null()),
+    latestDonations: v.union(v.array(donationValidator), v.null()),
     apiEndpoint: v.string(),
   },
   handler: async (ctx, args) => {

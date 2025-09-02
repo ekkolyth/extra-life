@@ -1,12 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery as useConvexQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
 
 export const WheelSpins = ({ visible }: { visible: boolean }) => {
-  // Use Convex for database queries
-  const _randomizers = useConvexQuery(api.randomizer.list) || [];
 
   // For now, we'll use demo data since we removed the donor-drive integration
   // You can implement TanStack Query here later for real-time wheel spin data from external APIs

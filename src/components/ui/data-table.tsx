@@ -8,13 +8,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import type { ReactNode } from 'react';
+
+interface DataTableColumn<TData> {
+  accessorKey: string;
+  header: ReactNode;
+  cell?: (row: { original: TData }) => ReactNode;
+}
 
 interface DataTableProps<TData> {
-  columns: {
-    accessorKey: string;
-    header: string;
-    cell?: (row: { original: TData }) => React.ReactNode;
-  }[];
+  columns: DataTableColumn<TData>[];
   data: TData[];
 }
 
@@ -36,7 +39,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                 <TableCell key={column.accessorKey}>
                   {column.cell
                     ? column.cell({ original: row })
-                    : (row as Record<string, unknown>)[column.accessorKey]}
+                    : (row as Record<string, ReactNode>)[column.accessorKey]}
                 </TableCell>
               ))}
             </TableRow>

@@ -1,5 +1,10 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
+import {
+  statsValidator,
+  donorValidator,
+  donationValidator,
+} from './donor-drive-validators';
 
 export default defineSchema({
   goals: defineTable({
@@ -30,10 +35,10 @@ export default defineSchema({
   }),
   donorDriveDebug: defineTable({
     timestamp: v.string(),
-    stats: v.any(),
-    topDonation: v.any(),
-    topDonor: v.any(),
-    latestDonations: v.any(),
+    stats: v.union(statsValidator, v.null()),
+    topDonation: v.union(donationValidator, v.null()),
+    topDonor: v.union(donorValidator, v.null()),
+    latestDonations: v.union(v.array(donationValidator), v.null()),
     apiEndpoint: v.string(),
   }).index('by_timestamp', ['timestamp']),
 });

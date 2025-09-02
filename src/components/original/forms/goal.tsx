@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
 
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -51,7 +52,7 @@ export function GoalForm(props: GoalFormProps) {
       if (values.id) {
         // Update existing goal
         await updateGoal({
-          id: values.id,
+          id: values.id as Id<'goals'>,
           title: values.title,
           amount: values.amount,
           endOfStream: values.endOfStream,

@@ -1,39 +1,41 @@
+import type { Id } from '@/convex/_generated/dataModel';
+
 export interface Goal {
-  id: string
-  title: string
-  amount: number
-  endOfStream: boolean
+  id: Id<'goals'>;
+  title: string;
+  amount: number;
+  endOfStream: boolean;
 }
 
 export interface Segment {
-  id: string
-  title: string
-  startsAt: string
-  duration: number
+  id: Id<'segments'>;
+  title: string;
+  startsAt: string;
+  duration: number;
 }
 
 export interface Rotator {
-  id: string
-  text: string
+  id: Id<'rotator'>;
+  text: string;
 }
 
 export interface RandomizerItem {
-  id: string
-  name: string
-  limit: number
-  redeemed: number
-  randomizerId: string
+  id: Id<'randomizerItems'>;
+  name: string;
+  limit: number;
+  redeemed: number;
+  randomizerId: string;
 }
 
 export interface WheelRedemption {
-  id: string
-  randomizerId: string
-  createdAt: string
+  id: Id<'wheelRedemptions'>;
+  randomizerId: string;
+  createdAt: string;
 }
 
 export interface Randomizer {
-  id: string
-  name: string
-  items: RandomizerItem[]
-  redemptions: WheelRedemption[]
+  id: Id<'randomizers'>;
+  name: string;
+  items: RandomizerItem[];
+  redemptions: WheelRedemption[];
 }

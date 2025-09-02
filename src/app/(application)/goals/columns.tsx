@@ -73,7 +73,7 @@ export const columns = [
   },
   {
     accessorKey: 'id',
-    header: () => <span className='sr-only'>Actions</span>,
+    header: <span className='sr-only'>Actions</span>,
     cell: (row: { original: Goal }) => <GoalActions goal={row.original} />,
   },
 ];

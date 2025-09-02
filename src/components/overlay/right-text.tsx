@@ -11,6 +11,7 @@ import {
   fetchStatsWithDebug,
   useDonorDriveDebug,
 } from '@/utils/donor-drive-debug';
+import { useSegments } from '@/utils/useSegments';
 
 interface TopRotatorProps {
   goals: Goal[];
@@ -34,19 +35,25 @@ export function RightText(props: TopRotatorProps) {
       fetchTopDonorWithDebug(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID), debugMutation),
   });
   const { data: stats } = useQuery({
-    queryKey: 'stats',
+    queryKey: ['stats'],
     queryFn: () =>
       fetchStatsWithDebug(String(process.env.NEXT_PUBLIC_DONORDRIVE_ID), debugMutation),
     refetchInterval: 15000,
   });
 
   // Use Convex for database queries
-  const segments = useConvexQuery(api.segment.list) || [];
+  const convexSegments = useConvexQuery(api.segment.list) || [];
+  const segments = convexSegments.map((s) => ({
+    id: s._id,
+    title: s.title,
+    startsAt: s.startsAt,
+    duration: s.duration,
+  }));
   const { currentSegment, nextSegment } = useSegments(segments);
 
   useEffect(() => {
     if (stats && stats !== 'Rate limited' && goals && goals.length) {
-      setNextGoal(goals?.find((goal) => goal.amount > stats.sumDonations) ?? null);
+      setNextGoal(goals.find((goal) => goal.amount > stats.sumDonations) ?? null);
     }
   }, [stats, goals]);
 

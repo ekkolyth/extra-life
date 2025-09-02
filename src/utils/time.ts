@@ -1,8 +1,8 @@
-import { config } from '@/data/config'
+import { appConfig } from '@/data/config'
 
 export const timeslotFromIndex = (index: number) => {
   let hour = 0
-  let streamHour = config.streamStart.split(':')[0]
+  const streamHour = appConfig.streamStart.split(':')[0]
 
   if (index + Number(streamHour) > 24) {
     hour = index + Number(streamHour) - 24
@@ -19,8 +19,8 @@ export const timeslotFromIndex = (index: number) => {
 // ex: 02:00 -> 13
 export const timeslotIndexFromStart = (start: string) => {
   let index = 1
-  let [hour, minute] = config.streamStart.split(':')
-  let [startHour, startMinute] = start.split(':')
+  const [hour, minute] = appConfig.streamStart.split(':')
+  const [startHour, startMinute] = start.split(':')
 
   // If the start hour and minutes are the same, return the index, otherwise dig deeper
   if (hour !== startHour || minute !== startMinute) {

@@ -2,19 +2,16 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Randomizer, RandomizerItem } from '@/types/db';
+import { Randomizer } from '@/types/db';
+import type { Id } from '@/convex/_generated/dataModel';
 import { FerrisWheelIcon } from 'lucide-react';
 
 import ContentCard from './card';
 import { Button } from '@/components/ui/button';
 import { fetchWheelSpinDonations } from '@/utils/donor-drive';
 
-interface RandomizerWithItems extends Randomizer {
-  items: RandomizerItem[];
-}
-
 interface RandomizerCardProps {
-  randomizers: RandomizerWithItems[];
+  randomizers: Randomizer[];
 }
 
 export function RandomizerCard(props: RandomizerCardProps) {
@@ -22,7 +19,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
 
   const [left, setLeft] = useState(0);
   const [total, setTotal] = useState(0);
-  const [channel, setChannel] = useState<any>(null);
+  // Channel publishing removed for now
 
   useEffect(() => {
     if (!randomizers || randomizers.length === 0) return;
@@ -76,7 +73,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
     );
   }
 
-  function handleWheelSpin(id: string) {
+  function handleWheelSpin(id: Id<'randomizers'>) {
     // Get options for the given wheel
     const items = randomizers.find((randomizer) => randomizer.id === id)?.items;
 
@@ -100,15 +97,7 @@ export function RandomizerCard(props: RandomizerCardProps) {
       }),
     });
 
-    // Publish the winner
-    channel?.publish({
-      name: 'wheel-spin',
-      data: {
-        id,
-        answer: winner,
-        randomizer: randomizers.find((randomizer) => randomizer.id === id),
-      },
-    });
+    // Publish the winner - to be implemented
   }
 
   return (
@@ -132,21 +121,14 @@ export function RandomizerCard(props: RandomizerCardProps) {
           randomizers.map((randomizer) => (
             <li key={randomizer.id} className='flex justify-between items-center'>
               <p>{randomizer.name}</p>
-              {channel && (
-                <Button
-                  // disabled={left === 0}
-                  variant='link'
-                  onClick={() => {
-                    handleWheelSpin(randomizer.id);
-                    // channel.publish({
-                    //   name: 'randomizer-start',
-                    //   data: randomizer.id
-                    // })
-                  }}
-                >
-                  Trigger
-                </Button>
-              )}
+              <Button
+                variant='link'
+                onClick={() => {
+                  handleWheelSpin(randomizer.id);
+                }}
+              >
+                Trigger
+              </Button>
             </li>
           ))
         ) : (

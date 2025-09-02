@@ -2,6 +2,7 @@
 
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
+import type { Goal } from '@/types/db';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,7 @@ export default function GoalsPage() {
   const convexGoals = useQuery(api.goals.list) || [];
 
   // Transform Convex data to match expected component types
-  const goals = convexGoals.map((g) => ({
+  const goals: Goal[] = convexGoals.map((g) => ({
     id: g._id,
     title: g.title,
     amount: g.amount,

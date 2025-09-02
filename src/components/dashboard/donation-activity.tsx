@@ -7,7 +7,7 @@ import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 export function DonationActivity() {
-  const recentDonations = [
+  const recentDonations: Array<{ amount: number; name: string; time: string }> = [
     // Empty for now, but structure ready for real data
   ];
 

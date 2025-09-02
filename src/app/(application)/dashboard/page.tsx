@@ -15,6 +15,7 @@ import {
   fetchTopDonorWithDebug,
   useDonorDriveDebug,
 } from '@/utils/donor-drive-debug';
+import type { Goal, Randomizer, Segment } from '@/types/db';
 
 import { Schedule } from '@/components/original/cards/segments';
 import { RandomizerCard } from '@/components/original/cards/randomizers';
@@ -70,7 +71,7 @@ export default function AdminPage() {
   }
 
   // Transform Convex data to match expected component types
-  const randomizers = (convexRandomizers || []).map((r) => ({
+  const randomizers: Randomizer[] = (convexRandomizers || []).map((r) => ({
     id: r._id,
     name: r.name,
     items:
@@ -84,14 +85,14 @@ export default function AdminPage() {
     redemptions: [], // TODO: Implement redemptions query
   }));
 
-  const segments = (convexSegments || []).map((s) => ({
+  const segments: Segment[] = (convexSegments || []).map((s) => ({
     id: s._id,
     title: s.title,
     startsAt: s.startsAt,
     duration: s.duration,
   }));
 
-  const goals = (convexGoals || []).map((g) => ({
+  const goals: Goal[] = (convexGoals || []).map((g) => ({
     id: g._id,
     title: g.title,
     amount: g.amount,

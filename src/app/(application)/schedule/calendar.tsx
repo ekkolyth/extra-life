@@ -4,26 +4,19 @@ import { Fragment } from 'react';
 import { TrashIcon } from 'lucide-react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Segment } from '@/types/db';
 import { set, subMinutes } from 'date-fns';
 
 import { cn } from '@/utils/style';
 import { Button } from '@/components/ui/button';
 import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time';
 
-interface CalendarProps {
-  segments: Segment[];
-}
-
-export function Calendar(props: CalendarProps) {
-  const segments = useQuery(api.segment.list);
+export function Calendar() {
+  const segments = useQuery(api.segment.list) || [];
   const deleteSegment = useMutation(api.segment.removeSegment);
 
   function getBackground(id: string) {
     let background = 'bg-secondary';
-    if (!segments) return background;
-
-    const segment = segments?.find((s) => s.id === id);
+    const segment = segments.find((s) => s._id === id);
     const startHour = Number(segment?.startsAt.split(':')[0] ?? '');
     const startMinutes = Number(segment?.startsAt.split(':')[1] ?? '');
     const endHour = startHour + Number(segment?.duration) / 2;
@@ -89,21 +82,19 @@ export function Calendar(props: CalendarProps) {
               className='col-start-1 col-end-2 row-start-1 grid grid-cols-1'
               style={{ gridTemplateRows: 'repeat(48, minmax(2.5rem, 1fr))' }}
             >
-              {segments?.map((segment) => (
+              {segments.map((segment) => (
                 <li
-                  key={segment.id}
-                  className={cn('p-2 m-2 rounded flex justify-between', getBackground(segment.id))}
+                  key={segment._id}
+                  className={cn('p-2 m-2 rounded flex justify-between', getBackground(segment._id))}
                   style={{
-                    gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${
-                      segment.duration
-                    }`,
+                    gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${segment.duration}`,
                   }}
                 >
                   <p>{segment.title}</p>
                   <Button
                     variant='ghost'
                     size='sm'
-                    onClick={() => deleteSegment({ id: segment.id })}
+                    onClick={() => deleteSegment({ id: segment._id })}
                   >
                     <span className='sr-only'>Delete</span>
                     <TrashIcon className='h-4 w-4' />

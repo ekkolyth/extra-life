@@ -87,9 +87,9 @@ function isBlocked(id: string) {
 const FIFTEEN_SECONDS = 15 * 1000
 
 type CacheEntry = {
-  timestamp: number
-  data: any
-}
+  timestamp: number;
+  data: unknown;
+};
 
 const cache = new Map<string, CacheEntry>()
 

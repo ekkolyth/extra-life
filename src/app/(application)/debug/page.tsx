@@ -158,7 +158,7 @@ export default function DebugPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {debugData.map((entry, index) => {
+                    {debugData.map((entry) => {
                       const timestamp = new Date(entry.timestamp);
                       const dataType = entry.stats
                         ? 'Stats'

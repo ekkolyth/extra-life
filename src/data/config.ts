@@ -1,3 +1,3 @@
-export const config = {
-  streamStart: '10:00'
-}
+export const appConfig = {
+  streamStart: '10:00',
+};

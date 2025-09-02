@@ -1,7 +1,5 @@
 'use client';
 
-import type { RandomizerItem } from '@/types/db';
-
 import { useState, useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -20,17 +18,17 @@ export function Randomizer(props: RandomizerProps) {
   const [choices, setChoices] = useState<string[]>([]);
 
   // Get randomizers from Convex
-  const randomizers = useQuery(api.randomizer.list) || [];
+  const randomizers = useQuery(api.randomizer.list);
 
   // For now, we'll use a simple demo mode since we removed Ably
   // You can implement Convex real-time subscriptions here later
   useEffect(() => {
     // Demo: Show randomizer every 30 seconds
     const interval = setInterval(() => {
-      if (randomizers.length > 0) {
+      if (randomizers && randomizers.length > 0) {
         const randomRandomizer = randomizers[Math.floor(Math.random() * randomizers.length)];
         if (randomRandomizer.items && randomRandomizer.items.length > 0) {
-          setChoices(randomRandomizer.items.map((item: RandomizerItem) => item.name));
+          setChoices(randomRandomizer.items.map((item) => item.name));
           setVisible(true);
           setSpinning(true);
 

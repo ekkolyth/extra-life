@@ -1,14 +1,33 @@
 import { api } from '@/convex/_generated/api';
 import { useMutation } from 'convex/react';
-import { fetchStats, fetchTopDonor, fetchTopDonation, fetchLatestDonations } from './donor-drive';
+import {
+  fetchStats,
+  fetchTopDonor,
+  fetchTopDonation,
+  fetchLatestDonations,
+  type StatsResult,
+  type Donor,
+  type Donation,
+} from './donor-drive';
 
 // Hook to get the debug mutation
+type DebugMutation = (args: {
+  stats: StatsResult | null;
+  topDonation: Donation | null;
+  topDonor: Donor | null;
+  latestDonations: Donation[] | null;
+  apiEndpoint: string;
+}) => Promise<null>;
+
 export function useDonorDriveDebug() {
   return useMutation(api.donorDriveDebug.add);
 }
 
 // Wrapper functions that store debug data
-export async function fetchStatsWithDebug(id: string, debugMutation: any) {
+export async function fetchStatsWithDebug(
+  id: string,
+  debugMutation?: DebugMutation
+): Promise<StatsResult | 'Rate limited'> {
   try {
     console.log('🔍 fetchStatsWithDebug called with id:', id);
     const result = await fetchStats(id);
@@ -40,7 +59,10 @@ export async function fetchStatsWithDebug(id: string, debugMutation: any) {
   }
 }
 
-export async function fetchTopDonorWithDebug(id: string, debugMutation: any) {
+export async function fetchTopDonorWithDebug(
+  id: string,
+  debugMutation?: DebugMutation
+): Promise<Donor | 'Rate limited'> {
   try {
     console.log('🔍 fetchTopDonorWithDebug called with id:', id);
     const result = await fetchTopDonor(id);
@@ -72,7 +94,10 @@ export async function fetchTopDonorWithDebug(id: string, debugMutation: any) {
   }
 }
 
-export async function fetchTopDonationWithDebug(id: string, debugMutation: any) {
+export async function fetchTopDonationWithDebug(
+  id: string,
+  debugMutation?: DebugMutation
+): Promise<Donation | 'Rate limited'> {
   try {
     console.log('🔍 fetchTopDonationWithDebug called with id:', id);
     const result = await fetchTopDonation(id);
@@ -104,7 +129,11 @@ export async function fetchTopDonationWithDebug(id: string, debugMutation: any) 
   }
 }
 
-export async function fetchLatestDonationsWithDebug(id: string, limit: number, debugMutation: any) {
+export async function fetchLatestDonationsWithDebug(
+  id: string,
+  limit: number,
+  debugMutation?: DebugMutation
+): Promise<Donation[] | 'Rate limited'> {
   try {
     console.log('🔍 fetchLatestDonationsWithDebug called with id:', id, 'limit:', limit);
     const result = await fetchLatestDonations(id, limit);

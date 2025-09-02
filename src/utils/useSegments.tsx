@@ -1,6 +1,5 @@
 import type { Segment } from '@/types/db'
 
-import { set } from 'date-fns'
 import { useEffect, useState } from 'react'
 
 export function useSegments(segments: Segment[]) {
