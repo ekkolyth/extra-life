@@ -289,18 +289,6 @@ export default function DebugPage() {
                 </Table>
               </CardContent>
             </Card>
-
-            {/* Info Box */}
-            <div className='p-6 bg-card rounded-lg border border-border'>
-              <h3 className='font-semibold mb-3 text-foreground'>Debug Info</h3>
-              <ul className='text-sm text-muted-foreground space-y-2'>
-                <li>• Shows last 10 API calls to DonorDrive</li>
-                <li>• Data is stored in Convex and updates in real-time</li>
-                <li>• Click any row to expand and view payload details</li>
-                <li>• Multiple rows can be expanded simultaneously</li>
-                <li>• Old entries are automatically cleaned up</li>
-              </ul>
-            </div>
           </div>
         )}
       </div>
