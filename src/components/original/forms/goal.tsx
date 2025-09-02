@@ -28,8 +28,10 @@ const formSchema = z.object({
   endOfStream: z.boolean(),
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 interface GoalFormProps {
-  defaultValues?: z.infer<typeof formSchema>;
+  defaultValues?: FormData;
 }
 
 export function GoalForm(props: GoalFormProps) {
@@ -38,7 +40,7 @@ export function GoalForm(props: GoalFormProps) {
   const createGoal = useMutation(api.goals.create);
   const updateGoal = useMutation(api.goals.update);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
       title: '',
@@ -47,7 +49,7 @@ export function GoalForm(props: GoalFormProps) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormData) {
     try {
       if (values.id) {
         // Update existing goal

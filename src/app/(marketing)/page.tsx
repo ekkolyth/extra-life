@@ -1,7 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 
 export default function Home() {
@@ -16,10 +14,10 @@ export default function Home() {
               <div className='w-8 h-8 border-2 border-white rounded-full flex items-center justify-center'>
                 <div className='w-2 h-2 bg-white rounded-full'></div>
               </div>
-              <span className='text-lg font-medium'>Children's Miracle Network Hospitals</span>
+              <span className='text-lg font-medium'>Children&apos;s Miracle Network Hospitals</span>
             </div>
             <h1 className='text-4xl md:text-6xl font-bold tracking-tight max-w-4xl mx-auto'>
-              Play Games to Change Kids' Health to Change the Future
+              Play Games to Change Kids&apos; Health to Change the Future
             </h1>
           </div>
         </div>
@@ -52,16 +50,16 @@ export default function Home() {
             <div>
               <h2 className='text-3xl font-bold text-foreground mb-4'>What Is Extra Life?</h2>
               <p className='text-lg text-muted-foreground leading-relaxed'>
-                Extra Life is a fundraising program of Children's Miracle Network Hospitals®. The
-                Extra Life community fundraises year-round to Change Kids' Health to Change the
-                Future. Donations go to member children's hospitals to fund critical life-saving
-                treatments and healthcare services, along with innovative research, vital pediatric
-                medical equipment, and child life services.
+                Extra Life is a fundraising program of Children&apos;s Miracle Network Hospitals®.
+                The Extra Life community fundraises year-round to Change Kids&apos; Health to Change
+                the Future. Donations go to member children&apos;s hospitals to fund critical
+                life-saving treatments and healthcare services, along with innovative research,
+                vital pediatric medical equipment, and child life services.
               </p>
               <p className='text-lg text-muted-foreground leading-relaxed mt-4'>
                 Since its inception in 2008, Extra Life has raised over $100 million USD to Change
-                Kids' Health to Change the Future. Right now, children's hospitals need YOUR
-                support.
+                Kids&apos; Health to Change the Future. Right now, children&apos;s hospitals need
+                YOUR support.
               </p>
             </div>
 
@@ -96,13 +94,14 @@ export default function Home() {
               <h3 className='text-2xl font-bold text-foreground'>Helping a Great Cause</h3>
               <p className='text-muted-foreground leading-relaxed'>
                 Regardless of what else you take away from this, just know that at the end of the
-                day we're here to raise money for those in need - and <em>that's</em> what matters.
+                day we&apos;re here to raise money for those in need - and <em>that&apos;s</em> what
+                matters.
               </p>
               <p className='text-muted-foreground leading-relaxed'>
-                Don't have money to donate? That's okay! Share the stream or the donations page with
-                friends and family, hang out in chat (trust me, we need people to talk to!), perform
-                magic on your own to bless the stream, what ever you like! Just know we appreciate
-                that you've cared enough to scroll this far down the page.
+                Don&apos;t have money to donate? That&apos;s okay! Share the stream or the donations
+                page with friends and family, hang out in chat (trust me, we need people to talk
+                to!), perform magic on your own to bless the stream, what ever you like! Just know
+                we appreciate that you&apos;ve cared enough to scroll this far down the page.
               </p>
               <div className='flex flex-col sm:flex-row gap-4'>
                 <Button size='lg' className='flex-1'>
@@ -146,19 +145,19 @@ export default function Home() {
               </Card>
               <p className='text-muted-foreground leading-relaxed'>
                 2023 Marks the SEVENTH Year that Kenway has put on this 24+ Hour effort to raise
-                money for Riley's Children Hospital in Indianapolis, IN.
+                money for Riley&apos;s Children Hospital in Indianapolis, IN.
               </p>
               <p className='text-muted-foreground leading-relaxed'>
-                The names and faces attached have changed over the years, but one thing hasn't - the
-                mission. Each year, 4 - 10 humans come together to put their bodies and spirit on
-                the line in hopes to encourage you "beautiful creatures of the internet" to give to
-                kids in need. Thankfully, you've always shown up to show us that you care - and
-                that's truly amazing.
+                The names and faces attached have changed over the years, but one thing hasn&apos;t
+                - the mission. Each year, 4 - 10 humans come together to put their bodies and spirit
+                on the line in hopes to encourage you &ldquo;beautiful creatures of the
+                internet&rdquo; to give to kids in need. Thankfully, you&apos;ve always shown up to
+                show us that you care - and that&apos;s truly amazing.
               </p>
               <p className='text-muted-foreground leading-relaxed'>
                 In 2020, the stream turnout was bigger than ever despite worries about attendance.
-                While 2023 hasn't panned out as hoped, we continue to keep the mission alive: raise
-                money for kids who need it.
+                While 2023 hasn&apos;t panned out as hoped, we continue to keep the mission alive:
+                raise money for kids who need it.
               </p>
 
               {/* Fundraising Totals */}

@@ -1,11 +1,27 @@
 'use client';
 
-import { EllipsisHorizontalIcon, GiftIcon } from '@heroicons/react/24/outline';
 import { Fragment, useState, useEffect } from 'react';
 import ContentCard from './card';
 import { fetchWheelSpinDonations } from '@/utils/donor-drive';
 import { Menu, Transition } from '@headlessui/react';
 import { cn } from '@/utils/style';
+
+// Simple SVG icons to replace heroicons
+const EllipsisHorizontalIcon = () => (
+  <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+    <path d='M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z' />
+  </svg>
+);
+
+const GiftIcon = () => (
+  <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
+    <path
+      fillRule='evenodd'
+      d='M5 5a3 3 0 015-2.236A3 3 0 0114.82 6H18a2 2 0 012 2v7a2 2 0 01-2 2h-1a1 1 0 01-1-1v-4a1 1 0 00-1-1H9a1 1 0 00-1 1v4a1 1 0 01-1 1H5a2 2 0 01-2-2V8a2 2 0 012-2h2.82A3 3 0 015 5zm4 1a1 1 0 00-1 1v1h1V6a1 1 0 00-1-1zm4 0a1 1 0 011 1v1h-1V6a1 1 0 00-1-1z'
+      clipRule='evenodd'
+    />
+  </svg>
+);
 
 const WheelSpins = () => {
   // Any donation over 20.22 and under 99.99 counts as 1 spin
@@ -56,7 +72,7 @@ const WheelSpins = () => {
         <Menu as='div' className='relative inline-block text-left'>
           <div>
             <Menu.Button className='inline-flex w-full justify-center rounded-full border bg-white p-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-el-dark-blue focus:ring-offset-2 focus:ring-offset-gray-100'>
-              <EllipsisHorizontalIcon className='w-5 h-5' />
+              <EllipsisHorizontalIcon />
             </Menu.Button>
           </div>
 
