@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
+import { TwitchEmbed } from '@/components/marketing/twitch-embed';
 
 export default function Home() {
   return (
@@ -75,6 +76,16 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Live Stream Section */}
+      <section id='live-stream' className='py-16'>
+        <div className='container mx-auto px-4'>
+          <div className='space-y-6'>
+            <h3 className='text-2xl font-bold text-foreground'>Live Stream</h3>
+            <TwitchEmbed />
+          </div>
+        </div>
+      </section>
+
       {/* How Your Donation Helps Section */}
       <section className='bg-muted/50 dark:bg-muted/20 py-16'>
         <div className='container mx-auto px-4'>
@@ -107,8 +118,8 @@ export default function Home() {
                 <Button size='lg' className='flex-1'>
                   DONATE NOW
                 </Button>
-                <Button size='lg' variant='outline' className='flex-1'>
-                  JUMP TO THE STREAM!
+                <Button asChild size='lg' variant='outline' className='flex-1'>
+                  <a href='#live-stream'>JUMP TO THE STREAM!</a>
                 </Button>
               </div>
             </div>
