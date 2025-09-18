@@ -94,7 +94,6 @@ export function Overview({ data }: OverviewProps) {
 
   return (
     <div className='space-y-6'>
-      {/* Main fundraising card with enhanced design */}
       <Card className='border-border/50 bg-card/50 backdrop-blur-sm'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-xl'>
@@ -134,75 +133,6 @@ export function Overview({ data }: OverviewProps) {
               </div>
             </div>
           </div>
-
-          <div className='space-y-3'>
-            <h4 className='text-sm font-medium text-foreground'>
-              Fundraising Trend
-            </h4>
-            <ChartContainer
-              config={{
-                amount: {
-                  label: 'Amount Raised',
-                  color: 'hsl(var(--chart-1))',
-                },
-              }}
-              className='h-[200px]'
-            >
-              <ResponsiveContainer
-                width='100%'
-                height='100%'
-              >
-                <AreaChart data={fundraisingData}>
-                  <defs>
-                    <linearGradient
-                      id='colorAmount'
-                      x1='0'
-                      y1='0'
-                      x2='0'
-                      y2='1'
-                    >
-                      <stop
-                        offset='5%'
-                        stopColor='hsl(var(--chart-1))'
-                        stopOpacity={0.3}
-                      />
-                      <stop
-                        offset='95%'
-                        stopColor='hsl(var(--chart-1))'
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <XAxis
-                    dataKey='month'
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{
-                      fill: 'hsl(var(--muted-foreground))',
-                      fontSize: 12,
-                    }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{
-                      fill: 'hsl(var(--muted-foreground))',
-                      fontSize: 12,
-                    }}
-                  />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Area
-                    type='monotone'
-                    dataKey='amount'
-                    stroke='hsl(var(--chart-1))'
-                    fillOpacity={1}
-                    fill='url(#colorAmount)'
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </div>
         </CardContent>
       </Card>
 
@@ -233,87 +163,6 @@ export function Overview({ data }: OverviewProps) {
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      {/* Goal visualization with pie chart */}
-      <div className='grid md:grid-cols-2 gap-6'>
-        <Card className='border-border/50 bg-card/30 backdrop-blur-sm'>
-          <CardHeader className='pb-3'>
-            <CardTitle className='text-lg'>Goal Progress</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                raised: {
-                  label: 'Raised',
-                  color: 'hsl(var(--chart-1))',
-                },
-                remaining: {
-                  label: 'Remaining',
-                  color: 'hsl(var(--muted))',
-                },
-              }}
-              className='h-[200px]'
-            >
-              <ResponsiveContainer
-                width='100%'
-                height='100%'
-              >
-                <PieChart>
-                  <Pie
-                    data={goalBreakdown}
-                    cx='50%'
-                    cy='50%'
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey='value'
-                  >
-                    {goalBreakdown.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={entry.color}
-                      />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        <Card className='border-border/50 bg-card/30 backdrop-blur-sm'>
-          <CardContent className='p-6'>
-            <div className='space-y-4'>
-              <div className='flex items-center gap-2'>
-                <div className='h-2 w-2 rounded-full bg-primary'></div>
-                <span className='text-sm font-medium'>
-                  Event ID:{' '}
-                  {typeof data !== 'string' ? data.eventID : 'N/A'}
-                </span>
-              </div>
-              <div className='space-y-2'>
-                <button className='w-full text-left p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/20'>
-                  <div className='flex items-center justify-between'>
-                    <span className='text-sm font-medium text-primary'>
-                      Go to Extra Life Profile
-                    </span>
-                    <span className='text-primary'>→</span>
-                  </div>
-                </button>
-                <button className='w-full text-left p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors'>
-                  <div className='flex items-center justify-between'>
-                    <span className='text-sm font-medium'>
-                      View Donation Page
-                    </span>
-                    <span className='text-muted-foreground'>→</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

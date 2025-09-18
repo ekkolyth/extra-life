@@ -10,11 +10,12 @@ import { useQuery } from 'convex/react';
 import { useQuery as useTanStackQuery } from '@tanstack/react-query';
 import { api } from '@/convex/_generated/api';
 import {
-  fetchStatsWithDebug,
-  fetchLatestDonationsWithDebug,
-  fetchTopDonorWithDebug,
+  fetchStaticData,
+  fetchRealTimeData,
   useDonorDriveDebug,
-} from '@/utils/donor-drive-debug';
+  type StaticData,
+  type RealTimeData,
+} from '@/utils/donor-drive-optimized';
 import type { Goal, Randomizer, Segment } from '@/types/db';
 
 import { Schedule } from '@/components/original/cards/segments';
@@ -35,24 +36,19 @@ export default function AdminPage() {
 
   const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
 
-  const { data: stats } = useTanStackQuery({
-    queryKey: ['donationStats'],
-    queryFn: () => fetchStatsWithDebug(donorDriveId!, debugMutation),
-    refetchInterval: 15000, // 15 seconds
+  // Static data - 24 hour cache, manual refresh only
+  const { data: staticData } = useTanStackQuery({
+    queryKey: ['staticData', donorDriveId],
+    queryFn: () => fetchStaticData(donorDriveId!, debugMutation),
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+    refetchInterval: false, // No automatic refetch
     enabled: !!donorDriveId,
   });
 
-  const { data: donations } = useTanStackQuery({
-    queryKey: ['latestDonations'],
-    queryFn: () =>
-      fetchLatestDonationsWithDebug(donorDriveId!, 10, debugMutation),
-    refetchInterval: 15000, // 15 seconds
-    enabled: !!donorDriveId,
-  });
-
-  const { data: topDonor } = useTanStackQuery({
-    queryKey: ['topDonor'],
-    queryFn: () => fetchTopDonorWithDebug(donorDriveId!, debugMutation),
+  // Real-time data - 15 second intervals with timestamp guard
+  const { data: realTimeData } = useTanStackQuery({
+    queryKey: ['realTimeData', donorDriveId],
+    queryFn: () => fetchRealTimeData(donorDriveId!, debugMutation),
     refetchInterval: 15000, // 15 seconds
     enabled: !!donorDriveId,
   });
@@ -61,7 +57,8 @@ export default function AdminPage() {
   if (
     convexRandomizers === undefined ||
     convexSegments === undefined ||
-    convexGoals === undefined
+    convexGoals === undefined ||
+    (!staticData && !realTimeData)
   ) {
     return (
       <div className='space-y-4'>
@@ -102,41 +99,66 @@ export default function AdminPage() {
     endOfStream: g.endOfStream,
   }));
 
-  // Use real data if available, fallback to demo data
-  const statsData =
-    stats && stats !== 'Rate limited'
-      ? stats
-      : {
-          avatarImageURL: '',
-          createdDateUTC: '',
-          displayName: 'Rate Limited',
-          eventID: 0,
-          eventName: 'Demo Event',
-          fundraisingGoal: 0,
-          hasActivityTracking: false,
-          isCustomAvatarImage: false,
-          isTeamCaptain: false,
-          isTeamCoCaptain: false,
-          links: { donate: '', page: '', stream: '' },
-          numDonations: 0,
-          numIncentives: 0,
-          numMilestones: 0,
-          participantID: 0,
-          participantTypeCode: '',
-          role: '',
-          streamIsEnabled: false,
-          streamIsLive: false,
-          streamingChannel: '',
-          streamingPlatform: '',
-          sumDonations: 0,
-          sumPledges: 0,
-          teamID: 0,
-          teamName: '',
-        };
+  // Combine static and real-time data, with fallbacks
+  const validStaticData =
+    staticData && staticData !== 'Rate limited' ? staticData : null;
+
+  const combinedData = {
+    // Static data with fallbacks
+    avatarImageURL: validStaticData?.avatarImageURL || '',
+    createdDateUTC: validStaticData?.createdDateUTC || '',
+    displayName: validStaticData?.displayName || 'Loading...',
+    eventID: validStaticData?.eventID || 0,
+    eventName: validStaticData?.eventName || 'Demo Event',
+    fundraisingGoal: validStaticData?.fundraisingGoal || 2000,
+    hasActivityTracking: validStaticData?.hasActivityTracking || false,
+    isCustomAvatarImage: validStaticData?.isCustomAvatarImage || false,
+    isTeamCaptain: validStaticData?.isTeamCaptain || false,
+    isTeamCoCaptain: validStaticData?.isTeamCoCaptain || false,
+    links: validStaticData?.links || { donate: '', page: '', stream: '' },
+    numIncentives: validStaticData?.numIncentives || 0,
+    numMilestones: validStaticData?.numMilestones || 0,
+    participantID: validStaticData?.participantID || 0,
+    participantTypeCode: validStaticData?.participantTypeCode || '',
+    role: validStaticData?.role || '',
+    streamIsEnabled: validStaticData?.streamIsEnabled || false,
+    streamingChannel: validStaticData?.streamingChannel || '',
+    streamingPlatform: validStaticData?.streamingPlatform || '',
+    teamID: validStaticData?.teamID || 0,
+    teamName: validStaticData?.teamName || '',
+
+    // Real-time data with fallbacks
+    sumDonations:
+      realTimeData &&
+      realTimeData !== 'Rate limited' &&
+      realTimeData !== 'Using cached data'
+        ? realTimeData.sumDonations
+        : 0,
+    sumPledges:
+      realTimeData &&
+      realTimeData !== 'Rate limited' &&
+      realTimeData !== 'Using cached data'
+        ? realTimeData.sumPledges
+        : 0,
+    numDonations:
+      realTimeData &&
+      realTimeData !== 'Rate limited' &&
+      realTimeData !== 'Using cached data'
+        ? realTimeData.numDonations
+        : 0,
+    streamIsLive:
+      realTimeData &&
+      realTimeData !== 'Rate limited' &&
+      realTimeData !== 'Using cached data'
+        ? realTimeData.streamIsLive
+        : false,
+  };
 
   const donationsData =
-    donations && donations !== 'Rate limited'
-      ? donations
+    realTimeData &&
+    realTimeData !== 'Rate limited' &&
+    realTimeData !== 'Using cached data'
+      ? realTimeData.latestDonations
       : [
           {
             displayName: 'Anonymous',
@@ -151,8 +173,17 @@ export default function AdminPage() {
         ];
 
   const topDonorData =
-    topDonor && topDonor !== 'Rate limited'
-      ? topDonor
+    realTimeData &&
+    realTimeData !== 'Rate limited' &&
+    realTimeData !== 'Using cached data'
+      ? realTimeData.topDonor || {
+          displayName: 'No donations yet',
+          donorID: 'none',
+          avatarImageURL: '',
+          modifiedDateUTC: '',
+          sumDonations: 0,
+          numDonations: 0,
+        }
       : {
           displayName: 'Gaming Hero',
           donorID: 'demo',
@@ -165,50 +196,21 @@ export default function AdminPage() {
   return (
     <div className='space-y-4'>
       <EnvCheck />
-      <div className='grid grid-cols-3 gap-4'>
-        <div className='flex flex-col gap-y-4'>
-          <TotalRaised data={statsData} />
-          <QuickResources />
-        </div>
-        <div className='flex flex-col gap-y-4'>
-          <Schedule segments={segments} />
-          <RandomizerCard randomizers={randomizers} />
-          <LatestDonations data={donationsData} />
-        </div>
-        <div className='flex flex-col gap-y-4'>
-          <TopDonor data={topDonorData} />
-          <NextGoal
-            data={statsData}
-            goals={goals}
-          />
-          <Goals
-            data={statsData}
-            goals={goals}
-          />
-        </div>
-      </div>
-
-      {/* New Modern Components */}
       <div className='space-y-6'>
-        <Overview data={statsData} />
-        <DonationActivity
-          data={statsData}
-          donations={donationsData}
-          topDonor={topDonorData}
-        />
+        <Overview data={combinedData} />
+        <QuickResourcesSection />
 
         <div className='grid md:grid-cols-2 gap-6'>
           <GoalsSection
-            data={statsData}
+            data={combinedData}
             goals={goals}
           />
           <div className='space-y-6'>
             <ScheduleSection segments={segments} />
             <RandomizersSection randomizers={randomizers} />
+            <TopDonor data={topDonorData} />
           </div>
         </div>
-
-        <QuickResourcesSection />
       </div>
     </div>
   );

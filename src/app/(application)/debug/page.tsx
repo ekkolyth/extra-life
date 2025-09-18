@@ -2,11 +2,34 @@
 
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useMutation } from 'convex/react';
-import { TrashIcon, RefreshCwIcon, ChevronDownIcon, ChevronRightIcon } from 'lucide-react';
+import {
+  TrashIcon,
+  RefreshCwIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  DatabaseIcon,
+} from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  forceRefreshStatic,
+  getLastApiCallInfo,
+} from '@/utils/donor-drive-optimized';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -24,6 +47,30 @@ export default function DebugPage() {
   const debugData = useQuery(api.donorDriveDebug.list);
   const clearDebug = useMutation(api.donorDriveDebug.clear);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Pagination calculations
+  const totalItems = debugData?.length || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = debugData?.slice(startIndex, endIndex) || [];
+
+  // Reset to page 1 when items per page changes
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(parseInt(value));
+    setCurrentPage(1);
+  };
+
+  // Reset to page 1 when data changes (e.g., after clearing)
+  React.useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
 
   const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows);
@@ -40,6 +87,26 @@ export default function DebugPage() {
       await clearDebug();
     } catch (error) {
       console.error('Failed to clear debug data:', error);
+    }
+  };
+
+  const handleRefreshStatic = async () => {
+    setIsRefreshing(true);
+    try {
+      // Force refresh static data
+      forceRefreshStatic();
+
+      // Invalidate and refetch static data query
+      const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
+      await queryClient.invalidateQueries({
+        queryKey: ['staticData', donorDriveId],
+      });
+
+      console.log('✅ Static data refresh triggered');
+    } catch (error) {
+      console.error('Failed to refresh static data:', error);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -63,7 +130,9 @@ export default function DebugPage() {
       <div className='min-h-screen bg-background text-foreground'>
         <div className='container mx-auto p-6'>
           <div className='flex items-center justify-between mb-8'>
-            <h1 className='text-3xl font-bold text-foreground'>DonorDrive API Debug</h1>
+            <h1 className='text-3xl font-bold text-foreground'>
+              DonorDrive API Debug
+            </h1>
           </div>
           <div className='text-center py-16'>
             <RefreshCwIcon className='h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground' />
@@ -78,15 +147,40 @@ export default function DebugPage() {
     <div className='min-h-screen bg-background text-foreground'>
       <div className='container mx-auto p-6'>
         <div className='flex items-center justify-between mb-8'>
-          <h1 className='text-3xl font-bold text-foreground'>DonorDrive API Debug</h1>
-          <Button
-            variant='outline'
-            onClick={handleClear}
-            className='flex items-center gap-2 border-border text-muted-foreground hover:bg-muted hover:text-foreground'
-          >
-            <TrashIcon className='h-4 w-4' />
-            Clear All
-          </Button>
+          <div>
+            <h1 className='text-3xl font-bold text-foreground'>
+              DonorDrive API Debug
+            </h1>
+            <div className='mt-2 text-sm text-muted-foreground'>
+              {(() => {
+                const apiInfo = getLastApiCallInfo();
+                return apiInfo.timestamp > 0
+                  ? `Last API call: ${apiInfo.secondsAgo}s ago`
+                  : 'No API calls yet';
+              })()}
+            </div>
+          </div>
+          <div className='flex gap-3'>
+            <Button
+              variant='outline'
+              onClick={handleRefreshStatic}
+              disabled={isRefreshing}
+              className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
+            >
+              <DatabaseIcon
+                className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
+              />
+              {isRefreshing ? 'Refreshing...' : 'Refresh Static Data'}
+            </Button>
+            <Button
+              variant='outline'
+              onClick={handleClear}
+              className='flex items-center gap-2 border-border text-muted-foreground hover:bg-muted hover:text-foreground'
+            >
+              <TrashIcon className='h-4 w-4' />
+              Clear All
+            </Button>
+          </div>
         </div>
 
         {debugData.length === 0 ? (
@@ -99,66 +193,53 @@ export default function DebugPage() {
           </Card>
         ) : (
           <div className='space-y-6'>
-            {/* Summary Stats */}
-            <Card className='bg-card border-border'>
-              <CardHeader className='border-b border-border'>
-                <CardTitle className='text-lg text-foreground'>Summary</CardTitle>
-              </CardHeader>
-              <CardContent className='pt-6'>
-                <div className='grid grid-cols-4 gap-6 text-sm'>
-                  <div>
-                    <p className='text-muted-foreground mb-1'>Total Logs</p>
-                    <p className='text-2xl font-bold text-foreground'>{debugData.length}</p>
-                  </div>
-                  <div>
-                    <p className='text-muted-foreground mb-1'>Latest Call</p>
-                    <p className='text-sm text-muted-foreground'>
-                      {debugData[debugData.length - 1]
-                        ? formatDistanceToNow(new Date(debugData[debugData.length - 1].timestamp), {
-                            addSuffix: true,
-                          })
-                        : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className='text-muted-foreground mb-1'>API Endpoints</p>
-                    <p className='text-sm text-muted-foreground'>
-                      {new Set(debugData.map((d) => d.apiEndpoint)).size}
-                    </p>
-                  </div>
-                  <div>
-                    <p className='text-muted-foreground mb-1'>Data Types</p>
-                    <p className='text-sm text-muted-foreground'>
-                      {
-                        debugData.filter(
-                          (d) => d.stats || d.topDonation || d.topDonor || d.latestDonations
-                        ).length
-                      }
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Logs Table */}
             <Card className='bg-zinc-950/90 border-border'>
               <CardHeader className='border-b border-border'>
-                <CardTitle className='text-lg text-foreground'>API Call Logs</CardTitle>
+                <div className='flex items-center justify-between'>
+                  <CardTitle className='text-lg text-foreground'>
+                    API Call Logs
+                  </CardTitle>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-sm text-muted-foreground'>
+                      Show
+                    </span>
+                    <Select
+                      value={itemsPerPage.toString()}
+                      onValueChange={handleItemsPerPageChange}
+                    >
+                      <SelectTrigger className='w-20 h-8'>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='5'>5</SelectItem>
+                        <SelectItem value='10'>10</SelectItem>
+                        <SelectItem value='25'>25</SelectItem>
+                        <SelectItem value='50'>50</SelectItem>
+                        <SelectItem value='100'>100</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className='p-0'>
                 <Table>
                   <TableHeader>
                     <TableRow className='border-border hover:bg-muted/50'>
-                      <TableHead className='text-muted-foreground font-medium'>Timestamp</TableHead>
+                      <TableHead className='text-muted-foreground font-medium'>
+                        Timestamp
+                      </TableHead>
                       <TableHead className='text-muted-foreground font-medium'>
                         API Endpoint
                       </TableHead>
-                      <TableHead className='text-muted-foreground font-medium'>Data Type</TableHead>
+                      <TableHead className='text-muted-foreground font-medium'>
+                        Data Type
+                      </TableHead>
                       <TableHead className='w-20 text-muted-foreground font-medium'></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {debugData.map((entry) => {
+                    {paginatedData.map((entry) => {
                       const timestamp = new Date(entry.timestamp);
                       const dataType = entry.stats
                         ? 'Stats'
@@ -185,7 +266,10 @@ export default function DebugPage() {
                                 </p>
                                 <p className='text-xs text-muted-foreground'>
                                   {timestamp.toLocaleTimeString()} (
-                                  {formatDistanceToNow(timestamp, { addSuffix: true })})
+                                  {formatDistanceToNow(timestamp, {
+                                    addSuffix: true,
+                                  })}
+                                  )
                                 </p>
                               </div>
                             </TableCell>
@@ -222,8 +306,14 @@ export default function DebugPage() {
 
                           {/* Expanded Data Row */}
                           {isExpanded && (
-                            <TableRow key={`${entry._id}-expanded`} className='border-border'>
-                              <TableCell colSpan={4} className='p-0'>
+                            <TableRow
+                              key={`${entry._id}-expanded`}
+                              className='border-border'
+                            >
+                              <TableCell
+                                colSpan={4}
+                                className='p-0'
+                              >
                                 <div className='bg-muted/50 border-t border-border p-6'>
                                   <div className='space-y-6'>
                                     {/* Stats */}
@@ -247,7 +337,9 @@ export default function DebugPage() {
                                           Top Donation
                                         </h4>
                                         <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
-                                          <JSONViewer data={entry.topDonation} />
+                                          <JSONViewer
+                                            data={entry.topDonation}
+                                          />
                                         </div>
                                       </div>
                                     )}
@@ -260,7 +352,9 @@ export default function DebugPage() {
                                           Top Donor
                                         </h4>
                                         <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
-                                          <JSONViewer data={entry.topDonor} />
+                                          <JSONViewer
+                                            data={entry.topDonor}
+                                          />
                                         </div>
                                       </div>
                                     )}
@@ -273,7 +367,9 @@ export default function DebugPage() {
                                           Latest Donations
                                         </h4>
                                         <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
-                                          <JSONViewer data={entry.latestDonations} />
+                                          <JSONViewer
+                                            data={entry.latestDonations}
+                                          />
                                         </div>
                                       </div>
                                     )}
@@ -288,6 +384,97 @@ export default function DebugPage() {
                   </TableBody>
                 </Table>
               </CardContent>
+              {totalPages > 1 && (
+                <div className='border-t border-border px-6 py-4'>
+                  <div className='flex items-center justify-between'>
+                    <div className='text-sm text-muted-foreground'>
+                      Showing {startIndex + 1} to{' '}
+                      {Math.min(endIndex, totalItems)} of {totalItems}{' '}
+                      entries
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
+                        className='h-8 px-2'
+                      >
+                        First
+                      </Button>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() =>
+                          setCurrentPage(Math.max(1, currentPage - 1))
+                        }
+                        disabled={currentPage === 1}
+                        className='h-8 px-2'
+                      >
+                        Previous
+                      </Button>
+
+                      {/* Page numbers */}
+                      <div className='flex items-center gap-1'>
+                        {Array.from(
+                          { length: Math.min(5, totalPages) },
+                          (_, i) => {
+                            let pageNum;
+                            if (totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+
+                            return (
+                              <Button
+                                key={pageNum}
+                                variant={
+                                  currentPage === pageNum
+                                    ? 'default'
+                                    : 'outline'
+                                }
+                                size='sm'
+                                onClick={() => setCurrentPage(pageNum)}
+                                className='h-8 w-8 p-0'
+                              >
+                                {pageNum}
+                              </Button>
+                            );
+                          }
+                        )}
+                      </div>
+
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() =>
+                          setCurrentPage(
+                            Math.min(totalPages, currentPage + 1)
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                        className='h-8 px-2'
+                      >
+                        Next
+                      </Button>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => setCurrentPage(totalPages)}
+                        disabled={currentPage === totalPages}
+                        className='h-8 px-2'
+                      >
+                        Last
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </Card>
           </div>
         )}
