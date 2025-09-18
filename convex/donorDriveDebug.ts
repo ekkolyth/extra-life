@@ -1,15 +1,19 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { statsValidator, donorValidator, donationValidator } from './donor_drive_validators';
+import {
+  statsValidator,
+  donorValidator,
+  donationValidator,
+} from './donor_drive_validators';
 
 export const list = query({
   handler: async (ctx) => {
-    // Get the last 10 entries, ordered by timestamp descending
+    // Get the last 100 entries, ordered by timestamp descending
     const entries = await ctx.db
       .query('donorDriveDebug')
       .withIndex('by_timestamp')
       .order('desc')
-      .take(10);
+      .take(100);
 
     return entries.reverse(); // Return in chronological order
   },
@@ -41,11 +45,15 @@ export const add = mutation({
       const totalCount = await ctx.db.query('donorDriveDebug').collect();
       console.log('📊 Total entries:', totalCount.length);
 
-      // If we have more than 10 entries, delete the oldest ones
-      if (totalCount.length > 10) {
+      // If we have more than 100 entries, delete the oldest ones
+      if (totalCount.length > 100) {
         const entriesToDelete = totalCount
-          .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-          .slice(0, totalCount.length - 10);
+          .sort(
+            (a, b) =>
+              new Date(a.timestamp).getTime() -
+              new Date(b.timestamp).getTime()
+          )
+          .slice(0, totalCount.length - 100);
 
         console.log('🗑️ Deleting old entries:', entriesToDelete.length);
         for (const entry of entriesToDelete) {

@@ -1,15 +1,44 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { DollarSign, TrendingUp, Users, Calendar, Target } from 'lucide-react';
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, PieChart, Pie, Cell } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import {
+  DollarSign,
+  TrendingUp,
+  Users,
+  Calendar,
+  Target,
+} from 'lucide-react';
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { StatsResult } from '@/utils/donor-drive';
 
-export function Overview() {
-  const totalRaised = 0;
-  const goal = 2000;
-  const progressPercentage = (totalRaised / goal) * 100;
+interface OverviewProps {
+  data: StatsResult;
+}
+
+export function Overview({ data }: OverviewProps) {
+  const totalRaised = typeof data !== 'string' ? data.sumDonations : 0;
+  const goal = typeof data !== 'string' ? data.fundraisingGoal : 2000;
+  const progressPercentage = goal > 0 ? (totalRaised / goal) * 100 : 0;
 
   const fundraisingData = [
     { month: 'Jan', amount: 0 },
@@ -28,7 +57,11 @@ export function Overview() {
 
   const goalBreakdown = [
     { name: 'Raised', value: totalRaised, color: 'hsl(var(--chart-1))' },
-    { name: 'Remaining', value: goal - totalRaised, color: 'hsl(var(--muted))' },
+    {
+      name: 'Remaining',
+      value: goal - totalRaised,
+      color: 'hsl(var(--muted))',
+    },
   ];
 
   const stats = [
@@ -40,19 +73,20 @@ export function Overview() {
     },
     {
       name: 'Total Donations',
-      value: '0',
+      value: typeof data !== 'string' ? data.numDonations.toString() : '0',
       icon: Users,
       change: '+0%',
     },
     {
       name: 'Active Incentives',
-      value: '0',
+      value:
+        typeof data !== 'string' ? data.numIncentives.toString() : '0',
       icon: TrendingUp,
       change: '+0%',
     },
     {
       name: 'Milestones Hit',
-      value: '0/4',
+      value: typeof data !== 'string' ? `${data.numMilestones}/4` : '0/4',
       icon: Calendar,
       change: '0%',
     },
@@ -77,12 +111,19 @@ export function Overview() {
                 ${totalRaised.toFixed(2)}
               </span>
               <div className='flex flex-col'>
-                <span className='text-lg text-muted-foreground'>of ${goal.toLocaleString()}</span>
-                <span className='text-sm text-primary font-medium'>+$0 this month</span>
+                <span className='text-lg text-muted-foreground'>
+                  of ${goal.toLocaleString()}
+                </span>
+                <span className='text-sm text-primary font-medium'>
+                  +${totalRaised.toFixed(2)} this month
+                </span>
               </div>
             </div>
             <div className='space-y-2'>
-              <Progress value={progressPercentage} className='h-2' />
+              <Progress
+                value={progressPercentage}
+                className='h-2'
+              />
               <div className='flex justify-between text-sm'>
                 <span className='text-muted-foreground'>
                   {progressPercentage.toFixed(1)}% complete
@@ -95,7 +136,9 @@ export function Overview() {
           </div>
 
           <div className='space-y-3'>
-            <h4 className='text-sm font-medium text-foreground'>Fundraising Trend</h4>
+            <h4 className='text-sm font-medium text-foreground'>
+              Fundraising Trend
+            </h4>
             <ChartContainer
               config={{
                 amount: {
@@ -105,24 +148,47 @@ export function Overview() {
               }}
               className='h-[200px]'
             >
-              <ResponsiveContainer width='100%' height='100%'>
+              <ResponsiveContainer
+                width='100%'
+                height='100%'
+              >
                 <AreaChart data={fundraisingData}>
                   <defs>
-                    <linearGradient id='colorAmount' x1='0' y1='0' x2='0' y2='1'>
-                      <stop offset='5%' stopColor='hsl(var(--chart-1))' stopOpacity={0.3} />
-                      <stop offset='95%' stopColor='hsl(var(--chart-1))' stopOpacity={0} />
+                    <linearGradient
+                      id='colorAmount'
+                      x1='0'
+                      y1='0'
+                      x2='0'
+                      y2='1'
+                    >
+                      <stop
+                        offset='5%'
+                        stopColor='hsl(var(--chart-1))'
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset='95%'
+                        stopColor='hsl(var(--chart-1))'
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
                   <XAxis
                     dataKey='month'
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tick={{
+                      fill: 'hsl(var(--muted-foreground))',
+                      fontSize: 12,
+                    }}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tick={{
+                      fill: 'hsl(var(--muted-foreground))',
+                      fontSize: 12,
+                    }}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Area
@@ -152,11 +218,17 @@ export function Overview() {
                 <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
                   <stat.icon className='h-5 w-5 text-primary' />
                 </div>
-                <span className='text-xs text-muted-foreground'>{stat.change}</span>
+                <span className='text-xs text-muted-foreground'>
+                  {stat.change}
+                </span>
               </div>
               <div className='mt-3 space-y-1'>
-                <p className='text-2xl font-bold text-foreground'>{stat.value}</p>
-                <p className='text-xs text-muted-foreground'>{stat.name}</p>
+                <p className='text-2xl font-bold text-foreground'>
+                  {stat.value}
+                </p>
+                <p className='text-xs text-muted-foreground'>
+                  {stat.name}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -183,7 +255,10 @@ export function Overview() {
               }}
               className='h-[200px]'
             >
-              <ResponsiveContainer width='100%' height='100%'>
+              <ResponsiveContainer
+                width='100%'
+                height='100%'
+              >
                 <PieChart>
                   <Pie
                     data={goalBreakdown}
@@ -195,7 +270,10 @@ export function Overview() {
                     dataKey='value'
                   >
                     {goalBreakdown.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                      />
                     ))}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -210,7 +288,10 @@ export function Overview() {
             <div className='space-y-4'>
               <div className='flex items-center gap-2'>
                 <div className='h-2 w-2 rounded-full bg-primary'></div>
-                <span className='text-sm font-medium'>Event ID: 559</span>
+                <span className='text-sm font-medium'>
+                  Event ID:{' '}
+                  {typeof data !== 'string' ? data.eventID : 'N/A'}
+                </span>
               </div>
               <div className='space-y-2'>
                 <button className='w-full text-left p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/20'>
@@ -223,7 +304,9 @@ export function Overview() {
                 </button>
                 <button className='w-full text-left p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors'>
                   <div className='flex items-center justify-between'>
-                    <span className='text-sm font-medium'>View Donation Page</span>
+                    <span className='text-sm font-medium'>
+                      View Donation Page
+                    </span>
                     <span className='text-muted-foreground'>→</span>
                   </div>
                 </button>

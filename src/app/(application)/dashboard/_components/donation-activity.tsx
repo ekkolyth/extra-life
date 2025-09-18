@@ -1,15 +1,52 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Users, ExternalLink, TrendingUp, Heart, Award } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  DollarSign,
+  Users,
+  ExternalLink,
+  TrendingUp,
+  Heart,
+  Award,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { Donation, StatsResult, Donor } from '@/utils/donor-drive';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
-export function DonationActivity() {
-  const recentDonations: Array<{ amount: number; name: string; time: string }> = [
-    // Empty for now, but structure ready for real data
-  ];
+dayjs.extend(relativeTime);
+
+interface DonationActivityProps {
+  data: StatsResult;
+  donations: Donation[];
+  topDonor: Donor;
+}
+
+export function DonationActivity({
+  data,
+  donations,
+  topDonor,
+}: DonationActivityProps) {
+  const recentDonations = Array.isArray(donations)
+    ? donations.slice(0, 5)
+    : [];
 
   const donationTrend = [
     { time: '00:00', amount: 0 },
@@ -21,22 +58,29 @@ export function DonationActivity() {
     { time: '24:00', amount: 0 },
   ];
 
+  const numDonations = typeof data !== 'string' ? data.numDonations : 0;
+  const sumDonations = typeof data !== 'string' ? data.sumDonations : 0;
+  const averageDonation =
+    numDonations > 0 ? sumDonations / numDonations : 0;
+  const topDonation =
+    typeof topDonor !== 'string' && topDonor ? topDonor.sumDonations : 0;
+
   const donationStats = [
     {
       label: 'Total Donations',
-      value: '0',
+      value: numDonations.toString(),
       icon: Users,
       change: '+0%',
     },
     {
       label: 'Average Donation',
-      value: '$0.00',
+      value: `$${averageDonation.toFixed(2)}`,
       icon: TrendingUp,
       change: '+0%',
     },
     {
       label: 'Top Donation',
-      value: '$0.00',
+      value: `$${topDonation.toFixed(2)}`,
       icon: Award,
       change: '+0%',
     },
@@ -47,17 +91,26 @@ export function DonationActivity() {
       {/* Donation Stats */}
       <div className='grid grid-cols-3 gap-4'>
         {donationStats.map((stat, index) => (
-          <Card key={index} className='border-border/50 bg-card/30 backdrop-blur-sm'>
+          <Card
+            key={index}
+            className='border-border/50 bg-card/30 backdrop-blur-sm'
+          >
             <CardContent className='p-4'>
               <div className='flex items-center justify-between mb-2'>
                 <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10'>
                   <stat.icon className='h-4 w-4 text-primary' />
                 </div>
-                <span className='text-xs text-muted-foreground'>{stat.change}</span>
+                <span className='text-xs text-muted-foreground'>
+                  {stat.change}
+                </span>
               </div>
               <div>
-                <p className='text-lg font-bold text-foreground'>{stat.value}</p>
-                <p className='text-xs text-muted-foreground'>{stat.label}</p>
+                <p className='text-lg font-bold text-foreground'>
+                  {stat.value}
+                </p>
+                <p className='text-xs text-muted-foreground'>
+                  {stat.label}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -84,18 +137,27 @@ export function DonationActivity() {
             }}
             className='h-[150px]'
           >
-            <ResponsiveContainer width='100%' height='100%'>
+            <ResponsiveContainer
+              width='100%'
+              height='100%'
+            >
               <LineChart data={donationTrend}>
                 <XAxis
                   dataKey='time'
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  tick={{
+                    fill: 'hsl(var(--muted-foreground))',
+                    fontSize: 12,
+                  }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  tick={{
+                    fill: 'hsl(var(--muted-foreground))',
+                    fontSize: 12,
+                  }}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line
@@ -103,7 +165,11 @@ export function DonationActivity() {
                   dataKey='amount'
                   stroke='hsl(var(--chart-1))'
                   strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--chart-1))', strokeWidth: 2, r: 4 }}
+                  dot={{
+                    fill: 'hsl(var(--chart-1))',
+                    strokeWidth: 2,
+                    r: 4,
+                  }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -125,7 +191,9 @@ export function DonationActivity() {
           {recentDonations.length === 0 ? (
             <div className='rounded-lg bg-muted/20 p-8 text-center'>
               <Heart className='h-12 w-12 text-muted-foreground mx-auto mb-3' />
-              <p className='text-lg font-medium text-foreground mb-1'>No donations yet</p>
+              <p className='text-lg font-medium text-foreground mb-1'>
+                No donations yet
+              </p>
               <p className='text-sm text-muted-foreground'>
                 Share your donation link to get started!
               </p>
@@ -134,19 +202,29 @@ export function DonationActivity() {
             <div className='space-y-3'>
               {recentDonations.map((donation, index) => (
                 <div
-                  key={index}
+                  key={donation.donationID || `donation-${index}`}
                   className='flex items-center justify-between p-3 rounded-lg bg-muted/20'
                 >
                   <div className='flex items-center gap-3'>
                     <div className='h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center'>
-                      <span className='text-xs font-medium text-primary'>A</span>
+                      <span className='text-xs font-medium text-primary'>
+                        {(donation.displayName || 'A')
+                          .charAt(0)
+                          .toUpperCase()}
+                      </span>
                     </div>
                     <div>
-                      <p className='text-sm font-medium'>Anonymous</p>
-                      <p className='text-xs text-muted-foreground'>Just now</p>
+                      <p className='text-sm font-medium'>
+                        {donation.displayName || 'Anonymous'}
+                      </p>
+                      <p className='text-xs text-muted-foreground'>
+                        {dayjs(donation.createdDateUTC).fromNow()}
+                      </p>
                     </div>
                   </div>
-                  <span className='text-sm font-bold text-primary'>$25.00</span>
+                  <span className='text-sm font-bold text-primary'>
+                    ${donation.amount.toFixed(2)}
+                  </span>
                 </div>
               ))}
             </div>

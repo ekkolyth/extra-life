@@ -1,9 +1,6 @@
-import { ClerkProvider } from '@/components/clerk-provider';
-import { ThemeProvider } from '@/components/theme-provider';
 import type { Metadata } from 'next';
 import type { CSSProperties, ReactNode } from 'react';
 import './globals.css';
-import ConvexClientProvider from '@/components/convex-client-provider';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
@@ -21,7 +18,9 @@ export default function RootLayout({
       lang='en'
       className='h-full'
       suppressHydrationWarning
-      style={{ '--font-satoshi': '"Satoshi", sans-serif' } as CSSProperties}
+      style={
+        { '--font-satoshi': '"Satoshi", sans-serif' } as CSSProperties
+      }
     >
       <head>
         <link
@@ -30,18 +29,7 @@ export default function RootLayout({
         />
       </head>
       <body className='flex min-h-full flex-col antialiased font-sans'>
-        <ClerkProvider>
-          <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Providers>
-              <ConvexClientProvider>{children}</ConvexClientProvider>
-            </Providers>
-          </ThemeProvider>
-        </ClerkProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -20,38 +20,41 @@ import type { Goal, Randomizer, Segment } from '@/types/db';
 import { Schedule } from '@/components/original/cards/segments';
 import { RandomizerCard } from '@/components/original/cards/randomizers';
 import { EnvCheck } from '@/components/original/env-check';
-import { DonationActivity } from '@/components/dashboard/donation-activity';
-import { Overview } from '@/components/dashboard/overview';
+import { DonationActivity } from '@/app/(application)/dashboard/_components/donation-activity';
+import { Overview } from '@/app/(application)/dashboard/_components/overview';
+import { GoalsSection } from '@/app/(application)/dashboard/_components/goals-section';
+import { RandomizersSection } from '@/app/(application)/dashboard/_components/randomizers-section';
+import { ScheduleSection } from '@/app/(application)/dashboard/_components/schedule-section';
+import { QuickResourcesSection } from '@/app/(application)/dashboard/_components/quick-resources-section';
 
 export default function AdminPage() {
-  // Use Convex queries for real-time database data
   const convexRandomizers = useQuery(api.randomizer.list);
   const convexSegments = useQuery(api.segment.list);
   const convexGoals = useQuery(api.goals.list);
   const debugMutation = useDonorDriveDebug();
 
-  // Use TanStack Query for donor-drive API calls with proper rate limiting
   const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
 
   const { data: stats } = useTanStackQuery({
     queryKey: ['donationStats'],
     queryFn: () => fetchStatsWithDebug(donorDriveId!, debugMutation),
-    refetchInterval: 15000, // 15 seconds as requested
-    enabled: !!donorDriveId, // Only run if we have the ID
+    refetchInterval: 15000, // 15 seconds
+    enabled: !!donorDriveId,
   });
 
   const { data: donations } = useTanStackQuery({
     queryKey: ['latestDonations'],
-    queryFn: () => fetchLatestDonationsWithDebug(donorDriveId!, 10, debugMutation),
-    refetchInterval: 15000, // 15 seconds as requested
-    enabled: !!donorDriveId, // Only run if we have the ID
+    queryFn: () =>
+      fetchLatestDonationsWithDebug(donorDriveId!, 10, debugMutation),
+    refetchInterval: 15000, // 15 seconds
+    enabled: !!donorDriveId,
   });
 
   const { data: topDonor } = useTanStackQuery({
     queryKey: ['topDonor'],
     queryFn: () => fetchTopDonorWithDebug(donorDriveId!, debugMutation),
-    refetchInterval: 15000, // 15 seconds as requested
-    enabled: !!donorDriveId, // Only run if we have the ID
+    refetchInterval: 15000, // 15 seconds
+    enabled: !!donorDriveId,
   });
 
   // Handle loading states
@@ -135,8 +138,16 @@ export default function AdminPage() {
     donations && donations !== 'Rate limited'
       ? donations
       : [
-          { displayName: 'Anonymous', amount: 50, message: 'Great cause!' },
-          { displayName: 'Gaming Hero', amount: 100, message: 'Keep it up!' },
+          {
+            displayName: 'Anonymous',
+            amount: 50,
+            message: 'Great cause!',
+          },
+          {
+            displayName: 'Gaming Hero',
+            amount: 100,
+            message: 'Keep it up!',
+          },
         ];
 
   const topDonorData =
@@ -166,12 +177,39 @@ export default function AdminPage() {
         </div>
         <div className='flex flex-col gap-y-4'>
           <TopDonor data={topDonorData} />
-          <NextGoal data={statsData} goals={goals} />
-          <Goals data={statsData} goals={goals} />
+          <NextGoal
+            data={statsData}
+            goals={goals}
+          />
+          <Goals
+            data={statsData}
+            goals={goals}
+          />
         </div>
       </div>
-      <Overview />
-      <DonationActivity />
+
+      {/* New Modern Components */}
+      <div className='space-y-6'>
+        <Overview data={statsData} />
+        <DonationActivity
+          data={statsData}
+          donations={donationsData}
+          topDonor={topDonorData}
+        />
+
+        <div className='grid md:grid-cols-2 gap-6'>
+          <GoalsSection
+            data={statsData}
+            goals={goals}
+          />
+          <div className='space-y-6'>
+            <ScheduleSection segments={segments} />
+            <RandomizersSection randomizers={randomizers} />
+          </div>
+        </div>
+
+        <QuickResourcesSection />
+      </div>
     </div>
   );
 }
