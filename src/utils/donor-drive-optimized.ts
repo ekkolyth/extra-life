@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 
 // Re-export types from the original file
 export type { StatsResult, Donor, Donation } from './donor-drive';
@@ -9,8 +9,7 @@ const BASE_URL = 'https://www.extra-life.org/api';
 const API_VERSION = '1.3';
 const FIFTEEN_SECONDS = 15 * 1000;
 
-// Global state for API call tracking and ETag caching
-let lastApiCallTimestamp = 0;
+// Global state for ETag caching (timestamp now stored in Convex)
 let etagCache = new Map<string, string>();
 
 // Helper function to build versioned URLs
@@ -20,21 +19,20 @@ function withVersion(path: string): string {
   }version=${API_VERSION}`;
 }
 
-// Check if we should make a real-time API call (single source of truth)
+// Check if we should make a real-time API call (fallback for when Convex data isn't available)
 export function shouldFetchRealTime(): boolean {
-  const now = Date.now();
-  return now - lastApiCallTimestamp > FIFTEEN_SECONDS;
-}
-
-// Update the last API call timestamp
-function updateLastApiCall(): void {
-  lastApiCallTimestamp = Date.now();
+  // This is now a fallback - should use Convex data when available
+  console.warn(
+    'shouldFetchRealTime: Using fallback logic - consider using Convex data'
+  );
+  return true; // Always fetch if we don't have Convex timestamp info
 }
 
 // Enhanced fetch with ETag support
 async function fetchWithETag<T>(
   key: string,
   url: string,
+  updateApiTimestamp?: () => Promise<any>,
   debugMutation?: (args: any) => Promise<any>,
   apiEndpoint?: string
 ): Promise<T | 'Rate limited' | 'Not modified'> {
@@ -50,7 +48,13 @@ async function fetchWithETag<T>(
     const response = await fetch(url, { headers });
 
     // Update timestamp on any API call
-    updateLastApiCall();
+    if (updateApiTimestamp) {
+      try {
+        await updateApiTimestamp();
+      } catch (error) {
+        console.error('Failed to update API timestamp:', error);
+      }
+    }
 
     // Handle rate limiting
     if (response.status === 429) {
@@ -183,10 +187,21 @@ export function useDonorDriveDebug() {
   return useMutation(api.donorDriveDebug.add);
 }
 
+// Hook to get last API call info from Convex
+export function useLastApiCallInfo() {
+  return useQuery(api.apiMetadata.getLastApiCall);
+}
+
+// Hook to update last API call timestamp in Convex
+export function useUpdateLastApiCall() {
+  return useMutation(api.apiMetadata.updateLastApiCall);
+}
+
 // Fetch static data (manual refresh only)
 export async function fetchStaticData(
   participantId: string,
-  debugMutation?: (args: any) => Promise<any>
+  debugMutation?: (args: any) => Promise<any>,
+  updateApiTimestamp?: () => Promise<any>
 ): Promise<StaticData | 'Rate limited'> {
   console.log('🔄 Fetching static data for participant:', participantId);
 
@@ -197,6 +212,7 @@ export async function fetchStaticData(
     const result = await fetchWithETag<any>(
       `static-${participantId}`,
       url,
+      updateApiTimestamp,
       debugMutation,
       apiEndpoint
     );
@@ -256,12 +272,18 @@ export async function fetchStaticData(
 // Fetch real-time data (15-second intervals with timestamp guard)
 export async function fetchRealTimeData(
   participantId: string,
-  debugMutation?: (args: any) => Promise<any>
+  debugMutation?: (args: any) => Promise<any>,
+  updateApiTimestamp?: () => Promise<any>,
+  lastApiCallInfo?: { timestamp: number; secondsAgo: number }
 ): Promise<RealTimeData | 'Rate limited' | 'Using cached data'> {
   console.log('🔄 Checking if real-time data fetch is needed...');
 
-  // Check if we should actually make API calls
-  if (!shouldFetchRealTime()) {
+  // Check if we should actually make API calls using passed-in info or fallback to local check
+  const shouldFetch = lastApiCallInfo
+    ? lastApiCallInfo.secondsAgo > 15
+    : shouldFetchRealTime();
+
+  if (!shouldFetch) {
     console.log('⏰ Using cached data - API called recently');
     return 'Using cached data';
   }
@@ -277,6 +299,7 @@ export async function fetchRealTimeData(
     const statsResult = await fetchWithETag<any>(
       `realtime-stats-${participantId}`,
       statsUrl,
+      updateApiTimestamp,
       debugMutation,
       `GET /participants/${participantId}`
     );
@@ -292,6 +315,7 @@ export async function fetchRealTimeData(
     const donationsResult = await fetchWithETag<any[]>(
       `realtime-donations-${participantId}`,
       donationsUrl,
+      updateApiTimestamp,
       debugMutation,
       `GET /participants/${participantId}/donations?limit=10`
     );
@@ -303,6 +327,7 @@ export async function fetchRealTimeData(
     const topDonorResult = await fetchWithETag<any[]>(
       `realtime-topdonor-${participantId}`,
       topDonorUrl,
+      updateApiTimestamp,
       debugMutation,
       `GET /participants/${participantId}/donors`
     );
@@ -395,14 +420,9 @@ export function forceRefreshStatic(): void {
   });
 }
 
-// Get last API call info for debugging
-export function getLastApiCallInfo(): {
-  timestamp: number;
-  secondsAgo: number;
-} {
-  const now = Date.now();
-  return {
-    timestamp: lastApiCallTimestamp,
-    secondsAgo: Math.floor((now - lastApiCallTimestamp) / 1000),
-  };
+// Force API calls by clearing ETags (timestamp reset handled by Convex)
+export function forceAPICall(): void {
+  console.log('🔄 Forcing API calls by clearing ETags');
+  // Clear all ETags to force fresh requests
+  etagCache.clear();
 }

@@ -20,7 +20,12 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import {
   forceRefreshStatic,
-  getLastApiCallInfo,
+  fetchStaticData,
+  fetchRealTimeData,
+  forceAPICall,
+  useDonorDriveDebug,
+  useLastApiCallInfo,
+  useUpdateLastApiCall,
 } from '@/utils/donor-drive-optimized';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -46,9 +51,14 @@ import React from 'react';
 export default function DebugPage() {
   const debugData = useQuery(api.donorDriveDebug.list);
   const clearDebug = useMutation(api.donorDriveDebug.clear);
+  const debugMutation = useDonorDriveDebug();
+  const lastApiCallInfo = useLastApiCallInfo();
+  const updateLastApiCall = useUpdateLastApiCall();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isForcingAPI, setIsForcingAPI] = useState(false);
+  const [apiPayloadData, setApiPayloadData] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -110,6 +120,58 @@ export default function DebugPage() {
     }
   };
 
+  const handleForceAPICall = async () => {
+    setIsForcingAPI(true);
+    setApiPayloadData(null);
+
+    try {
+      const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
+      if (!donorDriveId) {
+        console.error('No donor drive ID found');
+        return;
+      }
+
+      // Force fresh API calls by clearing ETags and bypassing timestamp check
+      forceAPICall();
+      console.log('🚀 Forcing fresh API calls...');
+
+      // Force static data call
+      const staticResult = await fetchStaticData(
+        donorDriveId,
+        debugMutation,
+        updateLastApiCall
+      );
+
+      // Force real-time data call
+      const realTimeResult = await fetchRealTimeData(
+        donorDriveId,
+        debugMutation,
+        updateLastApiCall,
+        lastApiCallInfo
+      );
+
+      // Combine results for display
+      const combinedPayload = {
+        timestamp: new Date().toISOString(),
+        participantId: donorDriveId,
+        staticData: staticResult,
+        realTimeData: realTimeResult,
+        note: 'This payload shows all data returned from Extra Life API calls',
+      };
+
+      setApiPayloadData(combinedPayload);
+      console.log('✅ Forced API calls completed', combinedPayload);
+    } catch (error) {
+      console.error('❌ Failed to force API calls:', error);
+      setApiPayloadData({
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      });
+    } finally {
+      setIsForcingAPI(false);
+    }
+  };
+
   const getDataTypeColor = (dataType: string) => {
     switch (dataType) {
       case 'Stats':
@@ -152,25 +214,33 @@ export default function DebugPage() {
               DonorDrive API Debug
             </h1>
             <div className='mt-2 text-sm text-muted-foreground'>
-              {(() => {
-                const apiInfo = getLastApiCallInfo();
-                return apiInfo.timestamp > 0
-                  ? `Last API call: ${apiInfo.secondsAgo}s ago`
-                  : 'No API calls yet';
-              })()}
+              {lastApiCallInfo?.timestamp
+                ? `Last API call: ${lastApiCallInfo.secondsAgo}s ago`
+                : 'No API calls yet'}
             </div>
           </div>
           <div className='flex gap-3'>
             <Button
               variant='outline'
               onClick={handleRefreshStatic}
-              disabled={isRefreshing}
+              disabled={isRefreshing || isForcingAPI}
               className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
             >
               <DatabaseIcon
                 className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
               />
               {isRefreshing ? 'Refreshing...' : 'Refresh Static Data'}
+            </Button>
+            <Button
+              variant='outline'
+              onClick={handleForceAPICall}
+              disabled={isForcingAPI || isRefreshing}
+              className='flex items-center gap-2 border-orange-300 text-orange-600 hover:bg-orange/10 hover:text-orange-700'
+            >
+              <RefreshCwIcon
+                className={`h-4 w-4 ${isForcingAPI ? 'animate-spin' : ''}`}
+              />
+              {isForcingAPI ? 'Forcing API...' : 'Force API Call'}
             </Button>
             <Button
               variant='outline'
@@ -193,6 +263,39 @@ export default function DebugPage() {
           </Card>
         ) : (
           <div className='space-y-6'>
+            {/* API Payload Display */}
+            {apiPayloadData && (
+              <Card className='bg-card border-border'>
+                <CardHeader className='border-b border-border'>
+                  <div className='flex items-center justify-between'>
+                    <CardTitle className='text-lg text-foreground'>
+                      Extra Life API Payload
+                    </CardTitle>
+                    <div className='flex items-center gap-2'>
+                      <Badge variant='outline'>
+                        {new Date(
+                          apiPayloadData.timestamp
+                        ).toLocaleString()}
+                      </Badge>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() => setApiPayloadData(null)}
+                        className='h-8 w-8 p-0'
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <div className='bg-zinc-950 rounded-lg m-4 p-4 border border-border'>
+                    <JSONViewer data={apiPayloadData} />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Logs Table */}
             <Card className='bg-zinc-950/90 border-border'>
               <CardHeader className='border-b border-border'>

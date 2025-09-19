@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as apiMetadata from "../apiMetadata.js";
 import type * as donorDriveDebug from "../donorDriveDebug.js";
 import type * as donor_drive_validators from "../donor_drive_validators.js";
 import type * as goals from "../goals.js";
@@ -31,6 +32,7 @@ import type * as wheelRedemption from "../wheelRedemption.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  apiMetadata: typeof apiMetadata;
   donorDriveDebug: typeof donorDriveDebug;
   donor_drive_validators: typeof donor_drive_validators;
   goals: typeof goals;

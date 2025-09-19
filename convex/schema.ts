@@ -1,6 +1,10 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import { statsValidator, donorValidator, donationValidator } from './donor_drive_validators';
+import {
+  statsValidator,
+  donorValidator,
+  donationValidator,
+} from './donor_drive_validators';
 
 export default defineSchema({
   goals: defineTable({
@@ -37,4 +41,9 @@ export default defineSchema({
     latestDonations: v.union(v.array(donationValidator), v.null()),
     apiEndpoint: v.string(),
   }).index('by_timestamp', ['timestamp']),
+  apiMetadata: defineTable({
+    key: v.string(), // 'lastApiCall', 'etagCache', etc.
+    value: v.string(), // JSON string for flexibility
+    updatedAt: v.string(),
+  }).index('by_key', ['key']),
 });

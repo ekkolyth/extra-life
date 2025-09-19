@@ -13,6 +13,8 @@ import {
   fetchStaticData,
   fetchRealTimeData,
   useDonorDriveDebug,
+  useLastApiCallInfo,
+  useUpdateLastApiCall,
   type StaticData,
   type RealTimeData,
 } from '@/utils/donor-drive-optimized';
@@ -33,13 +35,16 @@ export default function AdminPage() {
   const convexSegments = useQuery(api.segment.list);
   const convexGoals = useQuery(api.goals.list);
   const debugMutation = useDonorDriveDebug();
+  const lastApiCallInfo = useLastApiCallInfo();
+  const updateLastApiCall = useUpdateLastApiCall();
 
   const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
 
   // Static data - 24 hour cache, manual refresh only
   const { data: staticData } = useTanStackQuery({
     queryKey: ['staticData', donorDriveId],
-    queryFn: () => fetchStaticData(donorDriveId!, debugMutation),
+    queryFn: () =>
+      fetchStaticData(donorDriveId!, debugMutation, updateLastApiCall),
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
     refetchInterval: false, // No automatic refetch
     enabled: !!donorDriveId,
@@ -47,8 +52,14 @@ export default function AdminPage() {
 
   // Real-time data - 15 second intervals with timestamp guard
   const { data: realTimeData } = useTanStackQuery({
-    queryKey: ['realTimeData', donorDriveId],
-    queryFn: () => fetchRealTimeData(donorDriveId!, debugMutation),
+    queryKey: ['realTimeData', donorDriveId, lastApiCallInfo?.timestamp],
+    queryFn: () =>
+      fetchRealTimeData(
+        donorDriveId!,
+        debugMutation,
+        updateLastApiCall,
+        lastApiCallInfo || undefined
+      ),
     refetchInterval: 15000, // 15 seconds
     enabled: !!donorDriveId,
   });
