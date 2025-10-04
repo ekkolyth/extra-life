@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { useMutation, useQuery } from 'convex/react';
+import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query';
 
 // Define types for Donor Drive API responses
 export interface Donation {
@@ -145,17 +145,17 @@ export type RealTimeData = {
 
 // Debug mutation hook
 export function useDonorDriveDebug() {
-  return useMutation(api.donorDriveDebug.add);
+  return useConvexMutation(api.donorDriveDebug.add);
 }
 
 // Hook to get last API call info from Convex
 export function useLastApiCallInfo() {
-  return useQuery(api.apiMetadata.getLastApiCall);
+  return useConvexQuery(api.apiMetadata.getLastApiCall, {});
 }
 
 // Hook to update last API call timestamp in Convex
 export function useUpdateLastApiCall() {
-  return useMutation(api.apiMetadata.updateLastApiCall);
+  return useConvexMutation(api.apiMetadata.updateLastApiCall);
 }
 
 // Fetch participant data from our API route

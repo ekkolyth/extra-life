@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 
 interface LeftTextProps {
@@ -59,7 +59,7 @@ export function LeftText({}: LeftTextProps) {
   const [index, setIndex] = useState(0);
 
   // Use Convex to fetch rotators from the database
-  const rotators = useQuery(api.rotator.list) || [];
+  const rotators = useConvexQuery(api.rotator.list, {}) || [];
 
   const length = rotators.length;
   const visibleIndex = index % length;

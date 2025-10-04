@@ -3,7 +3,7 @@
 import type { Goal } from '@/types/db';
 
 import { PencilIcon, TrashIcon } from 'lucide-react';
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 
 import { GoalForm } from '@/components/forms/goal';
@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 
 // Component for the actions column to properly use React hooks
 function GoalActions({ goal }: { goal: Goal }) {
-  const deleteGoal = useMutation(api.goals.removeGoal);
+  const deleteGoal = useConvexMutation(api.goals.removeGoal);
 
   const handleDelete = async () => {
     try {

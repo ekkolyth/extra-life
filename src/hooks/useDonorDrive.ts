@@ -1,15 +1,18 @@
-import { useQuery, useMutation } from 'convex/react';
+import { useConvexQuery, useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { useEffect } from 'react';
 
 export function useDonorDrive() {
   const participantId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
-  const upsertData = useMutation(api.donorDriveData.upsert);
-  const upsertDonations = useMutation(api.donorDriveData.upsertDonations);
-  const upsertTopDonor = useMutation(api.donorDriveData.upsertTopDonor);
+  const upsertData = useConvexMutation(api.donorDriveData.upsert);
+  const upsertDonations = useConvexMutation(api.donorDriveData.upsertDonations);
+  const upsertTopDonor = useConvexMutation(api.donorDriveData.upsertTopDonor);
 
   // Get data from Convex
-  const convexData = useQuery(api.donorDriveData.get, participantId ? { participantId } : 'skip');
+  const convexData = useConvexQuery(
+    api.donorDriveData.get,
+    participantId ? { participantId } : 'skip'
+  );
 
   // Every 15 seconds, fetch fresh data and update Convex
   useEffect(() => {

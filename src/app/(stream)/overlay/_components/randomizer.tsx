@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 
 interface RandomizerProps {
@@ -18,7 +18,7 @@ export function Randomizer(props: RandomizerProps) {
   const [choices, setChoices] = useState<string[]>([]);
 
   // Get randomizers from Convex
-  const randomizers = useQuery(api.randomizer.list);
+  const randomizers = useConvexQuery(api.randomizer.list, {});
 
   // For now, we'll use a simple demo mode since we removed Ably
   // You can implement Convex real-time subscriptions here later

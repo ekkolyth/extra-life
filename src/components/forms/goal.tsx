@@ -4,7 +4,7 @@ import * as z from 'zod';
 import { DollarSignIcon } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 
@@ -37,8 +37,8 @@ interface GoalFormProps {
 export function GoalForm(props: GoalFormProps) {
   const { defaultValues } = props;
 
-  const createGoal = useMutation(api.goals.create);
-  const updateGoal = useMutation(api.goals.update);
+  const createGoal = useConvexMutation(api.goals.create);
+  const updateGoal = useConvexMutation(api.goals.update);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),

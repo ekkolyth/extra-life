@@ -1,10 +1,10 @@
 'use client';
 
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
 import {
   TrashIcon,
   RefreshCwIcon,
@@ -42,8 +42,8 @@ import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 
 export default function DebugPage() {
-  const debugData = useQuery(api.donorDriveDebug.list);
-  const clearDebug = useMutation(api.donorDriveDebug.clear);
+  const debugData = useConvexQuery(api.donorDriveDebug.list, {});
+  const clearDebug = useConvexMutation(api.donorDriveDebug.clear);
   const debugMutation = useDonorDriveDebug();
   const lastApiCallInfo = useLastApiCallInfo();
   const updateLastApiCall = useUpdateLastApiCall();

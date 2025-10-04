@@ -1,11 +1,11 @@
 'use client';
 
 import { RotatorForm } from '@/components/forms/rotator';
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 
 export default function RotatorPage() {
-  const convexRotators = useQuery(api.rotator.list) || [];
+  const convexRotators = useConvexQuery(api.rotator.list, {}) || [];
 
   // Transform Convex data to match expected component types
   const rotators = convexRotators.map((r) => ({

@@ -1,12 +1,12 @@
 'use client';
 
 import { RandomizerForm } from '@/components/forms/randomizer';
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import type { Randomizer } from '@/types/db';
 
 export default function RandomizerPage() {
-  const convexRandomizers = useQuery(api.randomizer.list) || [];
+  const convexRandomizers = useConvexQuery(api.randomizer.list, {}) || [];
 
   // Transform Convex data to match expected component types
   const randomizers: Randomizer[] = convexRandomizers.map((r) => ({

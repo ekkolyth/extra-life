@@ -12,11 +12,11 @@ import {
 } from '@/components/ui/dialog';
 import { GoalForm } from '@/components/forms/goal';
 import { Button } from '@/components/ui/button';
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 
 export default function GoalsPage() {
-  const convexGoals = useQuery(api.goals.list) || [];
+  const convexGoals = useConvexQuery(api.goals.list, {}) || [];
 
   // Transform Convex data to match expected component types
   const goals: Goal[] = convexGoals.map((g) => ({

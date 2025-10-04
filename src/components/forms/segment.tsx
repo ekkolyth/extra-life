@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 
 const formSchema = z.object({
@@ -31,7 +31,7 @@ const formSchema = z.object({
 });
 
 export function SegmentForm() {
-  const createSegment = useMutation(api.segment.create);
+  const createSegment = useConvexMutation(api.segment.create);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

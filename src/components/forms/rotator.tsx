@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { TrashIcon } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 
@@ -37,8 +37,8 @@ interface RotatorFormProps {
 export function RotatorForm(props: RotatorFormProps) {
   const { items } = props;
 
-  const createRotator = useMutation(api.rotator.create);
-  const updateRotator = useMutation(api.rotator.update);
+  const createRotator = useConvexMutation(api.rotator.create);
+  const updateRotator = useConvexMutation(api.rotator.update);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

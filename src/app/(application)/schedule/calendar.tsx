@@ -2,7 +2,7 @@
 
 import { Fragment } from 'react';
 import { TrashIcon } from 'lucide-react';
-import { useQuery, useMutation } from 'convex/react';
+import { useConvexQuery, useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { set, subMinutes } from 'date-fns';
 
@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time';
 
 export function Calendar() {
-  const segments = useQuery(api.segment.list) || [];
-  const deleteSegment = useMutation(api.segment.removeSegment);
+  const segments = useConvexQuery(api.segment.list, {}) || [];
+  const deleteSegment = useConvexMutation(api.segment.removeSegment);
 
   function getBackground(id: string) {
     let background = 'bg-secondary';

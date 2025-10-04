@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { useDonorDrive } from '@/hooks/useDonorDrive';
 import type { Goal, Randomizer, Segment } from '@/types/db';
@@ -11,12 +11,11 @@ import { Overview } from '@/app/(application)/dashboard/_components/overview';
 import { GoalsSection } from '@/app/(application)/dashboard/_components/goals';
 import { RandomizersSection } from '@/app/(application)/dashboard/_components/randomizers';
 import { ScheduleSection } from '@/app/(application)/dashboard/_components/schedule';
-import { QuickResourcesSection } from '@/app/(application)/dashboard/_components/quick-resources';
 
 export default function AdminPage() {
-  const convexRandomizers = useQuery(api.randomizer.list);
-  const convexSegments = useQuery(api.segment.list);
-  const convexGoals = useQuery(api.goals.list);
+  const convexRandomizers = useConvexQuery(api.randomizer.list, {});
+  const convexSegments = useConvexQuery(api.segment.list, {});
+  const convexGoals = useConvexQuery(api.goals.list, {});
 
   // Use the simple hook
   const {
@@ -158,7 +157,6 @@ export default function AdminPage() {
       <EnvCheck />
       <div className='space-y-6'>
         <Overview data={combinedData} />
-        <QuickResourcesSection />
 
         <div className='grid md:grid-cols-2 gap-6'>
           <GoalsSection

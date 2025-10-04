@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useConvexQuery, useConvexMutation } from '@convex-dev/react-query';
 import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,20 +25,20 @@ export default function DonationsPage() {
   const participantId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
 
   // Fetch all donations from Convex
-  const allDonations = useQuery(
+  const allDonations = useConvexQuery(
     api.donorDriveData.getAllDonations,
     participantId ? { participantId } : 'skip'
   );
 
   // Fetch viewed donations for current user
-  const viewedDonationIDs = useQuery(
+  const viewedDonationIDs = useConvexQuery(
     api.viewedDonations.getViewedDonations,
     user?.id ? { userId: user.id } : 'skip'
   );
 
   // Mutations
-  const markAsViewed = useMutation(api.viewedDonations.markAsViewed);
-  const markAsUnviewed = useMutation(api.viewedDonations.markAsUnviewed);
+  const markAsViewed = useConvexMutation(api.viewedDonations.markAsViewed);
+  const markAsUnviewed = useConvexMutation(api.viewedDonations.markAsUnviewed);
 
   // Local state for selected donations
   const [selectedDonationIDs, setSelectedDonationIDs] = useState<Set<string>>(new Set());
@@ -147,7 +147,7 @@ export default function DonationsPage() {
 
   return (
     <div className='space-y-4'>
-      <Card>
+      <Card className='border-border/50 bg-card/30 backdrop-blur-sm'>
         <CardHeader>
           <CardTitle>Donations</CardTitle>
         </CardHeader>

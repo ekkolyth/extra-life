@@ -1,12 +1,14 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState, ReactNode } from 'react';
 import { ClerkProvider as ClerkNextJSProvider } from '@clerk/nextjs';
 import { shadcn } from '@clerk/themes';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { ConvexQueryClient } from '@convex-dev/react-query';
 import { useAuth } from '@clerk/nextjs';
 
 // Convex client setup
@@ -15,6 +17,9 @@ if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
 }
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
+
+// Create Convex Query Client
+const convexQueryClient = new ConvexQueryClient(convex);
 
 // Clerk Provider Component
 type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>;
@@ -65,11 +70,27 @@ function QueryClientProviderWrapper({ children }: { children: ReactNode }) {
       })
   );
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
 }
 
 // Main Providers Component
 export function Providers({ children }: { children: React.ReactNode }) {
+  // Check for required Clerk environment variable
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    console.error('❌ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set');
+    console.error(
+      'Available env vars:',
+      Object.keys(process.env).filter((key) => key.startsWith('NEXT_PUBLIC'))
+    );
+  } else {
+    console.log('✅ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is set');
+  }
+
   return (
     <ClerkProvider>
       <ThemeProvider

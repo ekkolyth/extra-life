@@ -12,6 +12,10 @@ import {
   Settings,
   ExternalLink,
   Bug,
+  Bookmark,
+  Monitor,
+  MonitorPlay as Overlay,
+  Pointer as Counter,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -59,6 +63,33 @@ const tools = [
     name: 'Debug',
     href: '/debug',
     icon: Bug,
+    external: false,
+  },
+];
+
+const resources = [
+  {
+    name: 'Extra Life Page',
+    href: `https://www.extra-life.org/participants/${process.env.NEXT_PUBLIC_DONORDRIVE_ID}`,
+    icon: ExternalLink,
+    external: true,
+  },
+  {
+    name: 'Twitch Page',
+    href: 'https://www.twitch.tv/ekkolyth',
+    icon: Monitor,
+    external: true,
+  },
+  {
+    name: 'Overlay',
+    href: '/overlay',
+    icon: Overlay,
+    external: false,
+  },
+  {
+    name: 'Donation Counter',
+    href: '/counter',
+    icon: Counter,
     external: false,
   },
 ];
@@ -122,6 +153,31 @@ export function Sidebar() {
             <li key={item.name}>
               <Link
                 href={item.href}
+                className='flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary'
+              >
+                <div className='flex items-center gap-3'>
+                  <item.icon className='size-5' />
+                  {item.name}
+                </div>
+                {item.external && <ExternalLink className='size-4 text-muted-foreground' />}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Resources */}
+      <div className='px-4 py-6'>
+        <h3 className='mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+          Resources
+        </h3>
+        <ul className='space-y-2'>
+          {resources.map((item) => (
+            <li key={item.name}>
+              <Link
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
                 className='flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary'
               >
                 <div className='flex items-center gap-3'>

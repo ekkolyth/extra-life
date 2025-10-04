@@ -18,9 +18,7 @@ export default function RootLayout({
       lang='en'
       className='h-full'
       suppressHydrationWarning
-      style={
-        { '--font-satoshi': '"Satoshi", sans-serif' } as CSSProperties
-      }
+      style={{ '--font-satoshi': '"Satoshi", sans-serif' } as CSSProperties}
     >
       <head>
         <link
@@ -29,6 +27,24 @@ export default function RootLayout({
         />
       </head>
       <body className='flex min-h-full flex-col antialiased font-sans'>
+        {/* Debug: Check if Clerk key is available */}
+        {!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              background: 'red',
+              color: 'white',
+              padding: '10px',
+              zIndex: 9999,
+              textAlign: 'center',
+            }}
+          >
+            ⚠️ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing
+          </div>
+        )}
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { useDonorDrive } from '@/hooks/useDonorDrive';
 
@@ -75,7 +75,7 @@ const OverlayContent = () => {
       };
 
   // Get goals from Convex (with fallback for auth issues)
-  const convexGoals = useQuery(api.goals.list);
+  const convexGoals = useConvexQuery(api.goals.list, {});
 
   // Transform Convex data to match expected component types, with fallback
   const goals = (convexGoals || []).map((g) => ({

@@ -7,7 +7,7 @@
     "dev": "turbo run dev:convex dev:next",
     "dev:convex": "convex dev",
     "dev:next": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "check-types": "tsc --noEmit"
@@ -15,6 +15,7 @@
   "dependencies": {
     "@clerk/nextjs": "^6.31.6",
     "@clerk/themes": "^2.4.15",
+    "@convex-dev/react-query": "0.0.0-alpha.11",
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.1",
@@ -73,6 +74,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

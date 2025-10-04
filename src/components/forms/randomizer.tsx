@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { TrashIcon } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 
@@ -41,9 +41,9 @@ interface RandomizerFormProps {
 export function RandomizerForm(props: RandomizerFormProps) {
   const { randomizer } = props;
 
-  const createRandomizer = useMutation(api.randomizer.create);
-  const updateRandomizer = useMutation(api.randomizer.update);
-  const deleteRandomizer = useMutation(api.randomizer.delete);
+  const createRandomizer = useConvexMutation(api.randomizer.create);
+  const updateRandomizer = useConvexMutation(api.randomizer.update);
+  const deleteRandomizer = useConvexMutation(api.randomizer.delete);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

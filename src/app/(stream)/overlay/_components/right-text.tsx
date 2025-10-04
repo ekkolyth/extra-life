@@ -2,7 +2,7 @@
 
 import type { Goal } from '@/types/db';
 import { useEffect, useState } from 'react';
-import { useQuery as useConvexQuery } from 'convex/react';
+import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { useSegments } from '@/utils/useSegments';
 
@@ -66,7 +66,7 @@ export function RightText(props: TopRotatorProps) {
   const combinedData = data;
 
   // Use Convex for database queries
-  const convexSegments = useConvexQuery(api.segment.list) || [];
+  const convexSegments = useConvexQuery(api.segment.list, {}) || [];
   const segments = convexSegments.map((s) => ({
     id: s._id,
     title: s.title,
