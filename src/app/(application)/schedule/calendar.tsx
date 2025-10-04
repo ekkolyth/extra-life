@@ -87,7 +87,9 @@ export function Calendar() {
                   key={segment._id}
                   className={cn('p-2 m-2 rounded flex justify-between', getBackground(segment._id))}
                   style={{
-                    gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${segment.duration}`,
+                    gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${
+                      segment.duration
+                    }`,
                   }}
                 >
                   <p>{segment.title}</p>

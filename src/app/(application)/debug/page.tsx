@@ -2,12 +2,7 @@
 
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useMutation } from 'convex/react';
 import {
@@ -19,14 +14,12 @@ import {
 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  forceRefreshStatic,
-  fetchStaticData,
+  fetchParticipantData,
   fetchRealTimeData,
-  forceAPICall,
   useDonorDriveDebug,
   useLastApiCallInfo,
   useUpdateLastApiCall,
-} from '@/utils/donor-drive-optimized';
+} from '@/utils/donor-drive-api-client';
 import { Badge } from '@/components/ui/badge';
 import {
   Select,
@@ -58,7 +51,14 @@ export default function DebugPage() {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isForcingAPI, setIsForcingAPI] = useState(false);
-  const [apiPayloadData, setApiPayloadData] = useState<any>(null);
+  const [apiPayloadData, setApiPayloadData] = useState<{
+    timestamp: string;
+    participantId: string;
+    staticData: unknown;
+    realTimeData: unknown;
+    note: string;
+    error?: string;
+  } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -103,11 +103,13 @@ export default function DebugPage() {
   const handleRefreshStatic = async () => {
     setIsRefreshing(true);
     try {
-      // Force refresh static data
-      forceRefreshStatic();
+      // Clear cache for this participant
+      const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
+      await fetch(`/api/donor-drive/cache?action=participant&participantId=${donorDriveId}`, {
+        method: 'DELETE',
+      });
 
       // Invalidate and refetch static data query
-      const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
       await queryClient.invalidateQueries({
         queryKey: ['staticData', donorDriveId],
       });
@@ -124,22 +126,24 @@ export default function DebugPage() {
     setIsForcingAPI(true);
     setApiPayloadData(null);
 
-    try {
-      const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
-      if (!donorDriveId) {
-        console.error('No donor drive ID found');
-        return;
-      }
+    const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
+    if (!donorDriveId) {
+      console.error('No donor drive ID found');
+      return;
+    }
 
-      // Force fresh API calls by clearing ETags and bypassing timestamp check
-      forceAPICall();
+    try {
+      // Force fresh API calls by clearing all cache
+      await fetch('/api/donor-drive/cache?action=all', {
+        method: 'DELETE',
+      });
       console.log('🚀 Forcing fresh API calls...');
 
       // Force static data call
-      const staticResult = await fetchStaticData(
+      const staticResult = await fetchParticipantData(
         donorDriveId,
-        debugMutation,
-        updateLastApiCall
+        updateLastApiCall,
+        debugMutation
       );
 
       // Force real-time data call
@@ -164,8 +168,12 @@ export default function DebugPage() {
     } catch (error) {
       console.error('❌ Failed to force API calls:', error);
       setApiPayloadData({
-        error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString(),
+        participantId: donorDriveId || 'unknown',
+        staticData: null,
+        realTimeData: null,
+        note: 'Error occurred during API calls',
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       setIsForcingAPI(false);
@@ -192,9 +200,7 @@ export default function DebugPage() {
       <div className='min-h-screen bg-background text-foreground'>
         <div className='container mx-auto p-6'>
           <div className='flex items-center justify-between mb-8'>
-            <h1 className='text-3xl font-bold text-foreground'>
-              DonorDrive API Debug
-            </h1>
+            <h1 className='text-3xl font-bold text-foreground'>DonorDrive API Debug</h1>
           </div>
           <div className='text-center py-16'>
             <RefreshCwIcon className='h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground' />
@@ -210,9 +216,7 @@ export default function DebugPage() {
       <div className='container mx-auto p-6'>
         <div className='flex items-center justify-between mb-8'>
           <div>
-            <h1 className='text-3xl font-bold text-foreground'>
-              DonorDrive API Debug
-            </h1>
+            <h1 className='text-3xl font-bold text-foreground'>DonorDrive API Debug</h1>
             <div className='mt-2 text-sm text-muted-foreground'>
               {lastApiCallInfo?.timestamp
                 ? `Last API call: ${lastApiCallInfo.secondsAgo}s ago`
@@ -226,9 +230,7 @@ export default function DebugPage() {
               disabled={isRefreshing || isForcingAPI}
               className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
             >
-              <DatabaseIcon
-                className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
-              />
+              <DatabaseIcon className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               {isRefreshing ? 'Refreshing...' : 'Refresh Static Data'}
             </Button>
             <Button
@@ -237,9 +239,7 @@ export default function DebugPage() {
               disabled={isForcingAPI || isRefreshing}
               className='flex items-center gap-2 border-orange-300 text-orange-600 hover:bg-orange/10 hover:text-orange-700'
             >
-              <RefreshCwIcon
-                className={`h-4 w-4 ${isForcingAPI ? 'animate-spin' : ''}`}
-              />
+              <RefreshCwIcon className={`h-4 w-4 ${isForcingAPI ? 'animate-spin' : ''}`} />
               {isForcingAPI ? 'Forcing API...' : 'Force API Call'}
             </Button>
             <Button
@@ -273,9 +273,7 @@ export default function DebugPage() {
                     </CardTitle>
                     <div className='flex items-center gap-2'>
                       <Badge variant='outline'>
-                        {new Date(
-                          apiPayloadData.timestamp
-                        ).toLocaleString()}
+                        {new Date(apiPayloadData.timestamp).toLocaleString()}
                       </Badge>
                       <Button
                         variant='ghost'
@@ -300,13 +298,9 @@ export default function DebugPage() {
             <Card className='bg-zinc-950/90 border-border'>
               <CardHeader className='border-b border-border'>
                 <div className='flex items-center justify-between'>
-                  <CardTitle className='text-lg text-foreground'>
-                    API Call Logs
-                  </CardTitle>
+                  <CardTitle className='text-lg text-foreground'>API Call Logs</CardTitle>
                   <div className='flex items-center gap-2'>
-                    <span className='text-sm text-muted-foreground'>
-                      Show
-                    </span>
+                    <span className='text-sm text-muted-foreground'>Show</span>
                     <Select
                       value={itemsPerPage.toString()}
                       onValueChange={handleItemsPerPageChange}
@@ -329,15 +323,11 @@ export default function DebugPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className='border-border hover:bg-muted/50'>
-                      <TableHead className='text-muted-foreground font-medium'>
-                        Timestamp
-                      </TableHead>
+                      <TableHead className='text-muted-foreground font-medium'>Timestamp</TableHead>
                       <TableHead className='text-muted-foreground font-medium'>
                         API Endpoint
                       </TableHead>
-                      <TableHead className='text-muted-foreground font-medium'>
-                        Data Type
-                      </TableHead>
+                      <TableHead className='text-muted-foreground font-medium'>Data Type</TableHead>
                       <TableHead className='w-20 text-muted-foreground font-medium'></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -440,9 +430,7 @@ export default function DebugPage() {
                                           Top Donation
                                         </h4>
                                         <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
-                                          <JSONViewer
-                                            data={entry.topDonation}
-                                          />
+                                          <JSONViewer data={entry.topDonation} />
                                         </div>
                                       </div>
                                     )}
@@ -455,9 +443,7 @@ export default function DebugPage() {
                                           Top Donor
                                         </h4>
                                         <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
-                                          <JSONViewer
-                                            data={entry.topDonor}
-                                          />
+                                          <JSONViewer data={entry.topDonor} />
                                         </div>
                                       </div>
                                     )}
@@ -470,9 +456,7 @@ export default function DebugPage() {
                                           Latest Donations
                                         </h4>
                                         <div className='bg-zinc-950 rounded-lg p-4 border border-border'>
-                                          <JSONViewer
-                                            data={entry.latestDonations}
-                                          />
+                                          <JSONViewer data={entry.latestDonations} />
                                         </div>
                                       </div>
                                     )}
@@ -491,8 +475,7 @@ export default function DebugPage() {
                 <div className='border-t border-border px-6 py-4'>
                   <div className='flex items-center justify-between'>
                     <div className='text-sm text-muted-foreground'>
-                      Showing {startIndex + 1} to{' '}
-                      {Math.min(endIndex, totalItems)} of {totalItems}{' '}
+                      Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems}{' '}
                       entries
                     </div>
                     <div className='flex items-center gap-2'>
@@ -508,9 +491,7 @@ export default function DebugPage() {
                       <Button
                         variant='outline'
                         size='sm'
-                        onClick={() =>
-                          setCurrentPage(Math.max(1, currentPage - 1))
-                        }
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
                         className='h-8 px-2'
                       >
@@ -519,47 +500,36 @@ export default function DebugPage() {
 
                       {/* Page numbers */}
                       <div className='flex items-center gap-1'>
-                        {Array.from(
-                          { length: Math.min(5, totalPages) },
-                          (_, i) => {
-                            let pageNum;
-                            if (totalPages <= 5) {
-                              pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                              pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                              pageNum = totalPages - 4 + i;
-                            } else {
-                              pageNum = currentPage - 2 + i;
-                            }
-
-                            return (
-                              <Button
-                                key={pageNum}
-                                variant={
-                                  currentPage === pageNum
-                                    ? 'default'
-                                    : 'outline'
-                                }
-                                size='sm'
-                                onClick={() => setCurrentPage(pageNum)}
-                                className='h-8 w-8 p-0'
-                              >
-                                {pageNum}
-                              </Button>
-                            );
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
                           }
-                        )}
+
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? 'default' : 'outline'}
+                              size='sm'
+                              onClick={() => setCurrentPage(pageNum)}
+                              className='h-8 w-8 p-0'
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
                       </div>
 
                       <Button
                         variant='outline'
                         size='sm'
-                        onClick={() =>
-                          setCurrentPage(
-                            Math.min(totalPages, currentPage + 1)
-                          )
-                        }
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
                         className='h-8 px-2'
                       >

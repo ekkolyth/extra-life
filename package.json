@@ -4,7 +4,9 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "dev": "convex dev & next dev --turbopack",
+    "dev": "turbo run dev:convex dev:next",
+    "dev:convex": "convex dev",
+    "dev:next": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",

@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { GoalForm } from '@/components/original/forms/goal';
+import { GoalForm } from '@/components/forms/goal';
 import { Button } from '@/components/ui/button';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -30,7 +30,10 @@ export default function GoalsPage() {
     <div className='flex flex-col gap-4'>
       <Dialog>
         <DialogTrigger asChild>
-          <Button className='self-end' variant='outline'>
+          <Button
+            className='self-end'
+            variant='outline'
+          >
             Create Goal
           </Button>
         </DialogTrigger>
@@ -41,7 +44,10 @@ export default function GoalsPage() {
           <GoalForm />
         </DialogContent>
       </Dialog>
-      <DataTable columns={columns} data={goals} />
+      <DataTable
+        columns={columns}
+        data={goals}
+      />
     </div>
   );
 }

@@ -1,68 +1,22 @@
 'use client';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import {
-  DollarSign,
-  TrendingUp,
-  Users,
-  Calendar,
-  Target,
-} from 'lucide-react';
-import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart';
-import { StatsResult } from '@/utils/donor-drive';
-
+import { DollarSign, TrendingUp, Users, Calendar, Target } from 'lucide-react';
 interface OverviewProps {
-  data: StatsResult;
+  data: {
+    sumDonations: number;
+    fundraisingGoal: number;
+    numDonations: number;
+    numIncentives: number;
+    numMilestones: number;
+  };
 }
 
 export function Overview({ data }: OverviewProps) {
-  const totalRaised = typeof data !== 'string' ? data.sumDonations : 0;
-  const goal = typeof data !== 'string' ? data.fundraisingGoal : 2000;
+  const totalRaised = data.sumDonations;
+  const goal = data.fundraisingGoal;
   const progressPercentage = goal > 0 ? (totalRaised / goal) * 100 : 0;
-
-  const fundraisingData = [
-    { month: 'Jan', amount: 0 },
-    { month: 'Feb', amount: 0 },
-    { month: 'Mar', amount: 0 },
-    { month: 'Apr', amount: 0 },
-    { month: 'May', amount: 0 },
-    { month: 'Jun', amount: 0 },
-    { month: 'Jul', amount: 0 },
-    { month: 'Aug', amount: 0 },
-    { month: 'Sep', amount: 0 },
-    { month: 'Oct', amount: 0 },
-    { month: 'Nov', amount: 0 },
-    { month: 'Dec', amount: 0 },
-  ];
-
-  const goalBreakdown = [
-    { name: 'Raised', value: totalRaised, color: 'hsl(var(--chart-1))' },
-    {
-      name: 'Remaining',
-      value: goal - totalRaised,
-      color: 'hsl(var(--muted))',
-    },
-  ];
 
   const stats = [
     {
@@ -73,20 +27,19 @@ export function Overview({ data }: OverviewProps) {
     },
     {
       name: 'Total Donations',
-      value: typeof data !== 'string' ? data.numDonations.toString() : '0',
+      value: data.numDonations.toString(),
       icon: Users,
       change: '+0%',
     },
     {
       name: 'Active Incentives',
-      value:
-        typeof data !== 'string' ? data.numIncentives.toString() : '0',
+      value: data.numIncentives.toString(),
       icon: TrendingUp,
       change: '+0%',
     },
     {
       name: 'Milestones Hit',
-      value: typeof data !== 'string' ? `${data.numMilestones}/4` : '0/4',
+      value: `${data.numMilestones}/4`,
       icon: Calendar,
       change: '0%',
     },
@@ -110,9 +63,7 @@ export function Overview({ data }: OverviewProps) {
                 ${totalRaised.toFixed(2)}
               </span>
               <div className='flex flex-col'>
-                <span className='text-lg text-muted-foreground'>
-                  of ${goal.toLocaleString()}
-                </span>
+                <span className='text-lg text-muted-foreground'>of ${goal.toLocaleString()}</span>
                 <span className='text-sm text-primary font-medium'>
                   +${totalRaised.toFixed(2)} this month
                 </span>
@@ -148,17 +99,11 @@ export function Overview({ data }: OverviewProps) {
                 <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
                   <stat.icon className='h-5 w-5 text-primary' />
                 </div>
-                <span className='text-xs text-muted-foreground'>
-                  {stat.change}
-                </span>
+                <span className='text-xs text-muted-foreground'>{stat.change}</span>
               </div>
               <div className='mt-3 space-y-1'>
-                <p className='text-2xl font-bold text-foreground'>
-                  {stat.value}
-                </p>
-                <p className='text-xs text-muted-foreground'>
-                  {stat.name}
-                </p>
+                <p className='text-2xl font-bold text-foreground'>{stat.value}</p>
+                <p className='text-xs text-muted-foreground'>{stat.name}</p>
               </div>
             </CardContent>
           </Card>

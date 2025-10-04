@@ -1,10 +1,6 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import {
-  statsValidator,
-  donorValidator,
-  donationValidator,
-} from './donor_drive_validators';
+import { statsValidator, donorValidator, donationValidator } from './donor_drive_validators';
 
 export const list = query({
   handler: async (ctx) => {
@@ -15,7 +11,7 @@ export const list = query({
       .order('desc')
       .take(100);
 
-    return entries.reverse(); // Return in chronological order
+    return entries; // Return newest first
   },
 });
 
@@ -48,11 +44,7 @@ export const add = mutation({
       // If we have more than 100 entries, delete the oldest ones
       if (totalCount.length > 100) {
         const entriesToDelete = totalCount
-          .sort(
-            (a, b) =>
-              new Date(a.timestamp).getTime() -
-              new Date(b.timestamp).getTime()
-          )
+          .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
           .slice(0, totalCount.length - 100);
 
         console.log('🗑️ Deleting old entries:', entriesToDelete.length);

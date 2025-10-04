@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -8,7 +9,11 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "dev": {
+    "dev:convex": {
+      "persistent": true,
+      "cache": false
+    },
+    "dev:next": {
       "persistent": true,
       "cache": false
     }

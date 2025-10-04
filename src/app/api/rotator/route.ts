@@ -20,9 +20,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as { rotators: { text: string }[] };
     const existing = await convex.query(api.rotator.list);
     await Promise.all(
-      existing.map((r) =>
-        convex.mutation(api.rotator.remove, { id: r._id as Id<'rotator'> })
-      )
+      existing.map((r) => convex.mutation(api.rotator.remove, { id: r._id as Id<'rotator'> }))
     );
     await Promise.all(
       body.rotators.map((r) => convex.mutation(api.rotator.create, { text: r.text }))

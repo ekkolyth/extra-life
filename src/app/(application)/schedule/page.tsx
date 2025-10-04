@@ -1,7 +1,7 @@
 'use client';
 
 import { Calendar } from './calendar';
-import { SegmentForm } from '@/components/original/forms/segment';
+import { SegmentForm } from '@/components/forms/segment';
 
 export default function SchedulePage() {
   return (

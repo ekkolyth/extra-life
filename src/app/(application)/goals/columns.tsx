@@ -6,7 +6,7 @@ import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
-import { GoalForm } from '@/components/original/forms/goal';
+import { GoalForm } from '@/components/forms/goal';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -34,7 +34,10 @@ function GoalActions({ goal }: { goal: Goal }) {
     <div className='flex justify-end gap-4'>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant='outline' size='icon'>
+          <Button
+            variant='outline'
+            size='icon'
+          >
             <span className='sr-only'>Edit</span>
             <PencilIcon />
           </Button>
@@ -46,7 +49,11 @@ function GoalActions({ goal }: { goal: Goal }) {
           <GoalForm defaultValues={goal} />
         </DialogContent>
       </Dialog>
-      <Button variant='outline' size='icon' onClick={handleDelete}>
+      <Button
+        variant='outline'
+        size='icon'
+        onClick={handleDelete}
+      >
         <span className='sr-only'>Delete</span>
         <TrashIcon />
       </Button>

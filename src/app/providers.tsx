@@ -19,11 +19,7 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
 // Clerk Provider Component
 type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>;
 
-function ClerkProvider({
-  children,
-  appearance,
-  ...props
-}: ClerkProviderProps) {
+function ClerkProvider({ children, appearance, ...props }: ClerkProviderProps) {
   return (
     <ClerkNextJSProvider
       appearance={{
@@ -39,10 +35,7 @@ function ClerkProvider({
 }
 
 // Theme Provider Component
-function ThemeProvider({
-  children,
-  ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
+function ThemeProvider({ children, ...props }: React.ComponentProps<typeof NextThemesProvider>) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
 
@@ -59,11 +52,7 @@ function ConvexClientProvider({ children }: { children: ReactNode }) {
 }
 
 // Query Client Provider Component
-function QueryClientProviderWrapper({
-  children,
-}: {
-  children: ReactNode;
-}) {
+function QueryClientProviderWrapper({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -76,11 +65,7 @@ function QueryClientProviderWrapper({
       })
   );
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
 
 // Main Providers Component

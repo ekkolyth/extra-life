@@ -1,6 +1,6 @@
 'use client';
 
-import { RotatorForm } from '@/components/original/forms/rotator';
+import { RotatorForm } from '@/components/forms/rotator';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 

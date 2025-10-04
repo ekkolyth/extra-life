@@ -1,6 +1,6 @@
 'use client';
 
-import { RandomizerForm } from '@/components/original/forms/randomizer';
+import { RandomizerForm } from '@/components/forms/randomizer';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Randomizer } from '@/types/db';
@@ -26,7 +26,10 @@ export default function RandomizerPage() {
   return (
     <div className='space-y-6'>
       {randomizers.map((randomizer: Randomizer) => (
-        <RandomizerForm key={randomizer.id} randomizer={randomizer} />
+        <RandomizerForm
+          key={randomizer.id}
+          randomizer={randomizer}
+        />
       ))}
       <RandomizerForm />
     </div>
