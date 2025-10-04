@@ -19,7 +19,6 @@ const OverlayContent = () => {
   // Rotator State
   const [panel, setPanel] = useState('timeLeft');
   const [confetti, setConfetti] = useState(false);
-  const [timesUp, setTimesUp] = useState(false);
 
   // Get DonorDrive data
   const { data: donorDriveData, isLoading, error } = useDonorDrive();
@@ -30,10 +29,19 @@ const OverlayContent = () => {
         displayName: donorDriveData.displayName || 'Loading...',
         fundraisingGoal: donorDriveData.fundraisingGoal || 2000,
         eventName: donorDriveData.eventName || 'Demo Event',
+        links: { donate: '', page: '', stream: '' },
         streamIsEnabled: donorDriveData.streamIsEnabled || false,
         streamingChannel: donorDriveData.streamingChannel || '',
         streamingPlatform: donorDriveData.streamingPlatform || '',
         avatarImageURL: donorDriveData.avatarImageURL || '',
+        participantID: 0,
+        teamName: '',
+        isTeamCaptain: false,
+        isTeamCoCaptain: false,
+        role: '',
+        hasActivityTracking: false,
+        numIncentives: 0,
+        numMilestones: 0,
         sumDonations: donorDriveData.sumDonations || 0,
         sumPledges: donorDriveData.sumPledges || 0,
         numDonations: donorDriveData.numDonations || 0,
@@ -45,10 +53,19 @@ const OverlayContent = () => {
         displayName: 'Loading...',
         fundraisingGoal: 2000,
         eventName: 'Demo Event',
+        links: { donate: '', page: '', stream: '' },
         streamIsEnabled: false,
         streamingChannel: '',
         streamingPlatform: '',
         avatarImageURL: '',
+        participantID: 0,
+        teamName: '',
+        isTeamCaptain: false,
+        isTeamCoCaptain: false,
+        role: '',
+        hasActivityTracking: false,
+        numIncentives: 0,
+        numMilestones: 0,
         sumDonations: 0,
         sumPledges: 0,
         numDonations: 0,
@@ -145,7 +162,7 @@ const OverlayContent = () => {
           <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow relative'>
             <TimeLeft
               visible={panel === 'timeLeft'}
-              timesUp={(value) => setTimesUp(value)}
+              timesUp={() => {}}
             />
             <WheelSpins visible={panel === 'wheelSpins'} />
           </div>

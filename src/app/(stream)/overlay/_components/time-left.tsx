@@ -13,7 +13,6 @@ const TimeLeft = ({
   visible: boolean;
   timesUp: (value: boolean) => void;
 }) => {
-  const [displayTime, setDisplayTime] = useState(true);
   const [hoursLeft, setHoursLeft] = useState('00');
   const [minutesLeft, setMinutesLeft] = useState('00');
   const [secondsLeft, setSecondsLeft] = useState('00');
@@ -32,7 +31,6 @@ const TimeLeft = ({
       setSecondsLeft(String(seconds).padStart(2, '0'));
 
       if (timeDifference <= 0) {
-        setDisplayTime(false);
         timesUp(true);
       }
     };

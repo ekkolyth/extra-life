@@ -60,14 +60,23 @@ export function useDonorDrive() {
           if (Array.isArray(donationsData) && donationsData.length > 0) {
             await upsertDonations({
               participantId,
-              donations: donationsData.map((d: any) => ({
-                donationID: d.donationID || `${d.amount}-${d.createdDateUTC}`,
-                displayName: d.displayName || 'Anonymous',
-                amount: d.amount || 0,
-                message: d.message,
-                avatarImageURL: d.avatarImageURL,
-                createdDateUTC: d.createdDateUTC || new Date().toISOString(),
-              })),
+              donations: donationsData.map(
+                (d: {
+                  donationID?: string;
+                  displayName?: string;
+                  amount?: number;
+                  message?: string;
+                  avatarImageURL?: string;
+                  createdDateUTC?: string;
+                }) => ({
+                  donationID: d.donationID || `${d.amount}-${d.createdDateUTC}`,
+                  displayName: d.displayName || 'Anonymous',
+                  amount: d.amount || 0,
+                  message: d.message,
+                  avatarImageURL: d.avatarImageURL,
+                  createdDateUTC: d.createdDateUTC || new Date().toISOString(),
+                })
+              ),
             });
           }
 

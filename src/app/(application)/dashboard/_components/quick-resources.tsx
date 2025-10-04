@@ -56,12 +56,12 @@ export function QuickResourcesSection() {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3'>
           {resources.map((resource) => (
             <Button
+              key={resource.name}
               variant='outline'
               className='h-auto p-4 flex flex-col items-start gap-2 hover:bg-accent/10 bg-transparent'
               asChild
             >
               <Link
-                key={resource.name}
                 href={resource.link || '/dashboard'}
                 target='_blank'
                 rel='noopener noreferrer'
