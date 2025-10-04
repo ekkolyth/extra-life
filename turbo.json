@@ -6,16 +6,26 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
-    },
-    "dev:convex": {
-      "persistent": true,
-      "cache": false
-    },
-    "dev:next": {
-      "persistent": true,
-      "cache": false
-    }
+    "env": [
+      "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+      "CLERK_SECRET_KEY",
+      "DATABASE_URL",
+      "NEXT_PUBLIC_CONVEX_URL",
+      "NEXT_PUBLIC_DONORDRIVE_ID",
+      "CLERK_JWT_ISSUER_DOMAIN",
+      "NEXT_PUBLIC_CLERK_SIGN_IN_URL",
+      "NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL"
+    ]
+  },
+  "check-types": {
+    "dependsOn": ["^check-types"]
+  },
+  "dev:convex": {
+    "persistent": true,
+    "cache": false
+  },
+  "dev:next": {
+    "persistent": true,
+    "cache": false
   }
 }
