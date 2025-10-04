@@ -5,3 +5,4 @@ export const viewedDonations = defineTable({
   userId: v.string(),
   donationIDs: v.array(v.string()),
 }).index('by_user', ['userId']);
+

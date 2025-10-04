@@ -59,6 +59,7 @@ export const upsert = mutation({
   },
   handler: async (ctx, args) => {
     const { participantId, ...data } = args;
+    const lastUpdated = new Date().toISOString();
 
     const existing = await ctx.db
       .query('donorDriveData')
@@ -66,9 +67,9 @@ export const upsert = mutation({
       .first();
 
     if (existing) {
-      await ctx.db.patch(existing._id, data);
+      await ctx.db.patch(existing._id, { ...data, lastUpdated });
     } else {
-      await ctx.db.insert('donorDriveData', args);
+      await ctx.db.insert('donorDriveData', { ...args, lastUpdated });
     }
   },
 });
