@@ -6,7 +6,7 @@ import { useDonorDrive } from '@/hooks/useDonorDrive';
 import type { Goal, Randomizer, Segment } from '@/types/db';
 
 import { EnvCheck } from '@/components/env-check';
-import { TopDonor } from '@/components/cards/top-donor';
+import { TopDonor } from '@/app/(application)/dashboard/_components/top-donor';
 import { Overview } from '@/app/(application)/dashboard/_components/overview';
 import { GoalsSection } from '@/app/(application)/dashboard/_components/goals';
 import { RandomizersSection } from '@/app/(application)/dashboard/_components/randomizers';

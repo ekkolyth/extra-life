@@ -26,9 +26,9 @@ export function useDonorDrive() {
         const participantData = participantResponse.ok ? await participantResponse.json() : null;
         console.log('🔍 Participant data:', participantData);
 
-        // Fetch real-time data
+        // Fetch real-time data - fetch ALL donations for the donations page
         const donationsResponse = await fetch(
-          `/api/donor-drive/donations?id=${participantId}&limit=10&orderBy=createdDateUTC%20DESC`
+          `/api/donor-drive/donations?id=${participantId}&orderBy=createdDateUTC%20DESC`
         );
         const donationsData = donationsResponse.ok ? await donationsResponse.json() : [];
         console.log('🔍 Donations data:', donationsData);

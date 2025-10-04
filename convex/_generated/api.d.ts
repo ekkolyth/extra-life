@@ -30,8 +30,10 @@ import type * as schema_randomizer from "../schema/randomizer.js";
 import type * as schema_rotator from "../schema/rotator.js";
 import type * as schema_segments from "../schema/segments.js";
 import type * as schema_topDonor from "../schema/topDonor.js";
+import type * as schema_viewedDonations from "../schema/viewedDonations.js";
 import type * as schema_wheelRedemptions from "../schema/wheelRedemptions.js";
 import type * as segment from "../segment.js";
+import type * as viewedDonations from "../viewedDonations.js";
 import type * as wheelRedemption from "../wheelRedemption.js";
 
 /**
@@ -60,8 +62,10 @@ declare const fullApi: ApiFromModules<{
   "schema/rotator": typeof schema_rotator;
   "schema/segments": typeof schema_segments;
   "schema/topDonor": typeof schema_topDonor;
+  "schema/viewedDonations": typeof schema_viewedDonations;
   "schema/wheelRedemptions": typeof schema_wheelRedemptions;
   segment: typeof segment;
+  viewedDonations: typeof viewedDonations;
   wheelRedemption: typeof wheelRedemption;
 }>;
 export declare const api: FilterApi<

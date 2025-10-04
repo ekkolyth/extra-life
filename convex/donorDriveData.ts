@@ -28,6 +28,20 @@ export const get = query({
   },
 });
 
+// Get ALL donations for a participant (for donations page)
+export const getAllDonations = query({
+  args: { participantId: v.string() },
+  handler: async (ctx, { participantId }) => {
+    const donations = await ctx.db
+      .query('donations')
+      .withIndex('by_participant', (q) => q.eq('participantId', participantId))
+      .order('desc')
+      .collect();
+
+    return donations;
+  },
+});
+
 export const upsert = mutation({
   args: {
     participantId: v.string(),
@@ -51,22 +65,10 @@ export const upsert = mutation({
       .withIndex('by_participant', (q) => q.eq('participantId', participantId))
       .first();
 
-    const now = new Date().toISOString();
-
     if (existing) {
-      await ctx.db.patch(existing._id, {
-        ...data,
-        lastUpdated: now,
-      });
-      console.log('📝 Updated participant data');
-      return existing._id;
+      await ctx.db.patch(existing._id, data);
     } else {
-      console.log('📝 Creating new participant record');
-      return await ctx.db.insert('donorDriveData', {
-        participantId,
-        ...data,
-        lastUpdated: now,
-      });
+      await ctx.db.insert('donorDriveData', args);
     }
   },
 });
@@ -77,7 +79,7 @@ export const upsertDonations = mutation({
     donations: v.array(
       v.object({
         donationID: v.string(),
-        displayName: v.optional(v.string()),
+        displayName: v.string(),
         amount: v.number(),
         message: v.optional(v.string()),
         avatarImageURL: v.optional(v.string()),
@@ -99,7 +101,6 @@ export const upsertDonations = mutation({
         });
       }
     }
-    console.log(`📝 Upserted ${donations.length} donations`);
   },
 });
 
@@ -123,13 +124,11 @@ export const upsertTopDonor = mutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, data);
-      console.log('📝 Updated top donor');
     } else {
       await ctx.db.insert('topDonor', {
         participantId,
         ...data,
       });
-      console.log('📝 Created new top donor record');
     }
   },
 });

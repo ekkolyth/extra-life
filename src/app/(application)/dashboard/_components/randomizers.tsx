@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shuffle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Randomizer } from '@/types/db';
@@ -13,9 +8,7 @@ interface RandomizersSectionProps {
   randomizers: Randomizer[];
 }
 
-export function RandomizersSection({
-  randomizers,
-}: RandomizersSectionProps) {
+export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
   const totalItems = randomizers.reduce(
     (acc, randomizer) => acc + (randomizer.items?.length || 0),
     0
@@ -23,11 +16,7 @@ export function RandomizersSection({
 
   const redeemedItems = randomizers.reduce(
     (acc, randomizer) =>
-      acc +
-      (randomizer.items?.reduce(
-        (itemAcc, item) => itemAcc + item.redeemed,
-        0
-      ) || 0),
+      acc + (randomizer.items?.reduce((itemAcc, item) => itemAcc + item.redeemed, 0) || 0),
     0
   );
 
@@ -35,7 +24,7 @@ export function RandomizersSection({
 
   if (!randomizers || randomizers.length === 0) {
     return (
-      <Card>
+      <Card className='border-border/50 bg-card/50 backdrop-blur-sm'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
             <Shuffle className='h-5 w-5 text-primary' />
@@ -45,8 +34,7 @@ export function RandomizersSection({
         <CardContent className='space-y-4'>
           <div className='rounded-lg bg-muted/30 p-4'>
             <p className='text-xs text-muted-foreground mb-3'>
-              Do not close this page once a randomizer is triggered, until
-              it is finished spinning.
+              Do not close this page once a randomizer is triggered, until it is finished spinning.
             </p>
 
             <div className='text-center space-y-2'>
@@ -61,9 +49,7 @@ export function RandomizersSection({
               </div>
             </div>
 
-            <p className='text-sm text-muted-foreground text-center mt-3'>
-              No randomizers found
-            </p>
+            <p className='text-sm text-muted-foreground text-center mt-3'>No randomizers found</p>
           </div>
 
           <Button
@@ -93,8 +79,7 @@ export function RandomizersSection({
       <CardContent className='space-y-4'>
         <div className='rounded-lg bg-muted/30 p-4'>
           <p className='text-xs text-muted-foreground mb-3'>
-            Do not close this page once a randomizer is triggered, until it
-            is finished spinning.
+            Do not close this page once a randomizer is triggered, until it is finished spinning.
           </p>
 
           <div className='text-center space-y-2'>
@@ -116,9 +101,7 @@ export function RandomizersSection({
                 className='flex justify-between items-center text-sm'
               >
                 <span className='text-foreground'>{randomizer.name}</span>
-                <span className='text-muted-foreground'>
-                  {randomizer.items?.length || 0} items
-                </span>
+                <span className='text-muted-foreground'>{randomizer.items?.length || 0} items</span>
               </div>
             ))}
           </div>

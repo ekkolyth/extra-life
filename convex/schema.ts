@@ -10,6 +10,7 @@ import { donorDriveDebug } from './schema/donorDriveDebug';
 import { apiMetadata } from './schema/apiMetadata';
 import { donorDriveData } from './schema/donorDriveData';
 import { donations } from './schema/donations';
+import { viewedDonations } from './schema/viewedDonations';
 
 export default defineSchema({
   topDonor,
@@ -23,4 +24,5 @@ export default defineSchema({
   apiMetadata,
   donorDriveData,
   donations,
+  viewedDonations,
 });
