@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // Simple in-memory store for test video triggers with timestamp
 let lastTriggerTime = 0;
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   lastTriggerTime = Date.now();
   console.log('🎬 Test video triggered via API at', new Date(lastTriggerTime).toISOString());
   return NextResponse.json({ success: true, timestamp: lastTriggerTime });
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const now = Date.now();
   const timeSinceTrigger = now - lastTriggerTime;
   

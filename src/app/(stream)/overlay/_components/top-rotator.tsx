@@ -4,8 +4,6 @@ import type { Goal } from "@/types/db";
 
 import { LeftText } from "./left-text";
 import { RightText } from "./right-text";
-import Image from "next/image";
-import DiceIcon from "../../../../../public/icons/dice";
 import { ControllerIcon } from "../../../../../public/icons/controller";
 
 interface TopRotatorProps {

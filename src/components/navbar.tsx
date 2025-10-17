@@ -12,7 +12,6 @@ import {
   Settings,
   ExternalLink,
   Bug,
-  Bookmark,
   Monitor,
   MonitorPlay as Overlay,
   Pointer as Counter,

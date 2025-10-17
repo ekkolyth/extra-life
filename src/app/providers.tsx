@@ -19,7 +19,7 @@ if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
 
 // Create Convex Query Client
-const convexQueryClient = new ConvexQueryClient(convex);
+new ConvexQueryClient(convex);
 
 // Clerk Provider Component
 type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>;

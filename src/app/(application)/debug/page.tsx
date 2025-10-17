@@ -12,7 +12,6 @@ import {
   ChevronRightIcon,
   DatabaseIcon,
 } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   fetchParticipantData,
   fetchRealTimeData,
@@ -48,8 +47,7 @@ export default function DebugPage() {
   const lastApiCallInfo = useLastApiCallInfo();
   const updateLastApiCall = useUpdateLastApiCall();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const queryClient = useQueryClient();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isRefreshing] = useState(false);
   const [isForcingAPI, setIsForcingAPI] = useState(false);
   const [apiPayloadData, setApiPayloadData] = useState<{
     timestamp: string;

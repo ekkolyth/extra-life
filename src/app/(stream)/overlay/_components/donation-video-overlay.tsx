@@ -95,7 +95,7 @@ export function DonationVideoOverlay({
           </div>
           {donation.message && (
             <div className="text-2xl font-medium text-white drop-shadow-2xl">
-              "{donation.message}"
+              &ldquo;{donation.message}&rdquo;
             </div>
           )}
         </div>
