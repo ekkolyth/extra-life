@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
@@ -89,16 +89,17 @@ const OverlayContent = () => {
   useEffect(() => {
     const timer = setTimeout(
       () => {
-        if (panel === 'timeLeft') {
-          setPanel('wheelSpins');
-        } else {
-          setPanel('timeLeft');
-        }
+        setPanel(prevPanel => prevPanel === 'timeLeft' ? 'wheelSpins' : 'timeLeft');
       },
       panel === 'wheelSpins' ? 5000 : 10000
     );
     return () => clearTimeout(timer);
   }, [panel]);
+
+  // Memoize the timesUp callback to prevent re-renders
+  const handleTimesUp = useCallback(() => {
+    // Handle times up event if needed
+  }, []);
 
   // Trigger confetti when we're over 100% of the goal
   useEffect(() => {
@@ -162,7 +163,7 @@ const OverlayContent = () => {
           <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow relative'>
             <TimeLeft
               visible={panel === 'timeLeft'}
-              timesUp={() => {}}
+              timesUp={handleTimesUp}
             />
             <WheelSpins visible={panel === 'wheelSpins'} />
           </div>
