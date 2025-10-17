@@ -11,6 +11,8 @@ import TopRotator from './_components/top-rotator';
 import { Randomizer } from './_components/randomizer';
 import ProgressBar from './_components/progress-bar';
 import { WheelSpins } from './_components/wheel-spins';
+import { DonationVideoOverlay } from './_components/donation-video-overlay';
+import { useDonationVideoTrigger } from '@/hooks/useDonationVideoTrigger';
 
 const OverlayContent = () => {
   const searchParams = useSearchParams();
@@ -85,6 +87,34 @@ const OverlayContent = () => {
     endOfStream: g.endOfStream,
   }));
 
+  // Video overlay trigger for big donations
+  const { shouldPlayVideo, currentDonation, handleVideoEnd } = useDonationVideoTrigger({
+    latestDonations: combinedData.latestDonations,
+    threshold: 100,
+    timeWindowSeconds: 15,
+  });
+
+  // Test video trigger from debug page
+  const [showTestVideo, setShowTestVideo] = useState(false);
+
+  useEffect(() => {
+    const checkForTestTrigger = async () => {
+      try {
+        const response = await fetch('/api/test-video');
+        const data = await response.json();
+        if (data.triggered) {
+          setShowTestVideo(true);
+        }
+      } catch (error) {
+        // Silently fail - this is just for testing
+      }
+    };
+
+    // Check every 500ms
+    const interval = setInterval(checkForTestTrigger, 500);
+    return () => clearInterval(interval);
+  }, []);
+
   // Display time left for 5 seconds, then switch to wheel spins for 10 seconds, then repeat
   useEffect(() => {
     const timer = setTimeout(
@@ -135,6 +165,25 @@ const OverlayContent = () => {
 
   return (
     <div className='relative w-[1920px] h-[1080px]'>
+      {/* Donation Video Overlay */}
+      <DonationVideoOverlay 
+        isVisible={shouldPlayVideo} 
+        donation={currentDonation}
+        onVideoEnd={handleVideoEnd} 
+      />
+
+      {/* Test Video Overlay */}
+      <DonationVideoOverlay
+        isVisible={showTestVideo}
+        donation={{
+          amount: 250.00,
+          displayName: 'Anonymous',
+          message: 'For the kids!',
+          createdDateUTC: new Date().toISOString(),
+        }}
+        onVideoEnd={() => setShowTestVideo(false)}
+      />
+      
       {/* Confetti */}
       {!limited && confetti && (
         <div className='absolute inset-0 z-50 pointer-events-none'>

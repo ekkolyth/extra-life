@@ -100,25 +100,12 @@ export default function DebugPage() {
     }
   };
 
-  const handleRefreshStatic = async () => {
-    setIsRefreshing(true);
+  const handleTestVideo = async () => {
     try {
-      // Clear cache for this participant
-      const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID;
-      await fetch(`/api/donor-drive/cache?action=participant&participantId=${donorDriveId}`, {
-        method: 'DELETE',
-      });
-
-      // Invalidate and refetch static data query
-      await queryClient.invalidateQueries({
-        queryKey: ['staticData', donorDriveId],
-      });
-
-      console.log('✅ Static data refresh triggered');
+      await fetch('/api/test-video', { method: 'POST' });
+      console.log('🎬 Test video trigger sent');
     } catch (error) {
-      console.error('Failed to refresh static data:', error);
-    } finally {
-      setIsRefreshing(false);
+      console.error('Failed to trigger test video:', error);
     }
   };
 
@@ -226,12 +213,11 @@ export default function DebugPage() {
           <div className='flex gap-3'>
             <Button
               variant='outline'
-              onClick={handleRefreshStatic}
-              disabled={isRefreshing || isForcingAPI}
+              onClick={handleTestVideo}
               className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
             >
-              <DatabaseIcon className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Refreshing...' : 'Refresh Static Data'}
+              <DatabaseIcon className='h-4 w-4' />
+              Test Donation Video
             </Button>
             <Button
               variant='outline'
@@ -252,6 +238,7 @@ export default function DebugPage() {
             </Button>
           </div>
         </div>
+
 
         {debugData.length === 0 ? (
           <Card className='bg-card border-border'>
@@ -552,6 +539,7 @@ export default function DebugPage() {
           </div>
         )}
       </div>
+
     </div>
   );
 }
