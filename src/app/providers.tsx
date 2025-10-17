@@ -8,7 +8,6 @@ import { shadcn } from '@clerk/themes';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
-import { ConvexQueryClient } from '@convex-dev/react-query';
 import { useAuth } from '@clerk/nextjs';
 
 // Convex client setup
@@ -17,9 +16,6 @@ if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
 }
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
-
-// Create Convex Query Client
-const convexQueryClient = new ConvexQueryClient(convex);
 
 // Clerk Provider Component
 type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>;
