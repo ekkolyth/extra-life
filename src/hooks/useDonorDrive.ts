@@ -113,10 +113,10 @@ export function useDonorDrive() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [participantId]); // Only re-run if participantId changes
 
-  // Return the data from Convex
+  // Return the data from Convex with optimistic loading
   return {
     data: convexData,
-    isLoading: convexData === undefined,
+    isLoading: convexData === undefined && !convexData, // Only show loading if we have no data at all
     error: null,
   };
 }

@@ -31,38 +31,13 @@ export default function AdminPage() {
     error: donorDriveError,
   });
 
-  // Handle loading states
-  if (
-    convexRandomizers === undefined ||
-    convexSegments === undefined ||
-    convexGoals === undefined ||
-    donorDriveLoading
-  ) {
-    return (
-      <div className='space-y-4'>
-        <EnvCheck />
-        <div className='flex items-center justify-center p-8'>
-          <p>Loading dashboard data...</p>
-        </div>
-      </div>
-    );
-  }
+  // Show the dashboard immediately with whatever data we have
+  // Data will update automatically when fresh data arrives
 
-  // Handle error states
-  if (donorDriveError) {
-    return (
-      <div className='space-y-4'>
-        <EnvCheck />
-        <div className='flex items-center justify-center p-8'>
-          <div className='text-center'>
-            <p className='text-red-500 mb-4'>Error loading donor drive data</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Show dashboard even if there are errors - data will update when available
 
   // Transform Convex data to match expected component types
+  // Use empty arrays as fallback for undefined data (optimistic loading)
   const randomizers: Randomizer[] = (convexRandomizers || []).map((r) => ({
     id: r._id,
     name: r.name,
@@ -156,17 +131,18 @@ export default function AdminPage() {
     <div className='space-y-4'>
       <EnvCheck />
       <div className='space-y-6'>
-        <Overview data={combinedData} />
+        <Overview data={combinedData} isLoading={donorDriveLoading} />
 
         <div className='grid md:grid-cols-2 gap-6'>
           <GoalsSection
             data={combinedData}
             goals={goals}
+            isLoading={donorDriveLoading}
           />
           <div className='space-y-6'>
             <ScheduleSection segments={segments} />
             <RandomizersSection randomizers={randomizers} />
-            <TopDonor data={topDonorData} />
+            <TopDonor data={topDonorData} isLoading={donorDriveLoading} />
           </div>
         </div>
       </div>
