@@ -75,13 +75,9 @@ export function LeftText({}: LeftTextProps) {
 
   return (
     <div>
-      {rotating ? (
-        <p className='text-white font-bold text-2xl truncate animate-pulse'>
-          {rotators[visibleIndex]?.text || fallbackText}
-        </p>
-      ) : (
-        <p className='text-white font-bold text-2xl truncate'>{fallbackText}</p>
-      )}
+      <p className='text-white font-bold text-2xl truncate'>
+        {rotating ? (rotators[visibleIndex]?.text || fallbackText) : fallbackText}
+      </p>
     </div>
   );
 }

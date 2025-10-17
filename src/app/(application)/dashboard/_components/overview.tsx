@@ -3,6 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { DollarSign, TrendingUp, Users, Calendar, Target } from 'lucide-react';
+
+// Loading component for individual values
+function LoadingValue({ className = "h-8 w-24" }: { className?: string }) {
+  return (
+    <div className={`animate-pulse bg-muted rounded ${className}`} />
+  );
+}
 interface OverviewProps {
   data: {
     sumDonations: number;
@@ -11,9 +18,10 @@ interface OverviewProps {
     numIncentives: number;
     numMilestones: number;
   };
+  isLoading?: boolean;
 }
 
-export function Overview({ data }: OverviewProps) {
+export function Overview({ data, isLoading = false }: OverviewProps) {
   const totalRaised = data.sumDonations;
   const goal = data.fundraisingGoal;
   const progressPercentage = goal > 0 ? (totalRaised / goal) * 100 : 0;
@@ -59,28 +67,54 @@ export function Overview({ data }: OverviewProps) {
         <CardContent className='space-y-6'>
           <div className='space-y-4'>
             <div className='flex items-baseline gap-3'>
-              <span className='text-5xl font-bold tracking-tight text-foreground'>
-                ${totalRaised.toFixed(2)}
-              </span>
-              <div className='flex flex-col'>
-                <span className='text-lg text-muted-foreground'>of ${goal.toLocaleString()}</span>
-                <span className='text-sm text-primary font-medium'>
-                  +${totalRaised.toFixed(2)} this month
+              {isLoading ? (
+                <LoadingValue className="h-12 w-32" />
+              ) : (
+                <span className='text-5xl font-bold tracking-tight text-foreground'>
+                  ${totalRaised.toFixed(2)}
                 </span>
+              )}
+              <div className='flex flex-col'>
+                {isLoading ? (
+                  <>
+                    <LoadingValue className="h-6 w-20" />
+                    <LoadingValue className="h-4 w-24 mt-1" />
+                  </>
+                ) : (
+                  <>
+                    <span className='text-lg text-muted-foreground'>of ${goal.toLocaleString()}</span>
+                    <span className='text-sm text-primary font-medium'>
+                      +${totalRaised.toFixed(2)} this month
+                    </span>
+                  </>
+                )}
               </div>
             </div>
             <div className='space-y-2'>
-              <Progress
-                value={progressPercentage}
-                className='h-2'
-              />
+              {isLoading ? (
+                <LoadingValue className="h-2 w-full" />
+              ) : (
+                <Progress
+                  value={progressPercentage}
+                  className='h-2'
+                />
+              )}
               <div className='flex justify-between text-sm'>
-                <span className='text-muted-foreground'>
-                  {progressPercentage.toFixed(1)}% complete
-                </span>
-                <span className='text-muted-foreground'>
-                  ${(goal - totalRaised).toLocaleString()} remaining
-                </span>
+                {isLoading ? (
+                  <>
+                    <LoadingValue className="h-4 w-20" />
+                    <LoadingValue className="h-4 w-24" />
+                  </>
+                ) : (
+                  <>
+                    <span className='text-muted-foreground'>
+                      {progressPercentage.toFixed(1)}% complete
+                    </span>
+                    <span className='text-muted-foreground'>
+                      ${(goal - totalRaised).toLocaleString()} remaining
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -102,7 +136,11 @@ export function Overview({ data }: OverviewProps) {
                 <span className='text-xs text-muted-foreground'>{stat.change}</span>
               </div>
               <div className='mt-3 space-y-1'>
-                <p className='text-2xl font-bold text-foreground'>{stat.value}</p>
+                {isLoading ? (
+                  <LoadingValue className="h-8 w-16" />
+                ) : (
+                  <p className='text-2xl font-bold text-foreground'>{stat.value}</p>
+                )}
                 <p className='text-xs text-muted-foreground'>{stat.name}</p>
               </div>
             </CardContent>

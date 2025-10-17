@@ -4,14 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, Trophy, CheckCircle, Clock } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Goal } from '@/types/db';
+
+// Loading component for individual values
+function LoadingValue({ className = "h-8 w-24" }: { className?: string }) {
+  return (
+    <div className={`animate-pulse bg-muted rounded ${className}`} />
+  );
+}
+
 interface GoalsSectionProps {
   data: {
     sumDonations: number;
   };
   goals: Goal[];
+  isLoading?: boolean;
 }
 
-export function GoalsSection({ data, goals }: GoalsSectionProps) {
+export function GoalsSection({ data, goals, isLoading = false }: GoalsSectionProps) {
   const totalRaised = data.sumDonations;
 
   // Find next goal based on current total raised
@@ -21,36 +30,59 @@ export function GoalsSection({ data, goals }: GoalsSectionProps) {
 
   return (
     <div className='space-y-6'>
-      {/* Next Goal Highlight */}
-      {nextGoal && (
-        <Card className='border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm'>
-          <CardContent className='p-6'>
-            <div className='flex items-center gap-3 mb-4'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20'>
-                <Trophy className='h-5 w-5 text-primary' />
-              </div>
-              <div>
-                <span className='text-sm font-medium text-primary'>Next Goal</span>
-                <h3 className='text-2xl font-bold text-foreground'>{nextGoal.title}</h3>
-              </div>
+      {/* Next Goal Highlight - Always show the block */}
+      <Card className='border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm'>
+        <CardContent className='p-6'>
+          <div className='flex items-center gap-3 mb-4'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20'>
+              <Trophy className='h-5 w-5 text-primary' />
             </div>
+            <div>
+              <span className='text-sm font-medium text-primary'>Next Goal</span>
+              {isLoading || !nextGoal ? (
+                <LoadingValue className="h-8 w-32 mt-1" />
+              ) : (
+                <h3 className='text-2xl font-bold text-foreground'>{nextGoal.title}</h3>
+              )}
+            </div>
+          </div>
+          {isLoading || !nextGoal ? (
+            <LoadingValue className="h-4 w-24 mb-4" />
+          ) : (
             <p className='text-sm text-muted-foreground mb-4'>
               {nextGoal.endOfStream ? 'End of Stream Goal' : 'Donation Goal'}
             </p>
-            <div className='space-y-2'>
-              <div className='flex justify-between text-sm'>
-                <span className='text-muted-foreground'>${totalRaised.toFixed(2)} raised</span>
-                <span className='font-medium'>${nextGoal.amount.toLocaleString()} target</span>
-              </div>
+          )}
+          <div className='space-y-2'>
+            <div className='flex justify-between text-sm'>
+              {isLoading ? (
+                <>
+                  <LoadingValue className="h-4 w-20" />
+                  <LoadingValue className="h-4 w-20" />
+                </>
+              ) : (
+                <>
+                  <span className='text-muted-foreground'>${totalRaised.toFixed(2)} raised</span>
+                  <span className='font-medium'>${nextGoal?.amount.toLocaleString() || '0'} target</span>
+                </>
+              )}
+            </div>
+            {isLoading ? (
+              <LoadingValue className="h-2 w-full" />
+            ) : (
               <Progress
                 value={progressToNext}
                 className='h-2'
               />
+            )}
+            {isLoading ? (
+              <LoadingValue className="h-3 w-16" />
+            ) : (
               <p className='text-xs text-muted-foreground'>{progressToNext.toFixed(1)}% complete</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Goals List */}
       <Card className='border-border/50 bg-card/30 backdrop-blur-sm'>

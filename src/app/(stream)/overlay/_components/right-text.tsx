@@ -1,7 +1,7 @@
 'use client';
 
 import type { Goal } from '@/types/db';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { useSegments } from '@/utils/useSegments';
@@ -81,7 +81,8 @@ export function RightText(props: TopRotatorProps) {
     }
   }, [combinedData, goals]);
 
-  const bonusText: { label: string; text: string }[] = [
+  // Memoize bonusText to prevent recreation on every render
+  const bonusText = useMemo(() => [
     {
       label: 'right now',
       text: currentSegment?.title ?? '',
@@ -107,7 +108,8 @@ export function RightText(props: TopRotatorProps) {
       label: 'next goal unlock',
       text: nextGoal ? `${nextGoal?.title}${nextGoal?.endOfStream ? ` - End Of Stream` : ''}` : '',
     },
-  ];
+  ], [currentSegment, nextSegment, combinedData.latestDonations, combinedData.topDonor, nextGoal]);
+  
   const visibleIndex = index % bonusText.length;
 
   // Every 7 seconds increment the index
