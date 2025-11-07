@@ -1,6 +1,6 @@
 'use client';
 
-import styles from './overlay.module.css';
+import styles from './Overlay.module.css';
 
 import { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -16,13 +16,21 @@ import { WheelSpins } from './_components/wheel-spins';
 import { DonationVideoOverlay } from './_components/donation-video-overlay';
 import { useDonationVideoTrigger } from '@/hooks/useDonationVideoTrigger';
 
+/** ---- Explicit hex colors (stable in OBS/CEF) ---- */
+const COLOR_PRIMARY = '#25a8f1';
+const COLOR_PROGRESS_TRACK = '#1e3b52';     // dark blue track
+const COLOR_PROGRESS_FILL = '#25a8f1';      // bright blue fill
+const COLOR_PROGRESS_TEXT = '#ffffff';
+
 const OverlayContent = () => {
   const searchParams = useSearchParams();
   const limited = searchParams.get('limited') === 'true';
 
+  // Rotator State
   const [panel, setPanel] = useState<'timeLeft' | 'wheelSpins'>('timeLeft');
   const [confetti, setConfetti] = useState(false);
 
+  // DonorDrive data
   const { data: donorDriveData, isLoading, error } = useDonorDrive();
 
   const combinedData = donorDriveData
@@ -78,6 +86,7 @@ const OverlayContent = () => {
   // Goals from Convex
   const convexGoals = useConvexQuery(api.goals.list, {});
 
+  // Infer the element type so we never use `any`
   type Goal = NonNullable<typeof convexGoals>[number];
 
   const goals = (convexGoals ?? []).map((g: Goal) => ({
@@ -87,13 +96,14 @@ const OverlayContent = () => {
     endOfStream: g.endOfStream,
   }));
 
-
+  // Big-donation video trigger
   const { shouldPlayVideo, currentDonation, handleVideoEnd } = useDonationVideoTrigger({
     latestDonations: combinedData.latestDonations,
     threshold: 100,
     timeWindowSeconds: 15,
   });
 
+  // Debug video trigger
   const [showTestVideo, setShowTestVideo] = useState(false);
   useEffect(() => {
     const checkForTestTrigger = async () => {
@@ -107,6 +117,7 @@ const OverlayContent = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Rotate panels
   useEffect(() => {
     const timer = setTimeout(() => {
       setPanel(prev => (prev === 'timeLeft' ? 'wheelSpins' : 'timeLeft'));
@@ -116,6 +127,7 @@ const OverlayContent = () => {
 
   const handleTimesUp = useCallback(() => { }, []);
 
+  // Confetti when >= 100%
   useEffect(() => {
     const pct = (combinedData.sumDonations / combinedData.fundraisingGoal) * 100;
     if (pct >= 100 && !confetti) {
@@ -144,13 +156,19 @@ const OverlayContent = () => {
   }
 
   return (
-    <div className={styles.overlayRoot}>
+    <div
+      className={styles.overlayRoot}
+      // Enforce transparency even if CSS fails to load in OBS
+      style={{ backgroundColor: 'transparent' }}
+    >
+      {/* Donation Video Overlay */}
       <DonationVideoOverlay
         isVisible={shouldPlayVideo}
         donation={currentDonation}
         onVideoEnd={handleVideoEnd}
       />
 
+      {/* Test Video Overlay */}
       <DonationVideoOverlay
         isVisible={showTestVideo}
         donation={{
@@ -162,29 +180,51 @@ const OverlayContent = () => {
         onVideoEnd={() => setShowTestVideo(false)}
       />
 
+      {/* Confetti */}
       {!limited && confetti && <div className={styles.confettiLayer} />}
 
+      {/* Top Rotator */}
       {!limited && (
         <div className={styles.topRotatorWrap}>
           <TopRotator goals={goals} data={combinedData} />
         </div>
       )}
 
+      {/* Progress Bar */}
       {!limited && (
         <div className={styles.progressbarWrap}>
-          <ProgressBar />
+          {/* Pass explicit hex colors & inline fallback styles so OBS can’t misinterpret vars */}
+          <ProgressBar
+            trackColor={COLOR_PROGRESS_TRACK as string}
+            fillColor={COLOR_PROGRESS_FILL as string}
+            textColor={COLOR_PROGRESS_TEXT as string}
+            style={{
+              backgroundColor: COLOR_PROGRESS_TRACK,
+              borderRadius: 9999,
+              width: 1280,
+              height: 48,
+              boxShadow:
+                'inset 0 0 0 2px rgba(0,0,0,0.25), 0 2px 0 rgba(255,255,255,0.05)',
+            }}
+          />
         </div>
       )}
 
+      {/* Bottom Right Panel */}
       {!limited && (
         <div className={styles.bottomRightPanel}>
-          <div className={styles.panelCard}>
+          <div
+            className={styles.panelCard}
+            // Force the key color here too (belt & suspenders for OBS)
+            style={{ backgroundColor: COLOR_PRIMARY, color: '#010101' }}
+          >
             <TimeLeft visible={panel === 'timeLeft'} timesUp={handleTimesUp} />
             <WheelSpins visible={panel === 'wheelSpins'} />
           </div>
         </div>
       )}
 
+      {/* Randomizer View */}
       {!limited && <Randomizer setConfetti={setConfetti} />}
     </div>
   );
