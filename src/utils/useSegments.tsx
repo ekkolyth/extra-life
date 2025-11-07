@@ -13,6 +13,13 @@ export function useSegments(segments: Segment[]) {
   }, [segments])
 
   useEffect(() => {
+    // Don't set up interval if segments haven't loaded yet
+    if (!segments || segments.length === 0) {
+      setCurrentSegment(null)
+      setNextSegment(null)
+      return
+    }
+
     const updateSegments = () => {
       console.log('updateSegments')
       const now = new Date()
@@ -56,11 +63,13 @@ export function useSegments(segments: Segment[]) {
       setNextSegment(next)
     }
 
+    // Update immediately when segments change
     updateSegments()
-    const interval = setInterval(updateSegments, 60000) // Update every minute
+    // Set up interval to update every minute
+    const interval = setInterval(updateSegments, 60000)
 
     return () => clearInterval(interval)
-  }, []) // Empty dependency array - only run once
+  }, [segments]) // Re-run when segments change
 
   return { currentSegment, nextSegment }
 }

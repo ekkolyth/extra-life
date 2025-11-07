@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { DollarSign, Users, BanknoteIcon, Trophy } from 'lucide-react';
-import Image from 'next/image';
 import type { Donor } from '@/utils/donor-drive-api-client';
 import type { Goal } from '@/types/db';
 
@@ -158,17 +157,6 @@ export function Overview({ data, topDonor, goals = [], isLoading = false }: Over
                 </>
               ) : (
                 <>
-                  {topDonor.avatarImageURL && (
-                    <div className='mb-1'>
-                      <Image
-                        src={topDonor.avatarImageURL}
-                        alt={topDonor.displayName || 'Top Donor'}
-                        width={32}
-                        height={32}
-                        className='rounded-full'
-                      />
-                    </div>
-                  )}
                   <p className='text-4xl font-bold text-foreground leading-tight'>
                     {formatter.format(topDonor.sumDonations ?? 0)}
                   </p>
