@@ -2,8 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { TwitchEmbed } from '@/components/marketing/twitch-embed';
+import Link from 'next/link';
 
 export default function Home() {
+
+  const donorID = process.env.NEXT_PUBLIC_DONORDRIVE_ID as string | null
+  const extraLifeURL = new URL(`https://www.extra-life.org/participants/${donorID}`)
+  const rileyURL = "https://rileykids.org/transforming-childrens-health/rileychildrenshealth"
+
   return (
     <main className='flex flex-col min-h-screen'>
       {/* Hero Section */}
@@ -65,11 +71,22 @@ export default function Home() {
             </div>
 
             <div className='flex flex-col sm:flex-row gap-4'>
-              <Button size='lg' className='flex-1'>
-                DONATE NOW
+              <Button
+                size='lg'
+                className='flex-1'
+                asChild
+              >
+                <Link href={extraLifeURL}>DONATE NOW</Link>
               </Button>
-              <Button size='lg' variant='outline' className='flex-1'>
-                LEARN ABOUT RILEY
+              <Button
+                size='lg'
+                variant='outline'
+                className='flex-1'
+                asChild
+              >
+                <Link href={rileyURL}>
+                  LEARN ABOUT RILEY
+                </Link>
               </Button>
             </div>
           </div>
@@ -115,8 +132,12 @@ export default function Home() {
                 we appreciate that you&apos;ve cared enough to scroll this far down the page.
               </p>
               <div className='flex flex-col sm:flex-row gap-4'>
-                <Button size='lg' className='flex-1'>
-                  DONATE NOW
+                <Button
+                  size='lg'
+                  className='flex-1'
+                  asChild
+                >
+                  <Link href={extraLifeURL}>DONATE NOW</Link>
                 </Button>
                 <Button asChild size='lg' variant='outline' className='flex-1'>
                   <a href='#live-stream'>JUMP TO THE STREAM!</a>
@@ -199,8 +220,12 @@ export default function Home() {
                 </CardContent>
               </Card>
 
-              <Button size='lg' className='w-full'>
-                DONATE NOW
+              <Button
+                size='lg'
+                className='flex-1'
+                asChild
+              >
+                <Link href={extraLifeURL}>DONATE NOW</Link>
               </Button>
             </div>
           </div>
