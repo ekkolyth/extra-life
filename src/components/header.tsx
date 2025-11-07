@@ -1,11 +1,9 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/nextjs';
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { ModeToggle } from '@/components/mode-toggle';
+import { BarChart3 } from 'lucide-react';
 
 export function Header() {
   return (
@@ -18,7 +16,15 @@ export function Header() {
           </SignInButton>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <UserButton>
+            <UserButton.MenuItems>
+              <UserButton.Link
+                label='Dashboard'
+                href='/dashboard'
+                labelIcon={<BarChart3 className='size-4' />}
+              />
+            </UserButton.MenuItems>
+          </UserButton>
         </SignedIn>
       </div>
     </header>
