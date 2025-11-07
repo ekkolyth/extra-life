@@ -1,6 +1,6 @@
 'use client';
 
-import styles from './Overlay.module.css';
+import styles from './overlay.module.css';
 
 import { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
