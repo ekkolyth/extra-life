@@ -75,13 +75,18 @@ const OverlayContent = () => {
       topDonor: null,
     };
 
+  // Goals from Convex
   const convexGoals = useConvexQuery(api.goals.list, {});
-  const goals = (convexGoals || []).map((g: any) => ({
+
+  type Goal = NonNullable<typeof convexGoals>[number];
+
+  const goals = (convexGoals ?? []).map((g: Goal) => ({
     id: g._id,
     title: g.title,
     amount: g.amount,
     endOfStream: g.endOfStream,
   }));
+
 
   const { shouldPlayVideo, currentDonation, handleVideoEnd } = useDonationVideoTrigger({
     latestDonations: combinedData.latestDonations,
