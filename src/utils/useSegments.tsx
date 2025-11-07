@@ -30,14 +30,22 @@ export function useSegments(segments: Segment[]) {
       console.log('Stream date env var:', process.env.NEXT_PUBLIC_STREAM_DATETIME)
       console.log('Segments:', segmentsRef.current)
 
-      for (let i = 0; i < segmentsRef.current.length; i++) {
-        const event = segmentsRef.current[i]
+      // Sort segments by start time to ensure chronological order
+      const sortedSegments = [...segmentsRef.current].sort((a, b) => {
+        const [aHours, aMinutes] = a.startsAt.split(':').map(Number)
+        const [bHours, bMinutes] = b.startsAt.split(':').map(Number)
+        if (aHours !== bHours) return aHours - bHours
+        return aMinutes - bMinutes
+      })
+
+      // Use the stream date from environment variable, or fall back to today
+      const streamDate = process.env.NEXT_PUBLIC_STREAM_DATETIME 
+        ? new Date(process.env.NEXT_PUBLIC_STREAM_DATETIME)
+        : new Date()
+
+      for (let i = 0; i < sortedSegments.length; i++) {
+        const event = sortedSegments[i]
         const [hours, minutes] = event.startsAt.split(':').map(Number)
-        
-        // Use the stream date from environment variable, or fall back to today
-        const streamDate = process.env.NEXT_PUBLIC_STREAM_DATETIME 
-          ? new Date(process.env.NEXT_PUBLIC_STREAM_DATETIME)
-          : new Date()
         
         const eventStart = new Date(streamDate)
         eventStart.setHours(hours, minutes, 0, 0)
@@ -50,7 +58,18 @@ export function useSegments(segments: Segment[]) {
         if (now >= eventStart && now < eventEnd) {
           console.log('Current:', event)
           current = event
-          next = segmentsRef.current[i + 1] || null
+          // Find the next segment that hasn't started yet
+          for (let j = i + 1; j < sortedSegments.length; j++) {
+            const nextEvent = sortedSegments[j]
+            const [nextHours, nextMinutes] = nextEvent.startsAt.split(':').map(Number)
+            const nextEventStart = new Date(streamDate)
+            nextEventStart.setHours(nextHours, nextMinutes, 0, 0)
+            
+            if (now < nextEventStart) {
+              next = nextEvent
+              break
+            }
+          }
           break
         } else if (now < eventStart) {
           console.log('Next:', event)
