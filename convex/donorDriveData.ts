@@ -12,8 +12,15 @@ export const get = query({
     const donations = await ctx.db
       .query('donations')
       .withIndex('by_participant', (q) => q.eq('participantId', participantId))
-      .order('desc')
-      .take(10);
+      .collect();
+    
+    // Sort by createdDateUTC descending (most recent first)
+    const sortedDonations = donations.sort((a, b) => 
+      new Date(b.createdDateUTC).getTime() - new Date(a.createdDateUTC).getTime()
+    );
+    
+    // Take the 10 most recent
+    const latestDonations = sortedDonations.slice(0, 10);
 
     const topDonor = await ctx.db
       .query('topDonor')
@@ -22,7 +29,7 @@ export const get = query({
 
     return {
       ...data,
-      latestDonations: donations,
+      latestDonations,
       topDonor,
     };
   },
@@ -35,10 +42,20 @@ export const getAllDonations = query({
     const donations = await ctx.db
       .query('donations')
       .withIndex('by_participant', (q) => q.eq('participantId', participantId))
-      .order('desc')
       .collect();
 
-    return donations;
+    console.log(`📊 getAllDonations: Found ${donations.length} donations in database for participant ${participantId}`);
+    donations.forEach((d, i) => {
+      console.log(`  ${i + 1}. ID=${d.donationID}, Amount=$${d.amount}, Date=${d.createdDateUTC}`);
+    });
+
+    // Sort by createdDateUTC descending (most recent first)
+    const sorted = donations.sort((a, b) => 
+      new Date(b.createdDateUTC).getTime() - new Date(a.createdDateUTC).getTime()
+    );
+    
+    console.log(`📊 Returning ${sorted.length} sorted donations`);
+    return sorted;
   },
 });
 
@@ -80,7 +97,7 @@ export const upsertDonations = mutation({
     donations: v.array(
       v.object({
         donationID: v.string(),
-        displayName: v.string(),
+        displayName: v.optional(v.string()),
         amount: v.number(),
         message: v.optional(v.string()),
         avatarImageURL: v.optional(v.string()),
@@ -89,6 +106,10 @@ export const upsertDonations = mutation({
     ),
   },
   handler: async (ctx, { participantId, donations }) => {
+    console.log(`📥 upsertDonations called with ${donations.length} donations`);
+    let inserted = 0;
+    let skipped = 0;
+    
     for (const donation of donations) {
       const existing = await ctx.db
         .query('donations')
@@ -98,10 +119,23 @@ export const upsertDonations = mutation({
       if (!existing) {
         await ctx.db.insert('donations', {
           participantId,
-          ...donation,
+          donationID: donation.donationID,
+          displayName: donation.displayName,
+          amount: donation.amount,
+          message: donation.message,
+          avatarImageURL: donation.avatarImageURL,
+          createdDateUTC: donation.createdDateUTC,
         });
+        inserted++;
+        console.log(`✅ Inserted new donation: ${donation.donationID} - $${donation.amount} from ${donation.displayName || 'Anonymous'}`);
+      } else {
+        skipped++;
+        console.log(`⏭️ Skipped existing donation: ${donation.donationID}`);
       }
     }
+    
+    console.log(`📊 Summary: ${inserted} inserted, ${skipped} skipped`);
+    return { inserted, skipped, total: donations.length };
   },
 });
 

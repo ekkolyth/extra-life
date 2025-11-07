@@ -29,9 +29,9 @@ export function useDonorDrive() {
         const participantData = participantResponse.ok ? await participantResponse.json() : null;
         console.log('🔍 Participant data:', participantData);
 
-        // Fetch real-time data - fetch ALL donations for the donations page
+        // Fetch the most recent 10 donations - upsertDonations will only add new ones
         const donationsResponse = await fetch(
-          `/api/donor-drive/donations?id=${participantId}&orderBy=createdDateUTC%20DESC`
+          `/api/donor-drive/donations?id=${participantId}&limit=10&orderBy=createdDateUTC%20DESC`
         );
         const donationsData = donationsResponse.ok ? await donationsResponse.json() : [];
         console.log('🔍 Donations data:', donationsData);
@@ -61,26 +61,42 @@ export function useDonorDrive() {
 
           // Update donations
           if (Array.isArray(donationsData) && donationsData.length > 0) {
-            await upsertDonations({
-              participantId,
-              donations: donationsData.map(
-                (d: {
-                  donationID?: string;
-                  displayName?: string;
-                  amount?: number;
-                  message?: string;
-                  avatarImageURL?: string;
-                  createdDateUTC?: string;
-                }) => ({
-                  donationID: d.donationID || `${d.amount}-${d.createdDateUTC}`,
-                  displayName: d.displayName || 'Anonymous',
+            console.log(`💰 Processing ${donationsData.length} donations from API`);
+            const mappedDonations = donationsData.map(
+              (d: {
+                donationID?: string;
+                displayName?: string;
+                amount?: number;
+                message?: string | null;
+                avatarImageURL?: string;
+                createdDateUTC?: string;
+              }) => {
+                const donationID = d.donationID || `${d.amount}-${d.createdDateUTC}`;
+                const displayName = d.displayName || undefined; // Use undefined, not 'Anonymous' for optional field
+                console.log(`  - Donation: ID=${donationID}, Amount=$${d.amount}, Name=${displayName || 'Anonymous'}, Date=${d.createdDateUTC}`);
+                return {
+                  donationID,
+                  displayName, // Can be undefined
                   amount: d.amount || 0,
-                  message: d.message,
-                  avatarImageURL: d.avatarImageURL,
+                  message: d.message || undefined,
+                  avatarImageURL: d.avatarImageURL || undefined,
                   createdDateUTC: d.createdDateUTC || new Date().toISOString(),
-                })
-              ),
-            });
+                };
+              }
+            );
+            console.log(`📤 Calling upsertDonations with ${mappedDonations.length} donations`);
+            try {
+              const result = await upsertDonations({
+                participantId,
+                donations: mappedDonations,
+              });
+              console.log('✅ upsertDonations completed successfully:', result);
+            } catch (error) {
+              console.error('❌ Error in upsertDonations:', error);
+              throw error; // Re-throw to see the full error
+            }
+          } else {
+            console.log('⚠️ No donations data received from API');
           }
 
           // Update top donor

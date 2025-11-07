@@ -145,6 +145,14 @@ export default function DonationsPage() {
 
   const viewedSet = new Set(viewedDonationIDs);
 
+  // Debug logging
+  console.log('📋 Donations Page - allDonations:', allDonations?.length || 0, 'donations');
+  if (allDonations) {
+    allDonations.forEach((d, i) => {
+      console.log(`  ${i + 1}. ID=${d.donationID}, Amount=$${d.amount}, Date=${d.createdDateUTC}`);
+    });
+  }
+
   return (
     <div className='space-y-4'>
       <Card className='border-border/50 bg-card/30 backdrop-blur-sm'>
