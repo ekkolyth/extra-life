@@ -1,12 +1,12 @@
 'use client';
 
-import type { Goal } from '@/types/db';
+import type { Rotator } from '@/types/db';
 
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 
-import { GoalForm } from '@/components/forms/goal';
+import { RotatorForm } from '@/components/forms/rotator';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,18 +15,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { USDollar } from '@/utils/currency';
-import { Badge } from '@/components/ui/badge';
 
 // Component for the actions column to properly use React hooks
-function GoalActions({ goal }: { goal: Goal }) {
-  const deleteGoal = useConvexMutation(api.goals.removeGoal);
+function RotatorActions({ rotator }: { rotator: Rotator }) {
+  const deleteRotator = useConvexMutation(api.rotator.remove);
 
   const handleDelete = async () => {
     try {
-      await deleteGoal({ id: goal.id });
+      await deleteRotator({ id: rotator.id });
     } catch (error) {
-      console.error('Failed to delete goal:', error);
+      console.error('Failed to delete rotator:', error);
     }
   };
 
@@ -44,9 +42,9 @@ function GoalActions({ goal }: { goal: Goal }) {
         </DialogTrigger>
         <DialogContent className='max-w-2xl'>
           <DialogHeader>
-            <DialogTitle className='text-2xl'>Edit Goal</DialogTitle>
+            <DialogTitle className='text-2xl'>Edit Rotator</DialogTitle>
           </DialogHeader>
-          <GoalForm defaultValues={goal} />
+          <RotatorForm defaultValues={rotator} />
         </DialogContent>
       </Dialog>
       <Button
@@ -63,29 +61,16 @@ function GoalActions({ goal }: { goal: Goal }) {
 
 export const columns = [
   {
-    accessorKey: 'title',
-    header: <span className='text-lg font-semibold'>Title</span>,
-    cell: (row: { original: Goal }) => (
-      <span className='text-lg'>{row.original.title}</span>
+    accessorKey: 'text',
+    header: <span className='text-lg font-semibold'>Text</span>,
+    cell: (row: { original: Rotator }) => (
+      <span className='text-lg'>{row.original.text}</span>
     ),
-  },
-  {
-    accessorKey: 'amount',
-    header: <span className='text-lg font-semibold'>Amount</span>,
-    cell: (row: { original: Goal }) => (
-      <span className='text-lg'>{USDollar.format(row.original.amount)}</span>
-    ),
-  },
-  {
-    accessorKey: 'endOfStream',
-    header: <span className='text-lg font-semibold'>End of Stream</span>,
-    cell: (row: { original: Goal }) => {
-      return row.original.endOfStream ? <Badge className='text-base'>End Of Stream</Badge> : undefined;
-    },
   },
   {
     accessorKey: 'id',
     header: <span className='sr-only'>Actions</span>,
-    cell: (row: { original: Goal }) => <GoalActions goal={row.original} />,
+    cell: (row: { original: Rotator }) => <RotatorActions rotator={row.original} />,
   },
 ];
+

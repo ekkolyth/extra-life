@@ -24,11 +24,11 @@ interface DataTableProps<TData> {
 export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
   return (
     <div className='rounded-md border'>
-      <Table>
+      <Table className='text-lg'>
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
-              <TableHead key={column.accessorKey}>{column.header}</TableHead>
+              <TableHead key={column.accessorKey} className='h-14 px-4'>{column.header}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -36,7 +36,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
           {data.map((row, index) => (
             <TableRow key={index}>
               {columns.map((column) => (
-                <TableCell key={column.accessorKey}>
+                <TableCell key={column.accessorKey} className='px-4 py-4'>
                   {column.cell
                     ? column.cell({ original: row })
                     : (row as Record<string, ReactNode>)[column.accessorKey]}

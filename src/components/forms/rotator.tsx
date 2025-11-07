@@ -3,9 +3,8 @@
 import type { Rotator } from '@/types/db';
 
 import * as z from 'zod';
-import { TrashIcon } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
@@ -20,49 +19,48 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { DialogClose } from '@/components/ui/dialog';
 
-export const formSchema = z.object({
-  items: z.array(
-    z.object({
-      id: z.string().optional(),
-      text: z.string(),
-    })
-  ),
+const formSchema = z.object({
+  id: z.string().optional(),
+  text: z.string().min(1, 'Text is required'),
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 interface RotatorFormProps {
-  items?: Rotator[];
+  defaultValues?: FormData;
 }
 
 export function RotatorForm(props: RotatorFormProps) {
-  const { items } = props;
+  const { defaultValues } = props;
 
   const createRotator = useConvexMutation(api.rotator.create);
   const updateRotator = useConvexMutation(api.rotator.update);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: { items },
-  });
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'items',
+    defaultValues: defaultValues ?? {
+      text: '',
+    },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormData) {
     try {
-      // Process each item - create new ones, update existing ones
-      for (const item of values.items) {
-        if (item.id) {
-          // Update existing rotator
-          await updateRotator({ id: item.id as Id<'rotator'>, text: item.text });
-        } else {
-          // Create new rotator
-          await createRotator({ text: item.text });
-        }
+      if (values.id) {
+        // Update existing rotator
+        await updateRotator({
+          id: values.id as Id<'rotator'>,
+          text: values.text,
+        });
+      } else {
+        // Create new rotator
+        await createRotator({ text: values.text });
+        // Reset form after successful creation
+        form.reset();
       }
     } catch (error) {
-      console.error('Failed to save rotators:', error);
+      console.error('Failed to save rotator:', error);
     }
   }
 
@@ -70,55 +68,51 @@ export function RotatorForm(props: RotatorFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className='space-y-8'
+        className='space-y-6'
       >
-        {fields.map((field, index) => (
+        {defaultValues?.id && (
           <FormField
-            key={field.id}
             control={form.control}
-            name={`items.${index}.text`}
+            name='id'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Item {index + 1}</FormLabel>
                 <FormControl>
-                  <div className='flex gap-2'>
-                    <Input
-                      placeholder='shadcn'
-                      {...field}
-                    />
-                    <Button
-                      variant='outline'
-                      size='icon'
-                      onClick={() => remove(index)}
-                    >
-                      <TrashIcon />
-                    </Button>
-                  </div>
+                  <Input
+                    type='hidden'
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
-        ))}
-        <Button
-          variant='outline'
-          type='button'
-          onClick={() =>
-            append({
-              text: '',
-            })
-          }
-        >
-          Add Item
-        </Button>
-        <div className='flex justify-end'>
+        )}
+        <FormField
+          control={form.control}
+          name='text'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className='text-base font-semibold'>Text</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder='Enter rotator text...'
+                  className='text-base'
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <DialogClose asChild>
           <Button
             type='submit'
             variant='outline'
+            className='text-base'
+            size='lg'
           >
-            Save
+            Submit
           </Button>
-        </div>
+        </DialogClose>
       </form>
     </Form>
   );

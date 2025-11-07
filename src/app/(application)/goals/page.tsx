@@ -27,27 +27,30 @@ export default function GoalsPage() {
   }));
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-6'>
       <Dialog>
         <DialogTrigger asChild>
           <Button
-            className='self-end'
+            className='self-end text-base'
             variant='outline'
+            size='lg'
           >
             Create Goal
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className='max-w-2xl'>
           <DialogHeader>
-            <DialogTitle>New Goal</DialogTitle>
+            <DialogTitle className='text-2xl'>New Goal</DialogTitle>
           </DialogHeader>
           <GoalForm />
         </DialogContent>
       </Dialog>
-      <DataTable
-        columns={columns}
-        data={goals}
-      />
+      <div className='text-base'>
+        <DataTable
+          columns={columns}
+          data={goals}
+        />
+      </div>
     </div>
   );
 }

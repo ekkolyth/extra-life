@@ -79,7 +79,7 @@ export function GoalForm(props: GoalFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className='space-y-8'
+        className='space-y-6'
       >
         {defaultValues?.id && (
           <FormField
@@ -102,10 +102,11 @@ export function GoalForm(props: GoalFormProps) {
           name='title'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel className='text-base font-semibold'>Title</FormLabel>
               <FormControl>
                 <Input
                   placeholder='Eat Shit'
+                  className='text-base'
                   {...field}
                 />
               </FormControl>
@@ -118,13 +119,14 @@ export function GoalForm(props: GoalFormProps) {
           name='amount'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel className='text-base font-semibold'>Amount</FormLabel>
               <div className='flex items-center gap-2'>
-                <DollarSignIcon />
+                <DollarSignIcon className='h-5 w-5' />
                 <FormControl>
                   <Input
                     type='number'
                     step={0.01}
+                    className='text-base'
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                   />
@@ -140,7 +142,7 @@ export function GoalForm(props: GoalFormProps) {
           render={({ field: { value, onChange, name } }) => (
             <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
               <div className='space-y-0.5'>
-                <FormLabel className='text-base'>End of Stream</FormLabel>
+                <FormLabel className='text-base font-semibold'>End of Stream</FormLabel>
               </div>
               <FormControl>
                 <Switch
@@ -156,6 +158,8 @@ export function GoalForm(props: GoalFormProps) {
           <Button
             type='submit'
             variant='outline'
+            className='text-base'
+            size='lg'
           >
             Submit
           </Button>
