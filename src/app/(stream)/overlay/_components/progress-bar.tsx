@@ -4,19 +4,14 @@ import { CSSProperties } from 'react';
 import { useDonorDrive } from '@/hooks/useDonorDrive';
 
 type ProgressBarProps = {
-  /** Track (background) color */
   trackColor?: string;
-  /** Fill (progress) color */
   fillColor?: string;
-  /** Center text color */
   textColor?: string;
-  /** Outer width in px */
-  width?: number;
-  /** Outer height in px */
-  height?: number;
-  /** Extra inline styles merged into the outer wrapper */
+  width?: number;      // outer width
+  height?: number;     // outer height (track thickness)
+  borderWidth?: number;
+  borderColor?: string;
   style?: CSSProperties;
-  /** Optional className if you really want to target it */
   className?: string;
 };
 
@@ -24,24 +19,22 @@ export default function ProgressBar({
   trackColor = '#1e3b52',
   fillColor = '#25a8f1',
   textColor = '#ffffff',
-  width = 1280,
-  height = 48,
+  width = 960,          // ← match original
+  height = 64,          // ← tailwind h-16
+  borderWidth = 4,      // ← tailwind border-4
+  borderColor = 'rgba(0,0,0,0.35)',
   style,
   className,
 }: ProgressBarProps) {
   const { data: donorDriveData, isLoading, error } = useDonorDrive();
 
-  // Loading / error placeholders (plain CSS)
   if (isLoading) {
     return (
       <div
         className={className}
         style={{
-          width,
-          height,
-          borderRadius: 9999,
-          backgroundColor: '#2a2a2a',
-          opacity: 0.5,
+          width, height, borderRadius: 9999,
+          backgroundColor: '#2a2a2a', opacity: 0.5,
         }}
       />
     );
@@ -51,9 +44,7 @@ export default function ProgressBar({
       <div
         className={className}
         style={{
-          width,
-          height,
-          borderRadius: 9999,
+          width, height, borderRadius: 9999,
           backgroundColor: '#7f1d1d',
         }}
       />
@@ -62,8 +53,7 @@ export default function ProgressBar({
 
   const donations = donorDriveData?.sumDonations ?? 0;
   const goal = donorDriveData?.fundraisingGoal ?? 2000;
-  const pctRaw = (donations / goal) * 100;
-  const pct = Math.max(0, Math.min(100, Number.isFinite(pctRaw) ? pctRaw : 0));
+  const pct = Math.max(0, Math.min(100, (donations / goal) * 100 || 0));
 
   return (
     <div
@@ -74,8 +64,8 @@ export default function ProgressBar({
         height,
         borderRadius: 9999,
         backgroundColor: trackColor,
-        boxShadow:
-          'inset 0 0 0 2px rgba(0,0,0,0.25), 0 2px 0 rgba(255,255,255,0.05)',
+        border: `${borderWidth}px solid ${borderColor}`,
+        boxShadow: '0 6px 16px rgba(0,0,0,0.25)', // similar to "shadow-super"
         overflow: 'hidden',
         ...style,
       }}
@@ -84,9 +74,7 @@ export default function ProgressBar({
       <div
         style={{
           position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
+          left: 0, top: 0, bottom: 0,
           width: `${pct}%`,
           backgroundColor: fillColor,
           borderRadius: 9999,
@@ -94,7 +82,7 @@ export default function ProgressBar({
           willChange: 'width',
         }}
       />
-      {/* Centered text */}
+      {/* Centered amount */}
       <div
         style={{
           position: 'absolute',

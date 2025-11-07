@@ -195,18 +195,15 @@ const OverlayContent = () => {
         <div className={styles.progressbarWrap}>
           {/* Pass explicit hex colors & inline fallback styles so OBS can’t misinterpret vars */}
           <ProgressBar
-            trackColor={COLOR_PROGRESS_TRACK as string}
-            fillColor={COLOR_PROGRESS_FILL as string}
-            textColor={COLOR_PROGRESS_TEXT as string}
-            style={{
-              backgroundColor: COLOR_PROGRESS_TRACK,
-              borderRadius: 9999,
-              width: 1280,
-              height: 48,
-              boxShadow:
-                'inset 0 0 0 2px rgba(0,0,0,0.25), 0 2px 0 rgba(255,255,255,0.05)',
-            }}
+            trackColor="#1e3b52"
+            fillColor="#25a8f1"
+            textColor="#ffffff"
+            width={960}
+            height={64}
+            borderWidth={4}
+            borderColor="rgba(0,0,0,0.35)"
           />
+
         </div>
       )}
 
