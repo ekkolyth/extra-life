@@ -3,7 +3,9 @@ import { v } from 'convex/values';
 
 export const list = query({
   handler: async (ctx) => {
-    return await ctx.db.query('goals').collect();
+    const goals = await ctx.db.query('goals').collect();
+    // Sort by amount ascending (smallest to largest)
+    return goals.sort((a, b) => a.amount - b.amount);
   },
 });
 

@@ -6,11 +6,10 @@ import { useDonorDrive } from '@/hooks/useDonorDrive';
 import type { Goal, Randomizer, Segment } from '@/types/db';
 
 import { EnvCheck } from '@/components/env-check';
-import { TopDonor } from '@/app/(application)/dashboard/_components/top-donor';
 import { Overview } from '@/app/(application)/dashboard/_components/overview';
-import { GoalsSection } from '@/app/(application)/dashboard/_components/goals';
 import { RandomizersSection } from '@/app/(application)/dashboard/_components/randomizers';
 import { ScheduleSection } from '@/app/(application)/dashboard/_components/schedule';
+import { RecentDonations } from '@/app/(application)/dashboard/_components/recent-donations';
 
 export default function AdminPage() {
   const convexRandomizers = useConvexQuery(api.randomizer.list, {});
@@ -69,81 +68,71 @@ export default function AdminPage() {
   // Create combined data from Convex data (now flat structure)
   const combinedData = donorDriveData
     ? {
-        displayName: donorDriveData.displayName || 'Loading...',
-        fundraisingGoal: donorDriveData.fundraisingGoal || 2000,
-        eventName: donorDriveData.eventName || 'Demo Event',
-        streamIsEnabled: donorDriveData.streamIsEnabled || false,
-        streamingChannel: donorDriveData.streamingChannel || '',
-        streamingPlatform: donorDriveData.streamingPlatform || '',
-        avatarImageURL: donorDriveData.avatarImageURL || '',
-        participantID: donorDriveData.participantId ? parseInt(donorDriveData.participantId) : 0,
-        sumDonations: donorDriveData.sumDonations || 0,
-        sumPledges: donorDriveData.sumPledges || 0,
-        numDonations: donorDriveData.numDonations || 0,
-        streamIsLive: donorDriveData.streamIsLive || false,
-        latestDonations: donorDriveData.latestDonations || [],
-        topDonor: donorDriveData.topDonor || null,
-        links: { donate: '', page: '', stream: '' },
-        teamName: '',
-        isTeamCaptain: false,
-        isTeamCoCaptain: false,
-        role: '',
-        hasActivityTracking: false,
-        numIncentives: 0,
-        numMilestones: 0,
-      }
+      displayName: donorDriveData.displayName || 'Loading...',
+      fundraisingGoal: donorDriveData.fundraisingGoal || 2000,
+      eventName: donorDriveData.eventName || 'Demo Event',
+      streamIsEnabled: donorDriveData.streamIsEnabled || false,
+      streamingChannel: donorDriveData.streamingChannel || '',
+      streamingPlatform: donorDriveData.streamingPlatform || '',
+      avatarImageURL: donorDriveData.avatarImageURL || '',
+      participantID: donorDriveData.participantId ? parseInt(donorDriveData.participantId) : 0,
+      sumDonations: donorDriveData.sumDonations || 0,
+      sumPledges: donorDriveData.sumPledges || 0,
+      numDonations: donorDriveData.numDonations || 0,
+      streamIsLive: donorDriveData.streamIsLive || false,
+      latestDonations: donorDriveData.latestDonations || [],
+      topDonor: donorDriveData.topDonor || null,
+      links: { donate: '', page: '', stream: '' },
+      teamName: '',
+      isTeamCaptain: false,
+      isTeamCoCaptain: false,
+      role: '',
+      hasActivityTracking: false,
+      numIncentives: 0,
+      numMilestones: 0,
+    }
     : {
-        // Fallback data
-        displayName: 'Loading...',
-        fundraisingGoal: 2000,
-        eventName: 'Demo Event',
-        links: { donate: '', page: '', stream: '' },
-        streamIsEnabled: false,
-        streamingChannel: '',
-        streamingPlatform: '',
-        avatarImageURL: '',
-        participantID: 0,
-        teamName: '',
-        isTeamCaptain: false,
-        isTeamCoCaptain: false,
-        role: '',
-        hasActivityTracking: false,
-        numIncentives: 0,
-        numMilestones: 0,
-        sumDonations: 0,
-        sumPledges: 0,
-        numDonations: 0,
-        streamIsLive: false,
-        latestDonations: [],
-        topDonor: null,
-      };
+      // Fallback data
+      displayName: 'Loading...',
+      fundraisingGoal: 2000,
+      eventName: 'Demo Event',
+      links: { donate: '', page: '', stream: '' },
+      streamIsEnabled: false,
+      streamingChannel: '',
+      streamingPlatform: '',
+      avatarImageURL: '',
+      participantID: 0,
+      teamName: '',
+      isTeamCaptain: false,
+      isTeamCoCaptain: false,
+      role: '',
+      hasActivityTracking: false,
+      numIncentives: 0,
+      numMilestones: 0,
+      sumDonations: 0,
+      sumPledges: 0,
+      numDonations: 0,
+      streamIsLive: false,
+      latestDonations: [],
+      topDonor: null,
+    };
 
-  const topDonorData = combinedData.topDonor || {
-    displayName: 'No donations yet',
-    donorID: 'none',
-    avatarImageURL: '',
-    modifiedDateUTC: '',
-    sumDonations: 0,
-    numDonations: 0,
-  };
+  const recentDonations = combinedData.latestDonations || [];
 
   return (
     <div className='space-y-4'>
       <EnvCheck />
       <div className='space-y-6'>
-        <Overview data={combinedData} isLoading={donorDriveLoading} />
+        <Overview 
+          data={combinedData} 
+          topDonor={combinedData.topDonor}
+          goals={goals}
+          isLoading={donorDriveLoading} 
+        />
 
         <div className='grid md:grid-cols-2 gap-6'>
-          <GoalsSection
-            data={combinedData}
-            goals={goals}
-            isLoading={donorDriveLoading}
-          />
-          <div className='space-y-6'>
-            <ScheduleSection segments={segments} />
-            <RandomizersSection randomizers={randomizers} />
-            <TopDonor data={topDonorData} isLoading={donorDriveLoading} />
-          </div>
+          <ScheduleSection segments={segments} />
+          <RecentDonations donations={recentDonations} isLoading={donorDriveLoading} />
         </div>
       </div>
     </div>

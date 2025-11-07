@@ -54,11 +54,6 @@ const tools = [
     external: false,
   },
   {
-    name: "Settings",
-    href: "/config",
-    icon: Settings,
-  },
-  {
     name: "Debug",
     href: "/debug",
     icon: Bug,
