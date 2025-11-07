@@ -1,5 +1,7 @@
 'use client';
 
+import styles from './overlay.module.css';
+
 import { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useConvexQuery } from '@convex-dev/react-query';
@@ -18,207 +20,166 @@ const OverlayContent = () => {
   const searchParams = useSearchParams();
   const limited = searchParams.get('limited') === 'true';
 
-  // Rotator State
-  const [panel, setPanel] = useState('timeLeft');
+  const [panel, setPanel] = useState<'timeLeft' | 'wheelSpins'>('timeLeft');
   const [confetti, setConfetti] = useState(false);
 
-  // Get DonorDrive data
   const { data: donorDriveData, isLoading, error } = useDonorDrive();
 
-  // Create combined data from Convex data (now flat structure)
   const combinedData = donorDriveData
     ? {
-        displayName: donorDriveData.displayName || 'Loading...',
-        fundraisingGoal: donorDriveData.fundraisingGoal || 2000,
-        eventName: donorDriveData.eventName || 'Demo Event',
-        links: { donate: '', page: '', stream: '' },
-        streamIsEnabled: donorDriveData.streamIsEnabled || false,
-        streamingChannel: donorDriveData.streamingChannel || '',
-        streamingPlatform: donorDriveData.streamingPlatform || '',
-        avatarImageURL: donorDriveData.avatarImageURL || '',
-        participantID: 0,
-        teamName: '',
-        isTeamCaptain: false,
-        isTeamCoCaptain: false,
-        role: '',
-        hasActivityTracking: false,
-        numIncentives: 0,
-        numMilestones: 0,
-        sumDonations: donorDriveData.sumDonations || 0,
-        sumPledges: donorDriveData.sumPledges || 0,
-        numDonations: donorDriveData.numDonations || 0,
-        streamIsLive: donorDriveData.streamIsLive || false,
-        latestDonations: donorDriveData.latestDonations || [],
-        topDonor: donorDriveData.topDonor || null,
-      }
+      displayName: donorDriveData.displayName || 'Loading...',
+      fundraisingGoal: donorDriveData.fundraisingGoal || 2000,
+      eventName: donorDriveData.eventName || 'Demo Event',
+      links: { donate: '', page: '', stream: '' },
+      streamIsEnabled: donorDriveData.streamIsEnabled || false,
+      streamingChannel: donorDriveData.streamingChannel || '',
+      streamingPlatform: donorDriveData.streamingPlatform || '',
+      avatarImageURL: donorDriveData.avatarImageURL || '',
+      participantID: 0,
+      teamName: '',
+      isTeamCaptain: false,
+      isTeamCoCaptain: false,
+      role: '',
+      hasActivityTracking: false,
+      numIncentives: 0,
+      numMilestones: 0,
+      sumDonations: donorDriveData.sumDonations || 0,
+      sumPledges: donorDriveData.sumPledges || 0,
+      numDonations: donorDriveData.numDonations || 0,
+      streamIsLive: donorDriveData.streamIsLive || false,
+      latestDonations: donorDriveData.latestDonations || [],
+      topDonor: donorDriveData.topDonor || null,
+    }
     : {
-        displayName: 'Loading...',
-        fundraisingGoal: 2000,
-        eventName: 'Demo Event',
-        links: { donate: '', page: '', stream: '' },
-        streamIsEnabled: false,
-        streamingChannel: '',
-        streamingPlatform: '',
-        avatarImageURL: '',
-        participantID: 0,
-        teamName: '',
-        isTeamCaptain: false,
-        isTeamCoCaptain: false,
-        role: '',
-        hasActivityTracking: false,
-        numIncentives: 0,
-        numMilestones: 0,
-        sumDonations: 0,
-        sumPledges: 0,
-        numDonations: 0,
-        streamIsLive: false,
-        latestDonations: [],
-        topDonor: null,
-      };
+      displayName: 'Loading...',
+      fundraisingGoal: 2000,
+      eventName: 'Demo Event',
+      links: { donate: '', page: '', stream: '' },
+      streamIsEnabled: false,
+      streamingChannel: '',
+      streamingPlatform: '',
+      avatarImageURL: '',
+      participantID: 0,
+      teamName: '',
+      isTeamCaptain: false,
+      isTeamCoCaptain: false,
+      role: '',
+      hasActivityTracking: false,
+      numIncentives: 0,
+      numMilestones: 0,
+      sumDonations: 0,
+      sumPledges: 0,
+      numDonations: 0,
+      streamIsLive: false,
+      latestDonations: [],
+      topDonor: null,
+    };
 
-  // Get goals from Convex (with fallback for auth issues)
   const convexGoals = useConvexQuery(api.goals.list, {});
-
-  // Transform Convex data to match expected component types, with fallback
-  const goals = (convexGoals || []).map((g) => ({
+  const goals = (convexGoals || []).map((g: any) => ({
     id: g._id,
     title: g.title,
     amount: g.amount,
     endOfStream: g.endOfStream,
   }));
 
-  // Video overlay trigger for big donations
   const { shouldPlayVideo, currentDonation, handleVideoEnd } = useDonationVideoTrigger({
     latestDonations: combinedData.latestDonations,
     threshold: 100,
     timeWindowSeconds: 15,
   });
 
-  // Test video trigger from debug page
   const [showTestVideo, setShowTestVideo] = useState(false);
-
   useEffect(() => {
     const checkForTestTrigger = async () => {
       try {
         const response = await fetch('/api/test-video');
         const data = await response.json();
-        if (data.triggered) {
-          setShowTestVideo(true);
-        }
-      } catch (error) {
-        // Silently fail - this is just for testing
-      }
+        if (data.triggered) setShowTestVideo(true);
+      } catch { }
     };
-
-    // Check every 500ms
     const interval = setInterval(checkForTestTrigger, 500);
     return () => clearInterval(interval);
   }, []);
 
-  // Display time left for 5 seconds, then switch to wheel spins for 10 seconds, then repeat
   useEffect(() => {
-    const timer = setTimeout(
-      () => {
-        setPanel(prevPanel => prevPanel === 'timeLeft' ? 'wheelSpins' : 'timeLeft');
-      },
-      panel === 'wheelSpins' ? 5000 : 10000
-    );
+    const timer = setTimeout(() => {
+      setPanel(prev => (prev === 'timeLeft' ? 'wheelSpins' : 'timeLeft'));
+    }, panel === 'wheelSpins' ? 5000 : 10000);
     return () => clearTimeout(timer);
   }, [panel]);
 
-  // Memoize the timesUp callback to prevent re-renders
-  const handleTimesUp = useCallback(() => {
-    // Handle times up event if needed
-  }, []);
+  const handleTimesUp = useCallback(() => { }, []);
 
-  // Trigger confetti when we're over 100% of the goal
   useEffect(() => {
-    const progressPercentage = (combinedData.sumDonations / combinedData.fundraisingGoal) * 100;
-
-    if (progressPercentage >= 100 && !confetti) {
+    const pct = (combinedData.sumDonations / combinedData.fundraisingGoal) * 100;
+    if (pct >= 100 && !confetti) {
       setConfetti(true);
-      const timeout = setTimeout(() => {
-        setConfetti(false);
-      }, 30000);
-
-      return () => clearTimeout(timeout);
+      const t = setTimeout(() => setConfetti(false), 30000);
+      return () => clearTimeout(t);
     }
   }, [combinedData.sumDonations, combinedData.fundraisingGoal, confetti]);
 
-  // Handle loading state (only for DonorDrive data, not Convex)
   if (isLoading) {
     return (
-      <div className='relative w-[1920px] h-[1080px] flex items-center justify-center bg-black'>
-        <div className='text-white text-2xl'>Loading overlay data...</div>
+      <div className={styles.loading}>
+        <div className={styles.loadingText}>Loading overlay data...</div>
       </div>
     );
   }
 
-  // Handle error state (only for DonorDrive data, not Convex)
   if (error) {
     return (
-      <div className='relative w-[1920px] h-[1080px] flex items-center justify-center bg-black'>
-        <div className='text-red-500 text-2xl'>Error loading overlay data</div>
+      <div className={styles.loading}>
+        <div className={styles.loadingText} style={{ color: '#ef4444' }}>
+          Error loading overlay data
+        </div>
       </div>
     );
   }
 
   return (
-    <div className='relative w-[1920px] h-[1080px]'>
-      {/* Donation Video Overlay */}
-      <DonationVideoOverlay 
-        isVisible={shouldPlayVideo} 
+    <div className={styles.overlayRoot}>
+      <DonationVideoOverlay
+        isVisible={shouldPlayVideo}
         donation={currentDonation}
-        onVideoEnd={handleVideoEnd} 
+        onVideoEnd={handleVideoEnd}
       />
 
-      {/* Test Video Overlay */}
       <DonationVideoOverlay
         isVisible={showTestVideo}
         donation={{
-          amount: 250.00,
+          amount: 250.0,
           displayName: 'Anonymous',
           message: 'For the kids!',
           createdDateUTC: new Date().toISOString(),
         }}
         onVideoEnd={() => setShowTestVideo(false)}
       />
-      
-      {/* Confetti */}
-      {!limited && confetti && (
-        <div className='absolute inset-0 z-50 pointer-events-none'>
-          {/* Simple confetti effect - you can replace this with a proper confetti library later */}
-          <div className='w-full h-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 opacity-75 animate-pulse' />
+
+      {!limited && confetti && <div className={styles.confettiLayer} />}
+
+      {!limited && (
+        <div className={styles.topRotatorWrap}>
+          <TopRotator goals={goals} data={combinedData} />
         </div>
       )}
-      {/* Top Rotator */}
+
       {!limited && (
-        <div className='absolute top-12 left-0 right-0 w-full flex justify-center'>
-          <TopRotator
-            goals={goals}
-            data={combinedData}
-          />
-        </div>
-      )}
-      {/* Progress Bar */}
-      {!limited && (
-        <div className='absolute bottom-12 left-0 right-0 w-full flex justify-center'>
+        <div className={styles.progressbarWrap}>
           <ProgressBar />
         </div>
       )}
-      {/* Bottom Right Panel */}
+
       {!limited && (
-        <div className='absolute bottom-14 right-12'>
-          <div className='bg-primary w-72 rounded-xl py-4 px-6 shadow relative'>
-            <TimeLeft
-              visible={panel === 'timeLeft'}
-              timesUp={handleTimesUp}
-            />
+        <div className={styles.bottomRightPanel}>
+          <div className={styles.panelCard}>
+            <TimeLeft visible={panel === 'timeLeft'} timesUp={handleTimesUp} />
             <WheelSpins visible={panel === 'wheelSpins'} />
           </div>
         </div>
       )}
-      {/* Randomizer View */}
+
       {!limited && <Randomizer setConfetti={setConfetti} />}
     </div>
   );
@@ -228,8 +189,8 @@ const Overlay = () => {
   return (
     <Suspense
       fallback={
-        <div className='relative w-[1920px] h-[1080px] flex items-center justify-center bg-black'>
-          <div className='text-white text-2xl'>Loading overlay...</div>
+        <div className={styles.loading}>
+          <div className={styles.loadingText}>Loading overlay...</div>
         </div>
       }
     >

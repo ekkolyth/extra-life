@@ -1,0 +1,112 @@
+/* All styles are scoped under .overlayRoot so nothing leaks globally */
+.overlayRoot {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    isolation: isolate;
+
+    /* color vars live here, not on :root */
+    --background: #010101;
+    --foreground: #eeeeee;
+    --card: #050505;
+    --card-foreground: #eeeeee;
+    --popover: #050505;
+    --popover-foreground: #eeeeee;
+    --primary: #25a8f1;
+    --primary-foreground: #010101;
+    --secondary: #111111;
+    --secondary-foreground: #cdcdcd;
+    --muted: #0b0b0b;
+    --muted-foreground: #808080;
+    --destructive: #fe2235;
+    --destructive-foreground: #eeeeee;
+    --border: #151515;
+    --input: #0b0b0b;
+    --ring: #25a8f1;
+    --sidebar: #030303;
+    --sidebar-foreground: #dddddd;
+
+    background: var(--background, #010101);
+    color: var(--foreground, #eeeeee);
+    font-family:
+        system-ui,
+        -apple-system,
+        Segoe UI,
+        Roboto,
+        Inter,
+        Arial,
+        sans-serif;
+}
+
+/* children must nest under .overlayRoot to see the vars */
+.topRotatorWrap {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.progressbarWrap {
+    position: absolute;
+    bottom: 48px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.bottomRightPanel {
+    position: absolute;
+    bottom: 56px;
+    right: 48px;
+}
+
+.panelCard {
+    position: relative;
+    width: 288px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    background: var(--primary, #25a8f1);
+    color: var(--primary-foreground, #010101);
+    box-shadow:
+        0 10px 15px rgba(0, 0, 0, 0.15),
+        0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.confettiLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, #ef4444);
+    opacity: 0.75;
+    animation: confettiPulse 1.25s ease-in-out infinite;
+}
+
+@keyframes confettiPulse {
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.25);
+    }
+}
+
+.loading {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    background: #000;
+    display: grid;
+    place-items: center;
+}
+
+.loadingText {
+    color: #fff;
+    font-size: 24px;
+}
