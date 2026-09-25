@@ -1,14 +1,13 @@
 'use client'
 
+import { ClerkProvider as ClerkNextJSProvider, useAuth } from '@clerk/nextjs'
+import { shadcn } from '@clerk/themes'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useState, ReactNode } from 'react'
-import { ClerkProvider as ClerkNextJSProvider } from '@clerk/nextjs'
-import { shadcn } from '@clerk/themes'
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { ConvexReactClient } from 'convex/react'
 import { ConvexProviderWithClerk } from 'convex/react-clerk'
-import { useAuth } from '@clerk/nextjs'
+import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { ReactNode, useState } from 'react'
 
 // Convex client setup
 if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
@@ -94,8 +93,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <ThemeProvider
                 attribute='class'
                 defaultTheme='system'
-                enableSystem
                 disableTransitionOnChange
+                enableSystem
             >
                 <QueryClientProviderWrapper>
                     <ConvexClientProvider>{children}</ConvexClientProvider>

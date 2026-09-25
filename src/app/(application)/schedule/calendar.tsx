@@ -1,13 +1,12 @@
 'use client'
 
-import { Fragment } from 'react'
-import { TrashIcon } from 'lucide-react'
-import { useConvexQuery, useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
 import { set, subMinutes } from 'date-fns'
-
-import { cn } from '@/utils/style'
+import { TrashIcon } from 'lucide-react'
+import { Fragment } from 'react'
 import { Button } from '@/components/ui/button'
+import { api } from '@/convex/_generated/api'
+import { cn } from '@/utils/style'
 import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time'
 
 export function Calendar() {
@@ -61,7 +60,7 @@ export function Calendar() {
                             }}
                         >
                             {Array.from({ length: 24 }).map((_, i) => (
-                                <Fragment key={i}>
+                                <Fragment key={timeslotFromIndex(i)}>
                                     <div>
                                         <div className='sticky left-0 -ml-14 -mt-2.5 w-14 pr-2 text-right text-xs leading-5'>
                                             {timeslotFromIndex(i)}
@@ -90,11 +89,11 @@ export function Calendar() {
                         >
                             {segments.map((segment) => (
                                 <li
-                                    key={segment._id}
                                     className={cn(
                                         'p-2 m-2 rounded flex justify-between',
                                         getBackground(segment._id)
                                     )}
+                                    key={segment._id}
                                     style={{
                                         gridRow: `${timeslotIndexFromStart(segment.startsAt)} / span ${
                                             segment.duration
@@ -103,11 +102,11 @@ export function Calendar() {
                                 >
                                     <p>{segment.title}</p>
                                     <Button
-                                        variant='ghost'
-                                        size='sm'
                                         onClick={() =>
                                             deleteSegment({ id: segment._id })
                                         }
+                                        size='sm'
+                                        variant='ghost'
                                     >
                                         <span className='sr-only'>Delete</span>
                                         <TrashIcon className='h-4 w-4' />

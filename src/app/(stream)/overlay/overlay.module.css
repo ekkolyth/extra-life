@@ -1,11 +1,5 @@
 /* All styles are scoped under .overlayRoot so nothing leaks globally */
 .overlayRoot {
-    position: relative;
-    width: 1920px;
-    height: 1080px;
-    isolation: isolate;
-
-    /* color vars live here, not on :root */
     --background: #010101;
     --foreground: #eeeeee;
     --card: #050505;
@@ -25,9 +19,9 @@
     --ring: #25a8f1;
     --sidebar: #030303;
     --sidebar-foreground: #dddddd;
-
-    background: var(--background, #010101);
-    color: var(--foreground, #eeeeee);
+    position: relative;
+    width: 1920px;
+    height: 1080px;
     font-family:
         system-ui,
         -apple-system,
@@ -36,42 +30,46 @@
         Inter,
         Arial,
         sans-serif;
+    color: var(--foreground, #eeeeee);
+
+    background: var(--background, #010101);
+    isolation: isolate;
 }
 
 /* children must nest under .overlayRoot to see the vars */
 .topRotatorWrap {
     position: absolute;
     top: 48px;
-    left: 0;
     right: 0;
-    width: 100%;
+    left: 0;
     display: flex;
     justify-content: center;
+    width: 100%;
 }
 
 .progressbarWrap {
     position: absolute;
+    right: 0;
     bottom: 48px;
     left: 0;
-    right: 0;
-    width: 100%;
     display: flex;
     justify-content: center;
+    width: 100%;
 }
 
 .bottomRightPanel {
     position: absolute;
-    bottom: 56px;
     right: 48px;
+    bottom: 56px;
 }
 
 .panelCard {
     position: relative;
     width: 288px;
     padding: 16px 24px;
-    border-radius: 12px;
-    background: var(--primary, #25a8f1);
     color: var(--primary-foreground, #010101);
+    background: var(--primary, #25a8f1);
+    border-radius: 12px;
     box-shadow:
         0 10px 15px rgba(0, 0, 0, 0.15),
         0 4px 6px rgba(0, 0, 0, 0.1);
@@ -99,14 +97,14 @@
 
 .loading {
     position: relative;
+    display: grid;
+    place-items: center;
     width: 1920px;
     height: 1080px;
     background: #000;
-    display: grid;
-    place-items: center;
 }
 
 .loadingText {
-    color: #fff;
     font-size: 24px;
+    color: #fff;
 }

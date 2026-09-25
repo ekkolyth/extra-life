@@ -34,13 +34,11 @@ export function JSONViewer({ data, title }: JSONViewerProps) {
             )}
             <div className='p-4'>
                 <Editor
-                    height='300px'
-                    defaultLanguage='json'
-                    value={jsonString}
-                    theme='custom-dark'
                     beforeMount={(monaco) => {
                         monaco.editor.defineTheme('custom-dark', customTheme)
                     }}
+                    defaultLanguage='json'
+                    height='300px'
                     options={{
                         readOnly: true,
                         minimap: { enabled: false },
@@ -60,6 +58,8 @@ export function JSONViewer({ data, title }: JSONViewerProps) {
                             horizontalScrollbarSize: 8,
                         },
                     }}
+                    theme='custom-dark'
+                    value={jsonString}
                 />
             </div>
         </div>

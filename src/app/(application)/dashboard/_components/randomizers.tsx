@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Shuffle, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Randomizer } from '@/types/db'
+import { Plus, Shuffle } from 'lucide-react'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Randomizer } from '@/types/db'
 
 interface RandomizersSectionProps {
     randomizers: Randomizer[]
@@ -62,10 +62,10 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
                     </div>
 
                     <Button
-                        variant='outline'
+                        asChild
                         className='w-full bg-transparent'
                         size='sm'
-                        asChild
+                        variant='outline'
                     >
                         <Link href='/randomizer'>
                             <Plus className='h-4 w-4 mr-2' />
@@ -109,8 +109,8 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
                     <div className='mt-4 space-y-2'>
                         {randomizers.map((randomizer) => (
                             <div
-                                key={randomizer.id}
                                 className='flex justify-between items-center text-sm'
+                                key={randomizer.id}
                             >
                                 <span className='text-foreground'>
                                     {randomizer.name}
@@ -124,10 +124,10 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
                 </div>
 
                 <Button
-                    variant='outline'
+                    asChild
                     className='w-full bg-transparent'
                     size='sm'
-                    asChild
+                    variant='outline'
                 >
                     <Link href='/randomizer'>
                         <Plus className='h-4 w-4 mr-2' />

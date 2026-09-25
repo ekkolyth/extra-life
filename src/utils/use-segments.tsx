@@ -1,6 +1,5 @@
+import { useEffect, useRef, useState } from 'react'
 import type { Segment } from '@/types/db'
-
-import { useEffect, useState, useRef } from 'react'
 
 export function useSegments(segments: Segment[]) {
     const [currentSegment, setCurrentSegment] = useState<Segment | null>(null)
@@ -78,7 +77,8 @@ export function useSegments(segments: Segment[]) {
                         }
                     }
                     break
-                } else if (now < eventStart) {
+                }
+                if (now < eventStart) {
                     console.log('Next:', event)
                     next = event
                     break

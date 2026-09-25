@@ -1,16 +1,14 @@
 'use client'
 
 import { CSSProperties } from 'react'
-import { useDonorDrive } from '@/hooks/useDonorDrive'
+import { useDonorDrive } from '@/hooks/use-donor-drive'
 
 type ThermometerProgressBarProps = {
-    fillColor?: string
     style?: CSSProperties
     className?: string
 }
 
 export default function ThermometerProgressBar({
-    fillColor = '#ef4444', // Red color for thermometer fill
     style,
     className,
 }: ThermometerProgressBarProps) {
@@ -39,7 +37,7 @@ export default function ThermometerProgressBar({
 
     // Use override value if available, otherwise use real donations
     const donations =
-        overrideDonations !== null && !isNaN(overrideDonations)
+        overrideDonations !== null && !Number.isNaN(overrideDonations)
             ? overrideDonations
             : (donorDriveData?.sumDonations ?? 0)
 

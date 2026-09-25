@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import {
     Table,
     TableBody,
@@ -8,12 +9,11 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import type { ReactNode } from 'react'
 
 interface DataTableColumn<TData> {
     accessorKey: string
-    header: ReactNode
     cell?: (row: { original: TData }) => ReactNode
+    header: ReactNode
 }
 
 interface DataTableProps<TData> {
@@ -29,8 +29,8 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                     <TableRow>
                         {columns.map((column) => (
                             <TableHead
-                                key={column.accessorKey}
                                 className='h-14 px-4'
+                                key={column.accessorKey}
                             >
                                 {column.header}
                             </TableHead>
@@ -42,8 +42,8 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                         <TableRow key={index}>
                             {columns.map((column) => (
                                 <TableCell
-                                    key={column.accessorKey}
                                     className='px-4 py-4'
+                                    key={column.accessorKey}
                                 >
                                     {column.cell
                                         ? column.cell({ original: row })

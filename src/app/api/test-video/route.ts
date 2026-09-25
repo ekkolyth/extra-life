@@ -22,7 +22,7 @@ export async function GET() {
     if (triggered) {
         console.log(
             '🎬 Test video trigger detected, time since:',
-            timeSinceTrigger + 'ms'
+            `${timeSinceTrigger}ms`
         )
     }
 

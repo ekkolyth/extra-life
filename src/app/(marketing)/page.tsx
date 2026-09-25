@@ -1,8 +1,8 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import { TwitchEmbed } from '@/components/marketing/twitch-embed'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import Image from 'next/image'
-import { TwitchEmbed } from '@/components/marketing/twitch-embed'
-import Link from 'next/link'
 
 export default function Home() {
     const donorID = process.env.NEXT_PUBLIC_DONORDRIVE_ID as string | null
@@ -44,10 +44,10 @@ export default function Home() {
                             <CardContent className='p-0'>
                                 <div className='relative aspect-video'>
                                     <Image
-                                        src='/images/el-kid.jpg'
                                         alt='Extra Life kid'
-                                        fill
                                         className='object-cover'
+                                        fill
+                                        src='/images/el-kid.jpg'
                                     />
                                     <div className='absolute bottom-4 left-4 bg-black/80 text-white px-3 py-1 rounded text-sm font-bold'>
                                         EXTRA-LIFE.ORG
@@ -84,14 +84,14 @@ export default function Home() {
                         </div>
 
                         <div className='flex flex-col sm:flex-row gap-4'>
-                            <Button size='lg' className='flex-1' asChild>
+                            <Button asChild className='flex-1' size='lg'>
                                 <Link href={extraLifeURL}>DONATE NOW</Link>
                             </Button>
                             <Button
+                                asChild
+                                className='flex-1'
                                 size='lg'
                                 variant='outline'
-                                className='flex-1'
-                                asChild
                             >
                                 <Link href={rileyURL}>LEARN ABOUT RILEY</Link>
                             </Button>
@@ -101,7 +101,7 @@ export default function Home() {
             </section>
 
             {/* Live Stream Section */}
-            <section id='live-stream' className='py-16'>
+            <section className='py-16' id='live-stream'>
                 <div className='container mx-auto px-4'>
                     <div className='space-y-6'>
                         <h3 className='text-2xl font-bold text-foreground'>
@@ -119,10 +119,10 @@ export default function Home() {
                         {/* Left - Donation Breakdown */}
                         <div className='aspect-video relative rounded-lg overflow-hidden'>
                             <Image
-                                src='/images/el-impact.png'
                                 alt='Extra Life impact'
-                                fill
                                 className='object-cover'
+                                fill
+                                src='/images/el-impact.png'
                             />
                         </div>
 
@@ -147,14 +147,14 @@ export default function Home() {
                                 cared enough to scroll this far down the page.
                             </p>
                             <div className='flex flex-col sm:flex-row gap-4'>
-                                <Button size='lg' className='flex-1' asChild>
+                                <Button asChild className='flex-1' size='lg'>
                                     <Link href={extraLifeURL}>DONATE NOW</Link>
                                 </Button>
                                 <Button
                                     asChild
+                                    className='flex-1'
                                     size='lg'
                                     variant='outline'
-                                    className='flex-1'
                                 >
                                     <a href='#live-stream'>
                                         JUMP TO THE STREAM!
@@ -174,11 +174,11 @@ export default function Home() {
                         <div className='space-y-6'>
                             <div className='relative rounded-lg overflow-hidden'>
                                 <Image
-                                    src='/images/el-flyer.jpeg'
                                     alt='Extra Life flyer'
-                                    width={400}
-                                    height={600}
                                     className='w-full h-auto'
+                                    height={600}
+                                    src='/images/el-flyer.jpeg'
+                                    width={400}
                                 />
                             </div>
                         </div>
@@ -259,8 +259,8 @@ export default function Home() {
                                             { year: '2017', amount: '$105.00' },
                                         ].map((item) => (
                                             <div
-                                                key={item.year}
                                                 className='flex justify-between items-center'
+                                                key={item.year}
                                             >
                                                 <span className='font-medium text-blue-600 dark:text-blue-400'>
                                                     {item.year}
@@ -274,7 +274,7 @@ export default function Home() {
                                 </CardContent>
                             </Card>
 
-                            <Button size='lg' className='flex-1' asChild>
+                            <Button asChild className='flex-1' size='lg'>
                                 <Link href={extraLifeURL}>DONATE NOW</Link>
                             </Button>
                         </div>

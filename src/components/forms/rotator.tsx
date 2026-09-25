@@ -1,16 +1,11 @@
 'use client'
 
-import type { Rotator } from '@/types/db'
-
-import * as z from 'zod'
+import { useConvexMutation } from '@convex-dev/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
-import type { Id } from '@/convex/_generated/dataModel'
-
-import { Input } from '@/components/ui/input'
+import * as z from 'zod'
 import { Button } from '@/components/ui/button'
+import { DialogClose } from '@/components/ui/dialog'
 import {
     Form,
     FormControl,
@@ -19,7 +14,10 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
-import { DialogClose } from '@/components/ui/dialog'
+
+import { Input } from '@/components/ui/input'
+import { api } from '@/convex/_generated/api'
+import type { Id } from '@/convex/_generated/dataModel'
 
 const formSchema = z.object({
     id: z.string().optional(),
@@ -66,7 +64,7 @@ export function RotatorForm(props: RotatorFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+            <form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>
                 {defaultValues?.id && (
                     <FormField
                         control={form.control}
@@ -90,8 +88,8 @@ export function RotatorForm(props: RotatorFormProps) {
                             </FormLabel>
                             <FormControl>
                                 <Input
-                                    placeholder='Enter rotator text...'
                                     className='text-base'
+                                    placeholder='Enter rotator text...'
                                     {...field}
                                 />
                             </FormControl>
@@ -101,10 +99,10 @@ export function RotatorForm(props: RotatorFormProps) {
                 />
                 <DialogClose asChild>
                     <Button
-                        type='submit'
-                        variant='outline'
                         className='text-base'
                         size='lg'
+                        type='submit'
+                        variant='outline'
                     >
                         Submit
                     </Button>

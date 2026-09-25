@@ -1,25 +1,19 @@
 'use client'
 
-import { useConvexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { useConvexMutation } from '@convex-dev/react-query'
+import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
+import { formatDistanceToNow } from 'date-fns'
 import {
-    TrashIcon,
-    RefreshCwIcon,
     ChevronDownIcon,
     ChevronRightIcon,
     DatabaseIcon,
+    RefreshCwIcon,
+    TrashIcon,
 } from 'lucide-react'
-import {
-    fetchParticipantData,
-    fetchRealTimeData,
-    useDonorDriveDebug,
-    useLastApiCallInfo,
-    useUpdateLastApiCall,
-} from '@/utils/donor-drive-api-client'
+import React, { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { JSONViewer } from '@/components/ui/json-viewer'
 import {
     Select,
     SelectContent,
@@ -35,10 +29,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { useState } from 'react'
-import { JSONViewer } from '@/components/ui/json-viewer'
-import { formatDistanceToNow } from 'date-fns'
-import React from 'react'
+import { api } from '@/convex/_generated/api'
+import {
+    fetchParticipantData,
+    fetchRealTimeData,
+    useDonorDriveDebug,
+    useLastApiCallInfo,
+    useUpdateLastApiCall,
+} from '@/utils/donor-drive-api-client'
 
 export default function DebugPage() {
     const debugData = useConvexQuery(api.donorDriveDebug.list, {})
@@ -69,7 +67,7 @@ export default function DebugPage() {
 
     // Reset to page 1 when items per page changes
     const handleItemsPerPageChange = (value: string) => {
-        setItemsPerPage(parseInt(value))
+        setItemsPerPage(parseInt(value, 10))
         setCurrentPage(1)
     }
 
@@ -216,18 +214,18 @@ export default function DebugPage() {
                     </div>
                     <div className='flex gap-3'>
                         <Button
-                            variant='outline'
-                            onClick={handleTestVideo}
                             className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
+                            onClick={handleTestVideo}
+                            variant='outline'
                         >
                             <DatabaseIcon className='h-4 w-4' />
                             Test Donation Video
                         </Button>
                         <Button
-                            variant='outline'
-                            onClick={handleForceAPICall}
-                            disabled={isForcingAPI || isRefreshing}
                             className='flex items-center gap-2 border-orange-300 text-orange-600 hover:bg-orange/10 hover:text-orange-700'
+                            disabled={isForcingAPI || isRefreshing}
+                            onClick={handleForceAPICall}
+                            variant='outline'
                         >
                             <RefreshCwIcon
                                 className={`h-4 w-4 ${isForcingAPI ? 'animate-spin' : ''}`}
@@ -235,9 +233,9 @@ export default function DebugPage() {
                             {isForcingAPI ? 'Forcing API...' : 'Force API Call'}
                         </Button>
                         <Button
-                            variant='outline'
-                            onClick={handleClear}
                             className='flex items-center gap-2 border-border text-muted-foreground hover:bg-muted hover:text-foreground'
+                            onClick={handleClear}
+                            variant='outline'
                         >
                             <TrashIcon className='h-4 w-4' />
                             Clear All
@@ -271,12 +269,12 @@ export default function DebugPage() {
                                                 ).toLocaleString()}
                                             </Badge>
                                             <Button
-                                                variant='ghost'
-                                                size='sm'
+                                                className='h-8 w-8 p-0'
                                                 onClick={() =>
                                                     setApiPayloadData(null)
                                                 }
-                                                className='h-8 w-8 p-0'
+                                                size='sm'
+                                                variant='ghost'
                                             >
                                                 ×
                                             </Button>
@@ -303,10 +301,10 @@ export default function DebugPage() {
                                             Show
                                         </span>
                                         <Select
-                                            value={itemsPerPage.toString()}
                                             onValueChange={
                                                 handleItemsPerPageChange
                                             }
+                                            value={itemsPerPage.toString()}
                                         >
                                             <SelectTrigger className='w-20 h-8'>
                                                 <SelectValue />
@@ -412,9 +410,9 @@ export default function DebugPage() {
                                                         <TableCell>
                                                             <div className='flex justify-center'>
                                                                 <Button
-                                                                    variant='ghost'
-                                                                    size='sm'
                                                                     className='size-6 p-0 text-muted-foreground hover:text-foreground hover:bg-muted'
+                                                                    size='sm'
+                                                                    variant='ghost'
                                                                 >
                                                                     {isExpanded ? (
                                                                         <ChevronDownIcon className='h-4 w-4' />
@@ -429,12 +427,12 @@ export default function DebugPage() {
                                                     {/* Expanded Data Row */}
                                                     {isExpanded && (
                                                         <TableRow
-                                                            key={`${entry._id}-expanded`}
                                                             className='border-border'
+                                                            key={`${entry._id}-expanded`}
                                                         >
                                                             <TableCell
-                                                                colSpan={4}
                                                                 className='p-0'
+                                                                colSpan={4}
                                                             >
                                                                 <div className='bg-muted/50 border-t border-border p-6'>
                                                                     <div className='space-y-6'>
@@ -529,19 +527,19 @@ export default function DebugPage() {
                                         </div>
                                         <div className='flex items-center gap-2'>
                                             <Button
-                                                variant='outline'
-                                                size='sm'
+                                                className='h-8 px-2'
+                                                disabled={currentPage === 1}
                                                 onClick={() =>
                                                     setCurrentPage(1)
                                                 }
-                                                disabled={currentPage === 1}
-                                                className='h-8 px-2'
+                                                size='sm'
+                                                variant='outline'
                                             >
                                                 First
                                             </Button>
                                             <Button
-                                                variant='outline'
-                                                size='sm'
+                                                className='h-8 px-2'
+                                                disabled={currentPage === 1}
                                                 onClick={() =>
                                                     setCurrentPage(
                                                         Math.max(
@@ -550,8 +548,8 @@ export default function DebugPage() {
                                                         )
                                                     )
                                                 }
-                                                disabled={currentPage === 1}
-                                                className='h-8 px-2'
+                                                size='sm'
+                                                variant='outline'
                                             >
                                                 Previous
                                             </Button>
@@ -566,7 +564,7 @@ export default function DebugPage() {
                                                         ),
                                                     },
                                                     (_, i) => {
-                                                        let pageNum
+                                                        let pageNum: number
                                                         if (totalPages <= 5) {
                                                             pageNum = i + 1
                                                         } else if (
@@ -590,20 +588,20 @@ export default function DebugPage() {
 
                                                         return (
                                                             <Button
+                                                                className='h-8 w-8 p-0'
                                                                 key={pageNum}
+                                                                onClick={() =>
+                                                                    setCurrentPage(
+                                                                        pageNum
+                                                                    )
+                                                                }
+                                                                size='sm'
                                                                 variant={
                                                                     currentPage ===
                                                                     pageNum
                                                                         ? 'default'
                                                                         : 'outline'
                                                                 }
-                                                                size='sm'
-                                                                onClick={() =>
-                                                                    setCurrentPage(
-                                                                        pageNum
-                                                                    )
-                                                                }
-                                                                className='h-8 w-8 p-0'
                                                             >
                                                                 {pageNum}
                                                             </Button>
@@ -613,8 +611,10 @@ export default function DebugPage() {
                                             </div>
 
                                             <Button
-                                                variant='outline'
-                                                size='sm'
+                                                className='h-8 px-2'
+                                                disabled={
+                                                    currentPage === totalPages
+                                                }
                                                 onClick={() =>
                                                     setCurrentPage(
                                                         Math.min(
@@ -623,23 +623,21 @@ export default function DebugPage() {
                                                         )
                                                     )
                                                 }
-                                                disabled={
-                                                    currentPage === totalPages
-                                                }
-                                                className='h-8 px-2'
+                                                size='sm'
+                                                variant='outline'
                                             >
                                                 Next
                                             </Button>
                                             <Button
-                                                variant='outline'
-                                                size='sm'
-                                                onClick={() =>
-                                                    setCurrentPage(totalPages)
-                                                }
+                                                className='h-8 px-2'
                                                 disabled={
                                                     currentPage === totalPages
                                                 }
-                                                className='h-8 px-2'
+                                                onClick={() =>
+                                                    setCurrentPage(totalPages)
+                                                }
+                                                size='sm'
+                                                variant='outline'
                                             >
                                                 Last
                                             </Button>

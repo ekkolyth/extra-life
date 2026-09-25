@@ -1,17 +1,17 @@
 import type { Id } from '@/convex/_generated/dataModel'
 
 export interface Goal {
-    id: Id<'goals'>
-    title: string
     amount: number
     endOfStream: boolean
+    id: Id<'goals'>
+    title: string
 }
 
 export interface Segment {
-    id: Id<'segments'>
-    title: string
-    startsAt: string
     duration: number
+    id: Id<'segments'>
+    startsAt: string
+    title: string
 }
 
 export interface Rotator {
@@ -21,21 +21,21 @@ export interface Rotator {
 
 export interface RandomizerItem {
     id: Id<'randomizerItems'>
-    name: string
     limit: number
-    redeemed: number
+    name: string
     randomizerId: string
+    redeemed: number
 }
 
 export interface WheelRedemption {
+    createdAt: string
     id: Id<'wheelRedemptions'>
     randomizerId: string
-    createdAt: string
 }
 
 export interface Randomizer {
     id: Id<'randomizers'>
-    name: string
     items: RandomizerItem[]
+    name: string
     redemptions: WheelRedemption[]
 }

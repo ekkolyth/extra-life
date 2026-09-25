@@ -1,5 +1,5 @@
-import { query, mutation } from './_generated/server'
 import { v } from 'convex/values'
+import { mutation, query } from './_generated/server'
 
 export const list = query({
     handler: async (ctx) => {
@@ -43,10 +43,11 @@ export const update = mutation({
         const { id, ...data } = args
 
         // If title is being updated, check for uniqueness
-        if (data.title) {
+        const { title } = data
+        if (title) {
             const existingGoal = await ctx.db
                 .query('goals')
-                .withIndex('by_title', (q) => q.eq('title', data.title!))
+                .withIndex('by_title', (q) => q.eq('title', title))
                 .filter((q) => q.neq(q.field('_id'), id))
                 .first()
 

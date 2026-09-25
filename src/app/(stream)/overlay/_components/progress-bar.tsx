@@ -1,7 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
-import { useDonorDrive } from '@/hooks/useDonorDrive'
+import { useDonorDrive } from '@/hooks/use-donor-drive'
 
 type ProgressBarProps = {
     trackColor?: string

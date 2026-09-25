@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Clock } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Segment } from '@/types/db'
-import { useSegments } from '@/utils/useSegments'
+import { useSegments } from '@/utils/use-segments'
 
 interface ScheduleSectionProps {
     segments: Segment[]

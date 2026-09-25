@@ -1,9 +1,9 @@
 'use client'
 
-import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import { useConvexMutation } from '@convex-dev/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Input } from '@/components/ui/input'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import {
     Form,
@@ -13,6 +13,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import {
     Select,
     SelectContent,
@@ -20,7 +21,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { useConvexMutation } from '@convex-dev/react-query'
 import { api } from '@/convex/_generated/api'
 
 const formSchema = z.object({
@@ -46,7 +46,7 @@ export function SegmentForm() {
             await createSegment({
                 title: values.title,
                 startsAt: values.startsAt,
-                duration: parseInt(values.duration),
+                duration: parseInt(values.duration, 10),
             })
             form.reset()
         } catch (error) {
@@ -58,8 +58,8 @@ export function SegmentForm() {
         <div>
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
                     className='border p-4 rounded'
+                    onSubmit={form.handleSubmit(onSubmit)}
                 >
                     <p className='mb-4'>Add Segment</p>
                     <div className='space-y-6'>
@@ -99,9 +99,9 @@ export function SegmentForm() {
                                 <FormItem>
                                     <FormLabel>Duration</FormLabel>
                                     <Select
+                                        defaultValue={field.value}
                                         name={field.name}
                                         onValueChange={field.onChange}
-                                        defaultValue={field.value}
                                     >
                                         <FormControl>
                                             <SelectTrigger>

@@ -1,9 +1,9 @@
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
 import {
-    statsValidator,
-    donorValidator,
     donationValidator,
+    donorValidator,
+    statsValidator,
 } from '../donor_drive_validators'
 
 export const donorDriveDebug = defineTable({

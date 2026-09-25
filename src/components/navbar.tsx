@@ -1,21 +1,20 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import {
-    BarChart3,
-    Calendar,
-    Target,
     ArrowLeftRight,
-    RotateCcw,
-    DollarSign,
-    Settings,
-    ExternalLink,
+    BarChart3,
     Bug,
+    Calendar,
+    Pointer as Counter,
+    DollarSign,
+    ExternalLink,
     Monitor,
     MonitorPlay as Overlay,
-    Pointer as Counter,
+    RotateCcw,
+    Target,
 } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const navigationItems = [
@@ -97,11 +96,12 @@ export function Sidebar() {
             <div className='flex h-16 items-center gap-3 px-4'>
                 <div className='flex size-8 items-center justify-center rounded-lg bg-black border border-zinc-600'>
                     <svg
+                        aria-hidden='true'
                         className='size-5 text-primary'
                         fill='none'
                         stroke='currentColor'
-                        viewBox='0 0 24 24'
                         strokeWidth={2}
+                        viewBox='0 0 24 24'
                     >
                         <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
                     </svg>
@@ -120,13 +120,13 @@ export function Sidebar() {
                         return (
                             <li key={item.name}>
                                 <Link
-                                    href={item.href}
                                     className={cn(
                                         'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                                         isActive
                                             ? 'bg-muted text-foreground'
                                             : 'text-muted-foreground hover:bg-muted hover:text-primary'
                                     )}
+                                    href={item.href}
                                 >
                                     <item.icon className='size-5' />
                                     {item.name}
@@ -146,8 +146,8 @@ export function Sidebar() {
                     {tools.map((item) => (
                         <li key={item.name}>
                             <Link
-                                href={item.href}
                                 className='flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary'
+                                href={item.href}
                             >
                                 <div className='flex items-center gap-3'>
                                     <item.icon className='size-5' />
@@ -171,14 +171,14 @@ export function Sidebar() {
                     {resources.map((item) => (
                         <li key={item.name}>
                             <Link
+                                className='flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary'
                                 href={item.href}
-                                target={item.external ? '_blank' : undefined}
                                 rel={
                                     item.external
                                         ? 'noopener noreferrer'
                                         : undefined
                                 }
-                                className='flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary'
+                                target={item.external ? '_blank' : undefined}
                             >
                                 <div className='flex items-center gap-3'>
                                     <item.icon className='size-5' />

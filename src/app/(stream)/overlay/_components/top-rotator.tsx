@@ -1,13 +1,11 @@
 'use client'
 
 import type { Goal } from '@/types/db'
-
+import { ControllerIcon } from '../../../../../public/icons/controller'
 import { LeftText } from './left-text'
 import { RightText } from './right-text'
-import { ControllerIcon } from '../../../../../public/icons/controller'
 
 interface TopRotatorProps {
-    goals: Goal[]
     data: {
         displayName: string
         fundraisingGoal: number
@@ -55,6 +53,7 @@ interface TopRotatorProps {
             recipientImageURL?: string
         } | null
     }
+    goals: Goal[]
 }
 
 const TopRotator = (props: TopRotatorProps) => {
@@ -62,13 +61,13 @@ const TopRotator = (props: TopRotatorProps) => {
 
     return (
         <div
-            style={{ width: 1200, height: 78 }}
             className='bg-primary rounded-full relative shadow-super'
+            style={{ width: 1200, height: 78 }}
         >
             <div className='ml-8 mr-8 h-full flex items-center py-2 pl-6 pr-10'>
                 <ControllerIcon className='h-full mr-4' />
                 <LeftText data={data} />
-                <RightText goals={goals} data={data} />
+                <RightText data={data} goals={goals} />
             </div>
         </div>
     )

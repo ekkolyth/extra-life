@@ -1,11 +1,11 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DollarSign } from 'lucide-react'
-import Image from 'next/image'
-import type { Donation } from '@/utils/donor-drive-api-client'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { DollarSign } from 'lucide-react'
+import Image from 'next/image'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Donation } from '@/utils/donor-drive-api-client'
 
 dayjs.extend(relativeTime)
 
@@ -43,23 +43,21 @@ export function RecentDonations({
             </CardHeader>
             <CardContent className='space-y-3'>
                 {isLoading ? (
-                    <>
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div
-                                key={i}
-                                className='flex items-center justify-between p-3 rounded-lg bg-muted/20'
-                            >
-                                <div className='flex items-center gap-3'>
-                                    <LoadingValue className='h-10 w-10 rounded-full' />
-                                    <div className='space-y-1'>
-                                        <LoadingValue className='h-4 w-24' />
-                                        <LoadingValue className='h-3 w-16' />
-                                    </div>
+                    [1, 2, 3, 4, 5].map((i) => (
+                        <div
+                            className='flex items-center justify-between p-3 rounded-lg bg-muted/20'
+                            key={i}
+                        >
+                            <div className='flex items-center gap-3'>
+                                <LoadingValue className='h-10 w-10 rounded-full' />
+                                <div className='space-y-1'>
+                                    <LoadingValue className='h-4 w-24' />
+                                    <LoadingValue className='h-3 w-16' />
                                 </div>
-                                <LoadingValue className='h-5 w-16' />
                             </div>
-                        ))}
-                    </>
+                            <LoadingValue className='h-5 w-16' />
+                        </div>
+                    ))
                 ) : recentDonations.length === 0 ? (
                     <div className='rounded-lg bg-muted/20 p-8 text-center'>
                         <p className='text-sm text-muted-foreground'>
@@ -69,17 +67,17 @@ export function RecentDonations({
                 ) : (
                     recentDonations.map((donation, index) => (
                         <div
-                            key={donation.donationID || `donation-${index}`}
                             className='flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'
+                            key={donation.donationID || `donation-${index}`}
                         >
                             <div className='flex items-center gap-3'>
                                 {donation.avatarImageURL ? (
                                     <Image
-                                        src={donation.avatarImageURL}
                                         alt={donation.displayName || 'Donor'}
-                                        width={40}
-                                        height={40}
                                         className='rounded-full'
+                                        height={40}
+                                        src={donation.avatarImageURL}
+                                        width={40}
                                     />
                                 ) : (
                                     <div className='h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center'>

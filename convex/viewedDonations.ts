@@ -1,5 +1,5 @@
-import { query, mutation } from './_generated/server'
 import { v } from 'convex/values'
+import { mutation, query } from './_generated/server'
 
 // Get viewed donations for the current user
 export const getViewedDonations = query({
@@ -29,7 +29,7 @@ export const markAsViewed = mutation({
         if (existing) {
             // Add new donation IDs to existing array (avoid duplicates)
             const currentIDs = new Set(existing.donationIDs)
-            donationIDs.forEach((id) => currentIDs.add(id))
+            for (const id of donationIDs) currentIDs.add(id)
 
             await ctx.db.patch(existing._id, {
                 donationIDs: Array.from(currentIDs),

@@ -1,5 +1,5 @@
-import { query, mutation } from './_generated/server'
 import { v } from 'convex/values'
+import { mutation, query } from './_generated/server'
 
 // Get API metadata by key
 export const get = query({
@@ -35,14 +35,13 @@ export const set = mutation({
                 updatedAt,
             })
             return existing._id
-        } else {
-            // Create new entry
-            return await ctx.db.insert('apiMetadata', {
-                key: args.key,
-                value: args.value,
-                updatedAt,
-            })
         }
+        // Create new entry
+        return await ctx.db.insert('apiMetadata', {
+            key: args.key,
+            value: args.value,
+            updatedAt,
+        })
     },
 })
 
@@ -61,7 +60,7 @@ export const getLastApiCall = query({
             }
         }
 
-        const timestamp = parseInt(metadata.value)
+        const timestamp = parseInt(metadata.value, 10)
         const now = Date.now()
 
         return {
@@ -96,6 +95,6 @@ export const updateLastApiCall = mutation({
             })
         }
 
-        return parseInt(timestamp)
+        return parseInt(timestamp, 10)
     },
 })

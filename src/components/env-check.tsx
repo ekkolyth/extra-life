@@ -1,5 +1,6 @@
 'use client'
 
+import { AlertTriangleIcon } from 'lucide-react'
 import {
     Card,
     CardContent,
@@ -7,7 +8,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import { AlertTriangleIcon } from 'lucide-react'
 
 export function EnvCheck() {
     const missingVars = []
@@ -43,7 +43,7 @@ export function EnvCheck() {
             <CardContent>
                 <ul className='list-disc list-inside space-y-1'>
                     {missingVars.map((varName) => (
-                        <li key={varName} className='font-mono text-sm'>
+                        <li className='font-mono text-sm' key={varName}>
                             {varName}
                         </li>
                     ))}

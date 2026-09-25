@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Header } from '@/components/header'
 import { Sidebar } from '@/components/navbar'
 

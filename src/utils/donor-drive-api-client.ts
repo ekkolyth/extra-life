@@ -1,13 +1,13 @@
-import { api } from '@/convex/_generated/api'
 import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
+import { api } from '@/convex/_generated/api'
 
 // Define types for Donor Drive API responses
 export interface Donation {
     amount: number
     avatarImageURL?: string
     createdDateUTC?: string
-    donationID?: string
     displayName?: string
+    donationID?: string
     donorID?: string
     eventID?: number
     isRegFee?: boolean
@@ -20,45 +20,45 @@ export interface Donation {
 }
 
 export interface Donor {
+    avatarImageURL: string
     displayName?: string
     donorID?: string
-    avatarImageURL: string
     modifiedDateUTC: string
-    sumDonations: number
     numDonations: number
     recipientImageURL?: string
+    sumDonations: number
 }
 
 export interface StatsResult {
-    displayName: string
     avatarImageURL: string
-    participantID: number
-    participantTypeCode: string
     createdDateUTC: string
-    isCustomAvatarImage: boolean
+    displayName: string
     eventID: number
     eventName: string
     fundraisingGoal: number
+    hasActivityTracking: boolean
+    isCustomAvatarImage: boolean
+    isTeamCaptain?: boolean
+    isTeamCoCaptain?: boolean
     links: {
         donate: string
         page: string
         stream: string
     }
-    streamIsEnabled: boolean
-    streamingChannel: string
-    streamingPlatform: string
-    teamID?: number
-    teamName?: string
-    isTeamCaptain?: boolean
-    isTeamCoCaptain?: boolean
-    role?: string
-    hasActivityTracking: boolean
+    numDonations: number
     numIncentives: number
     numMilestones: number
+    participantID: number
+    participantTypeCode: string
+    role?: string
+    streamIsEnabled: boolean
+    streamIsLive: boolean
+    streamingChannel: string
+    streamingPlatform: string
     sumDonations: number
     sumPledges: number
-    numDonations: number
-    streamIsLive: boolean
+    teamID?: number
+    teamName?: string
 }
 
 // Static Data Types

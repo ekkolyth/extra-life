@@ -16,12 +16,13 @@ export function TwitchEmbed() {
     return (
         <div className='relative aspect-video w-full overflow-hidden rounded-lg'>
             <iframe
-                src={playerSrc}
                 allow='autoplay; fullscreen; picture-in-picture'
                 allowFullScreen
-                scrolling='no'
-                frameBorder='0'
                 className='absolute inset-0 h-full w-full'
+                frameBorder='0'
+                scrolling='no'
+                src={playerSrc}
+                title='Twitch stream player'
             />
         </div>
     )

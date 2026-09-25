@@ -1,15 +1,14 @@
 'use client'
 
-import type { Goal } from '@/types/db'
-import { useEffect, useState, useMemo } from 'react'
 import { useConvexQuery } from '@convex-dev/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { api } from '@/convex/_generated/api'
-import { useSegments } from '@/utils/useSegments'
+import type { Goal } from '@/types/db'
+import { useSegments } from '@/utils/use-segments'
 
 const eventDateEnd = new Date('November 8, 2025 22:00:00')
 
 interface TopRotatorProps {
-    goals: Goal[]
     data: {
         displayName: string
         fundraisingGoal: number
@@ -57,6 +56,7 @@ interface TopRotatorProps {
             recipientImageURL?: string
         } | null
     }
+    goals: Goal[]
 }
 
 export function RightText(props: TopRotatorProps) {
@@ -81,7 +81,7 @@ export function RightText(props: TopRotatorProps) {
     const { currentSegment, nextSegment } = useSegments(segments)
 
     useEffect(() => {
-        if (combinedData && goals && goals.length) {
+        if (combinedData && goals?.length) {
             setNextGoal(
                 goals.find((goal) => goal.amount > combinedData.sumDonations) ??
                     null

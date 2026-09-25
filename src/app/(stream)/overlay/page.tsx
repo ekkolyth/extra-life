@@ -1,18 +1,16 @@
 'use client'
 
-import styles from './overlay.module.css'
-
-import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { useConvexQuery } from '@convex-dev/react-query'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 import { api } from '@/convex/_generated/api'
-import { useDonorDrive } from '@/hooks/useDonorDrive'
-
-import TopRotator from './_components/top-rotator'
-import { Randomizer } from './_components/randomizer'
-import ProgressBar from './_components/progress-bar'
+import { useDonationVideoTrigger } from '@/hooks/use-donation-video-trigger'
+import { useDonorDrive } from '@/hooks/use-donor-drive'
 import { DonationVideoOverlay } from './_components/donation-video-overlay'
-import { useDonationVideoTrigger } from '@/hooks/useDonationVideoTrigger'
+import ProgressBar from './_components/progress-bar'
+import { Randomizer } from './_components/randomizer'
+import TopRotator from './_components/top-rotator'
+import styles from './overlay.module.css'
 
 const OverlayContent = () => {
     const searchParams = useSearchParams()
@@ -150,20 +148,20 @@ const OverlayContent = () => {
         >
             {/* Donation Video Overlay */}
             <DonationVideoOverlay
-                isVisible={shouldPlayVideo}
                 donation={currentDonation}
+                isVisible={shouldPlayVideo}
                 onVideoEnd={handleVideoEnd}
             />
 
             {/* Test Video Overlay */}
             <DonationVideoOverlay
-                isVisible={showTestVideo}
                 donation={{
                     amount: 250.0,
                     displayName: 'Anonymous',
                     message: 'For the kids!',
                     createdDateUTC: new Date().toISOString(),
                 }}
+                isVisible={showTestVideo}
                 onVideoEnd={() => setShowTestVideo(false)}
             />
 
@@ -173,7 +171,7 @@ const OverlayContent = () => {
             {/* Top Rotator */}
             {!limited && (
                 <div className={styles.topRotatorWrap}>
-                    <TopRotator goals={goals} data={combinedData} />
+                    <TopRotator data={combinedData} goals={goals} />
                 </div>
             )}
 
@@ -182,13 +180,13 @@ const OverlayContent = () => {
                 <div className={styles.progressbarWrap}>
                     {/* Pass explicit hex colors & inline fallback styles so OBS can’t misinterpret vars */}
                     <ProgressBar
-                        trackColor='#1e3b52'
-                        fillColor='#25a8f1'
-                        textColor='#ffffff'
-                        width={960}
-                        height={64}
-                        borderWidth={4}
                         borderColor='rgba(0,0,0,0.35)'
+                        borderWidth={4}
+                        fillColor='#25a8f1'
+                        height={64}
+                        textColor='#ffffff'
+                        trackColor='#1e3b52'
+                        width={960}
                     />
                 </div>
             )}

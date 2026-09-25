@@ -1,24 +1,24 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import {
-    DollarSign,
-    Users,
-    ExternalLink,
-    TrendingUp,
-    Heart,
     Award,
+    DollarSign,
+    ExternalLink,
+    Heart,
+    TrendingUp,
+    Users,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart'
-import { Donation, StatsResult, Donor } from '@/utils/donor-drive-api-client'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import { Donation, Donor, StatsResult } from '@/utils/donor-drive-api-client'
 
 dayjs.extend(relativeTime)
 
@@ -77,10 +77,10 @@ export function DonationActivity({
         <div className='space-y-6'>
             {/* Donation Stats */}
             <div className='grid grid-cols-3 gap-4'>
-                {donationStats.map((stat, index) => (
+                {donationStats.map((stat) => (
                     <Card
-                        key={index}
                         className='border-border/50 bg-card/30 backdrop-blur-sm'
+                        key={stat.label}
                     >
                         <CardContent className='p-4'>
                             <div className='flex items-center justify-between mb-2'>
@@ -116,46 +116,46 @@ export function DonationActivity({
                 </CardHeader>
                 <CardContent>
                     <ChartContainer
+                        className='h-[150px]'
                         config={{
                             amount: {
                                 label: 'Donations',
                                 color: 'hsl(var(--chart-1))',
                             },
                         }}
-                        className='h-[150px]'
                     >
-                        <ResponsiveContainer width='100%' height='100%'>
+                        <ResponsiveContainer height='100%' width='100%'>
                             <LineChart data={donationTrend}>
                                 <XAxis
-                                    dataKey='time'
                                     axisLine={false}
-                                    tickLine={false}
+                                    dataKey='time'
                                     tick={{
                                         fill: 'hsl(var(--muted-foreground))',
                                         fontSize: 12,
                                     }}
+                                    tickLine={false}
                                 />
                                 <YAxis
                                     axisLine={false}
-                                    tickLine={false}
                                     tick={{
                                         fill: 'hsl(var(--muted-foreground))',
                                         fontSize: 12,
                                     }}
+                                    tickLine={false}
                                 />
                                 <ChartTooltip
                                     content={<ChartTooltipContent />}
                                 />
                                 <Line
-                                    type='monotone'
                                     dataKey='amount'
-                                    stroke='hsl(var(--chart-1))'
-                                    strokeWidth={2}
                                     dot={{
                                         fill: 'hsl(var(--chart-1))',
                                         strokeWidth: 2,
                                         r: 4,
                                     }}
+                                    stroke='hsl(var(--chart-1))'
+                                    strokeWidth={2}
+                                    type='monotone'
                                 />
                             </LineChart>
                         </ResponsiveContainer>
@@ -188,11 +188,11 @@ export function DonationActivity({
                         <div className='space-y-3'>
                             {recentDonations.map((donation, index) => (
                                 <div
+                                    className='flex items-center justify-between p-3 rounded-lg bg-muted/20'
                                     key={
                                         donation.donationID ||
                                         `donation-${index}`
                                     }
-                                    className='flex items-center justify-between p-3 rounded-lg bg-muted/20'
                                 >
                                     <div className='flex items-center gap-3'>
                                         <div className='h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center'>
@@ -224,9 +224,9 @@ export function DonationActivity({
 
                     <div className='pt-4 border-t border-border/50'>
                         <Button
-                            variant='outline'
                             className='w-full bg-transparent hover:bg-primary/5 border-primary/20'
                             size='sm'
+                            variant='outline'
                         >
                             <ExternalLink className='h-4 w-4 mr-2' />
                             Go to Extra Life Donations Page

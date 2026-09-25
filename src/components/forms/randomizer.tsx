@@ -1,17 +1,11 @@
 // @ts-nocheck
 'use client'
 
-import type { Randomizer } from '@/types/db'
-
-import * as z from 'zod'
-import { TrashIcon } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useFieldArray, useForm } from 'react-hook-form'
 import { useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
-import type { Id } from '@/convex/_generated/dataModel'
-
-import { Input } from '@/components/ui/input'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { TrashIcon } from 'lucide-react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import {
     Form,
@@ -21,6 +15,10 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { api } from '@/convex/_generated/api'
+import type { Id } from '@/convex/_generated/dataModel'
+import type { Randomizer } from '@/types/db'
 
 export const formSchema = z.object({
     name: z.string().min(2),
@@ -103,10 +101,10 @@ export function RandomizerForm(props: RandomizerFormProps) {
                 </h3>
                 {randomizer && (
                     <Button
-                        type='button'
-                        size='sm'
-                        variant='outline'
                         onClick={handleDelete}
+                        size='sm'
+                        type='button'
+                        variant='outline'
                     >
                         Delete {randomizer.name}
                     </Button>
@@ -114,8 +112,8 @@ export function RandomizerForm(props: RandomizerFormProps) {
             </header>
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
                     className='space-y-8'
+                    onSubmit={form.handleSubmit(onSubmit)}
                 >
                     <FormField
                         control={form.control}
@@ -139,8 +137,8 @@ export function RandomizerForm(props: RandomizerFormProps) {
                         {fields.length > 0 &&
                             fields.map((field, index) => (
                                 <div
-                                    key={field.id}
                                     className='flex gap-4 items-end'
+                                    key={field.id}
                                 >
                                     <FormField
                                         control={form.control}
@@ -192,10 +190,10 @@ export function RandomizerForm(props: RandomizerFormProps) {
                                         )}
                                     />
                                     <Button
-                                        type='button'
-                                        size='icon'
-                                        variant='outline'
                                         onClick={() => remove(index)}
+                                        size='icon'
+                                        type='button'
+                                        variant='outline'
                                     >
                                         <span className='sr-only'>Remove</span>
                                         <TrashIcon />
@@ -203,12 +201,12 @@ export function RandomizerForm(props: RandomizerFormProps) {
                                 </div>
                             ))}
                         <Button
-                            type='button'
-                            variant='outline'
+                            className='mt-4'
                             onClick={() =>
                                 append({ name: '', limit: 1, redeemed: 0 })
                             }
-                            className='mt-4'
+                            type='button'
+                            variant='outline'
                         >
                             Add Item
                         </Button>

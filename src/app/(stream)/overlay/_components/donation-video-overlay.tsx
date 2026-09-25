@@ -4,14 +4,14 @@ import { useEffect, useRef, useState } from 'react'
 
 interface Donation {
     amount: number
+    createdDateUTC: string
     displayName?: string
     message?: string
-    createdDateUTC: string
 }
 
 interface DonationVideoOverlayProps {
-    isVisible: boolean
     donation: Donation | null
+    isVisible: boolean
     onVideoEnd: () => void
 }
 
@@ -69,16 +69,16 @@ export function DonationVideoOverlay({
     return (
         <div className='fixed inset-0 z-50 bg-black'>
             <video
-                ref={videoRef}
                 className='w-full h-full object-cover'
+                muted={false} // Enable audio
                 onEnded={handleVideoEnd}
                 onError={() => {
                     console.error('Video playback error')
                     onVideoEnd()
                 }}
-                preload='auto'
                 playsInline
-                muted={false} // Enable audio
+                preload='auto'
+                ref={videoRef}
             >
                 <source src='/videos/alert.webm' type='video/webm' />
                 Your browser does not support the video tag.

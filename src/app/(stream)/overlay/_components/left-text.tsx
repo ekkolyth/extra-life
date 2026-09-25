@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useConvexQuery } from '@convex-dev/react-query'
+import { useEffect, useState } from 'react'
 import { api } from '@/convex/_generated/api'
 
 interface LeftTextProps {
@@ -54,7 +54,7 @@ interface LeftTextProps {
     }
 }
 
-export function LeftText({}: LeftTextProps) {
+export function LeftText(_props: LeftTextProps) {
     const [rotating, setRotating] = useState(false)
     const [index, setIndex] = useState(0)
 

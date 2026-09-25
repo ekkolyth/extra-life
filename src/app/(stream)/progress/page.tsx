@@ -1,14 +1,14 @@
 'use client'
 
-import styles from './progress.module.css'
-
-import { Suspense } from 'react'
-import { useDonorDrive } from '@/hooks/useDonorDrive'
-import ThermometerProgressBar from './_components/thermometer-progress-bar'
 import Image from 'next/image'
 
+import { Suspense } from 'react'
+import { useDonorDrive } from '@/hooks/use-donor-drive'
+import ThermometerProgressBar from './_components/thermometer-progress-bar'
+import styles from './progress.module.css'
+
 const ProgressContent = () => {
-    const { data: donorDriveData, isLoading, error } = useDonorDrive()
+    const { isLoading, error } = useDonorDrive()
 
     if (isLoading) {
         return (
@@ -42,18 +42,18 @@ const ProgressContent = () => {
             {/* Background image */}
             <div className={styles.backgroundImage}>
                 <Image
-                    src='/images/stream-progress.webp'
                     alt='Stream Progress Background'
-                    width={1920}
                     height={1080}
                     priority
+                    src='/images/stream-progress.webp'
                     unoptimized
+                    width={1920}
                 />
             </div>
 
             {/* Thermometer Progress Bar Container */}
             <div className={styles.thermometerContainer}>
-                <ThermometerProgressBar fillColor='#ef4444' />
+                <ThermometerProgressBar />
             </div>
         </div>
     )

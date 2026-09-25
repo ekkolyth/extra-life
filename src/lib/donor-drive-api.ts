@@ -146,5 +146,5 @@ export function clearParticipantCache(participantId: string): void {
             keysToDelete.push(key)
         }
     }
-    keysToDelete.forEach((key) => cache.delete(key))
+    for (const key of keysToDelete) cache.delete(key)
 }

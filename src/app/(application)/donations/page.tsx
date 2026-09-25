@@ -1,22 +1,22 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useConvexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { useUser } from '@clerk/nextjs'
-import { api } from '@/convex/_generated/api'
+import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { Eye, EyeOff, MoreVertical } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MoreVertical, Eye, EyeOff } from 'lucide-react'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import { api } from '@/convex/_generated/api'
 
 dayjs.extend(relativeTime)
 
@@ -177,9 +177,9 @@ export default function DonationsPage() {
                     {/* Bulk Actions */}
                     <div className='flex items-center gap-4 pb-4 border-b'>
                         <Checkbox
+                            aria-label='Select all donations'
                             checked={allSelected}
                             onCheckedChange={handleSelectAll}
-                            aria-label='Select all donations'
                         />
                         <span className='text-sm text-muted-foreground'>
                             {allSelected ? 'Deselect All' : 'Select All'}
@@ -187,19 +187,19 @@ export default function DonationsPage() {
 
                         <div className='flex gap-2 ml-auto'>
                             <Button
-                                variant='outline'
-                                size='sm'
-                                onClick={handleBulkViewed}
                                 disabled={selectedDonationIDs.size === 0}
+                                onClick={handleBulkViewed}
+                                size='sm'
+                                variant='outline'
                             >
                                 <Eye className='h-4 w-4 mr-2' />
                                 Mark Viewed
                             </Button>
                             <Button
-                                variant='outline'
-                                size='sm'
-                                onClick={handleBulkUnviewed}
                                 disabled={selectedDonationIDs.size === 0}
+                                onClick={handleBulkUnviewed}
+                                size='sm'
+                                variant='outline'
                             >
                                 <EyeOff className='h-4 w-4 mr-2' />
                                 Mark Unviewed
@@ -217,32 +217,32 @@ export default function DonationsPage() {
 
                             return (
                                 <div
-                                    key={donation.donationID}
                                     className={`flex items-center gap-4 p-4 rounded-lg border transition-all ${
                                         isViewed
                                             ? 'opacity-50 bg-muted/30'
                                             : 'bg-card hover:bg-accent/5'
                                     }`}
+                                    key={donation.donationID}
                                 >
                                     {/* Checkbox */}
                                     <Checkbox
+                                        aria-label={`Select donation from ${donation.displayName || 'Anonymous'}`}
                                         checked={isSelected}
                                         onCheckedChange={() =>
                                             handleToggleSelection(
                                                 donation.donationID
                                             )
                                         }
-                                        aria-label={`Select donation from ${donation.displayName || 'Anonymous'}`}
                                     />
 
                                     {/* Avatar */}
                                     <Avatar className='h-10 w-10'>
                                         <AvatarImage
-                                            src={donation.avatarImageURL}
                                             alt={
                                                 donation.displayName ||
                                                 'Anonymous'
                                             }
+                                            src={donation.avatarImageURL}
                                         />
                                         <AvatarFallback>
                                             {(donation.displayName || 'A')
@@ -277,7 +277,7 @@ export default function DonationsPage() {
                                     {/* 3-dot Menu */}
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant='ghost' size='icon'>
+                                            <Button size='icon' variant='ghost'>
                                                 <MoreVertical className='h-4 w-4' />
                                                 <span className='sr-only'>
                                                     Open menu

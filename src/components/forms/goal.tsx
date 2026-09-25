@@ -1,16 +1,12 @@
 'use client'
 
-import * as z from 'zod'
-import { DollarSignIcon } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
 import { useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
-import type { Id } from '@/convex/_generated/dataModel'
-
-import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { DollarSignIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 import { Button } from '@/components/ui/button'
+import { DialogClose } from '@/components/ui/dialog'
 import {
     Form,
     FormControl,
@@ -19,7 +15,10 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
-import { DialogClose } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
+import { api } from '@/convex/_generated/api'
+import type { Id } from '@/convex/_generated/dataModel'
 
 const formSchema = z.object({
     id: z.string().optional(),
@@ -77,7 +76,7 @@ export function GoalForm(props: GoalFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+            <form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>
                 {defaultValues?.id && (
                     <FormField
                         control={form.control}
@@ -101,8 +100,8 @@ export function GoalForm(props: GoalFormProps) {
                             </FormLabel>
                             <FormControl>
                                 <Input
-                                    placeholder='Eat Shit'
                                     className='text-base'
+                                    placeholder='Eat Shit'
                                     {...field}
                                 />
                             </FormControl>
@@ -122,9 +121,9 @@ export function GoalForm(props: GoalFormProps) {
                                 <DollarSignIcon className='h-5 w-5' />
                                 <FormControl>
                                     <Input
-                                        type='number'
-                                        step={0.01}
                                         className='text-base'
+                                        step={0.01}
+                                        type='number'
                                         {...field}
                                         onChange={(e) =>
                                             field.onChange(
@@ -151,8 +150,8 @@ export function GoalForm(props: GoalFormProps) {
                             <FormControl>
                                 <Switch
                                     checked={value}
-                                    onCheckedChange={onChange}
                                     name={name}
+                                    onCheckedChange={onChange}
                                 />
                             </FormControl>
                         </FormItem>
@@ -160,10 +159,10 @@ export function GoalForm(props: GoalFormProps) {
                 />
                 <DialogClose asChild>
                     <Button
-                        type='submit'
-                        variant='outline'
                         className='text-base'
                         size='lg'
+                        type='submit'
+                        variant='outline'
                     >
                         Submit
                     </Button>

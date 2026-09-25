@@ -1,12 +1,10 @@
 'use client'
 
-import type { Goal } from '@/types/db'
+import { useConvexMutation } from '@convex-dev/react-query'
 
 import { PencilIcon, TrashIcon } from 'lucide-react'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
-
 import { GoalForm } from '@/components/forms/goal'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -15,8 +13,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
+import { api } from '@/convex/_generated/api'
+import type { Goal } from '@/types/db'
 import { USDollar } from '@/utils/currency'
-import { Badge } from '@/components/ui/badge'
 
 // Component for the actions column to properly use React hooks
 function GoalActions({ goal }: { goal: Goal }) {
@@ -34,7 +33,7 @@ function GoalActions({ goal }: { goal: Goal }) {
         <div className='flex justify-end gap-4'>
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button variant='outline' size='icon'>
+                    <Button size='icon' variant='outline'>
                         <span className='sr-only'>Edit</span>
                         <PencilIcon />
                     </Button>
@@ -48,7 +47,7 @@ function GoalActions({ goal }: { goal: Goal }) {
                     <GoalForm defaultValues={goal} />
                 </DialogContent>
             </Dialog>
-            <Button variant='outline' size='icon' onClick={handleDelete}>
+            <Button onClick={handleDelete} size='icon' variant='outline'>
                 <span className='sr-only'>Delete</span>
                 <TrashIcon />
             </Button>

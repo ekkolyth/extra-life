@@ -1,10 +1,10 @@
 'use client'
 
+import { BanknoteIcon, DollarSign, Trophy, Users } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { DollarSign, Users, BanknoteIcon, Trophy } from 'lucide-react'
-import type { Donor } from '@/utils/donor-drive-api-client'
 import type { Goal } from '@/types/db'
+import type { Donor } from '@/utils/donor-drive-api-client'
 
 // Loading component for individual values
 function LoadingValue({ className = 'h-8 w-24' }: { className?: string }) {
@@ -18,9 +18,9 @@ interface OverviewProps {
         numIncentives: number
         numMilestones: number
     }
-    topDonor?: Donor | null
     goals?: Goal[]
     isLoading?: boolean
+    topDonor?: Donor | null
 }
 
 export function Overview({
@@ -88,8 +88,8 @@ export function Overview({
                                 <LoadingValue className='h-2 w-full' />
                             ) : (
                                 <Progress
-                                    value={progressPercentage}
                                     className='h-2'
+                                    value={progressPercentage}
                                 />
                             )}
                             <div className='flex justify-between text-sm'>
@@ -243,8 +243,8 @@ export function Overview({
                                 <LoadingValue className='h-2 w-full' />
                             ) : (
                                 <Progress
-                                    value={progressToNext}
                                     className='h-2'
+                                    value={progressToNext}
                                 />
                             )}
                             {isLoading ? (

@@ -16,17 +16,17 @@ export default function RootLayout({
 }>) {
     return (
         <html
-            lang='en'
             className='h-full'
-            suppressHydrationWarning
+            lang='en'
             style={
                 { '--font-satoshi': '"Satoshi", sans-serif' } as CSSProperties
             }
+            suppressHydrationWarning
         >
             <head>
                 <link
-                    rel='stylesheet'
                     href='https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap'
+                    rel='stylesheet'
                 />
             </head>
             <body className='flex min-h-full flex-col antialiased font-sans'>

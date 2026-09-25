@@ -1,8 +1,9 @@
 'use client'
 
+import { useConvexQuery } from '@convex-dev/react-query'
+import { GoalForm } from '@/components/forms/goal'
+import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table'
-import { columns } from './columns'
-import type { Goal } from '@/types/db'
 import {
     Dialog,
     DialogContent,
@@ -10,10 +11,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
-import { GoalForm } from '@/components/forms/goal'
-import { Button } from '@/components/ui/button'
-import { useConvexQuery } from '@convex-dev/react-query'
 import { api } from '@/convex/_generated/api'
+import type { Goal } from '@/types/db'
+import { columns } from './columns'
 
 export default function GoalsPage() {
     const convexGoals = useConvexQuery(api.goals.list, {}) || []
@@ -32,8 +32,8 @@ export default function GoalsPage() {
                 <DialogTrigger asChild>
                     <Button
                         className='self-end text-base'
-                        variant='outline'
                         size='lg'
+                        variant='outline'
                     >
                         Create Goal
                     </Button>

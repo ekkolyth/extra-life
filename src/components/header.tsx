@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import { ModeToggle } from '@/components/mode-toggle'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { BarChart3 } from 'lucide-react'
+import { ModeToggle } from '@/components/mode-toggle'
+import { Button } from '@/components/ui/button'
 
 export function Header() {
     return (
@@ -19,8 +19,8 @@ export function Header() {
                     <UserButton>
                         <UserButton.MenuItems>
                             <UserButton.Link
-                                label='Dashboard'
                                 href='/dashboard'
+                                label='Dashboard'
                                 labelIcon={<BarChart3 className='size-4' />}
                             />
                         </UserButton.MenuItems>

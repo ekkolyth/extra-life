@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useConvexQuery } from '@convex-dev/react-query'
+import { useEffect, useState } from 'react'
 import { api } from '@/convex/_generated/api'
 
 interface RandomizerProps {

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
     clearCache,
-    clearRateLimit,
     clearParticipantCache,
+    clearRateLimit,
 } from '@/lib/donor-drive-api'
 
 export async function DELETE(request: NextRequest) {

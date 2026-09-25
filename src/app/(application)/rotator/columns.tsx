@@ -1,11 +1,8 @@
 'use client'
 
-import type { Rotator } from '@/types/db'
+import { useConvexMutation } from '@convex-dev/react-query'
 
 import { PencilIcon, TrashIcon } from 'lucide-react'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
-
 import { RotatorForm } from '@/components/forms/rotator'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +12,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
+import { api } from '@/convex/_generated/api'
+import type { Rotator } from '@/types/db'
 
 // Component for the actions column to properly use React hooks
 function RotatorActions({ rotator }: { rotator: Rotator }) {
@@ -32,7 +31,7 @@ function RotatorActions({ rotator }: { rotator: Rotator }) {
         <div className='flex justify-end gap-4'>
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button variant='outline' size='icon'>
+                    <Button size='icon' variant='outline'>
                         <span className='sr-only'>Edit</span>
                         <PencilIcon />
                     </Button>
@@ -46,7 +45,7 @@ function RotatorActions({ rotator }: { rotator: Rotator }) {
                     <RotatorForm defaultValues={rotator} />
                 </DialogContent>
             </Dialog>
-            <Button variant='outline' size='icon' onClick={handleDelete}>
+            <Button onClick={handleDelete} size='icon' variant='outline'>
                 <span className='sr-only'>Delete</span>
                 <TrashIcon />
             </Button>

@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Donation {
     amount: number
     createdDateUTC: string
-    donationID?: string
     displayName?: string
+    donationID?: string
     message?: string
 }
 
@@ -39,8 +39,8 @@ export function useDonationVideoTrigger({
         // Get current donation IDs
         const currentDonationIds = new Set(
             latestDonations
-                .filter((d) => d.donationID)
-                .map((d) => d.donationID!)
+                .map((d) => d.donationID)
+                .filter((id): id is string => Boolean(id))
         )
 
         // Find new donations that weren't in the previous set
