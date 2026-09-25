@@ -1,3 +1,3 @@
 export const appConfig = {
-  streamStart: '10:00',
-};
+    streamStart: '10:00',
+}
