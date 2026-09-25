@@ -1,0 +1,12 @@
+{
+    "$schema": "https://misojs.dev/miso.schema.json",
+    "scripts": "./scripts",
+    "repo": {
+        "mode": "miso",
+        "tasks": {
+            "dev": {
+                "concurrent": ["dev:convex", "dev:next"]
+            }
+        }
+    }
+}

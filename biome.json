@@ -34,8 +34,8 @@
             "!**/_generated",
             "!.claude/skills/",
             "!projects/dex/src/lib/gql/graphql.ts",
-            "!**/testdata/contracts/**",
-            "!packages/auth/contracts/**"
+            "!**/testdata/contracts",
+            "!packages/auth/contracts"
         ]
     },
     "formatter": {
