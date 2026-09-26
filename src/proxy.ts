@@ -1,6 +1,22 @@
-import { clerkMiddleware } from '@clerk/nextjs/server'
+import {
+    clerkClient,
+    clerkMiddleware,
+    createRouteMatcher,
+} from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+import { ADMIN_USERNAME } from '@/convex/lib/admin'
 
-export default clerkMiddleware()
+const isDebugRoute = createRouteMatcher(['/debug(.*)'])
+
+export default clerkMiddleware(async (auth, req) => {
+    if (!isDebugRoute(req)) return
+    const { userId } = await auth()
+    if (userId) {
+        const user = await (await clerkClient()).users.getUser(userId)
+        if (user.username === ADMIN_USERNAME) return
+    }
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+})
 
 export const config = {
     matcher: [

@@ -1,6 +1,11 @@
 'use client'
 
-import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
+import {
+    convexQuery,
+    useConvexAction,
+    useConvexMutation,
+} from '@convex-dev/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import {
     ChevronDownIcon,
@@ -14,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { JSONViewer } from '@/components/ui/json-viewer'
+import { Label } from '@/components/ui/label'
 import {
     Select,
     SelectContent,
@@ -21,6 +27,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import {
     Table,
     TableBody,
@@ -30,20 +37,24 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { api } from '@/convex/_generated/api'
-import {
-    fetchParticipantData,
-    fetchRealTimeData,
-    useDonorDriveDebug,
-    useLastApiCallInfo,
-    useUpdateLastApiCall,
-} from '@/utils/donor-drive-api-client'
 
 export default function DebugPage() {
-    const debugData = useConvexQuery(api.donorDriveDebug.list, {})
-    const clearDebug = useConvexMutation(api.donorDriveDebug.clear)
-    const debugMutation = useDonorDriveDebug()
-    const lastApiCallInfo = useLastApiCallInfo()
-    const updateLastApiCall = useUpdateLastApiCall()
+    const { data: debugData } = useQuery(
+        convexQuery(api.donorDriveDebug.list, {})
+    )
+    const clearDebug = useMutation({
+        mutationFn: useConvexMutation(api.donorDriveDebug.clear),
+    })
+    const { data: lastApiCallInfo } = useQuery(
+        convexQuery(api.apiMetadata.getLastApiCall, {})
+    )
+    const { data: campaign } = useQuery(convexQuery(api.campaigns.active, {}))
+    const setLivePolling = useMutation({
+        mutationFn: useConvexMutation(api.sync.setLivePolling),
+    })
+    const forceRun = useMutation({
+        mutationFn: useConvexAction(api.sync.forceRun),
+    })
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
     const [isRefreshing] = useState(false)
     const [isForcingAPI, setIsForcingAPI] = useState(false)
@@ -90,7 +101,7 @@ export default function DebugPage() {
 
     const handleClear = async () => {
         try {
-            await clearDebug()
+            await clearDebug.mutateAsync({})
         } catch (error) {
             console.error('Failed to clear debug data:', error)
         }
@@ -116,33 +127,19 @@ export default function DebugPage() {
         }
 
         try {
-            // Force fresh API calls by clearing all cache
-            await fetch('/api/donor-drive/cache?action=all', {
-                method: 'DELETE',
-            })
             console.log('🚀 Forcing fresh API calls...')
 
-            // Force static data call
-            const staticResult = await fetchParticipantData(
-                donorDriveId,
-                updateLastApiCall,
-                debugMutation
-            )
-
-            // Force real-time data call
-            const realTimeResult = await fetchRealTimeData(
-                donorDriveId,
-                debugMutation,
-                updateLastApiCall,
-                lastApiCallInfo
-            )
+            const result = await forceRun.mutateAsync({})
 
             // Combine results for display
             const combinedPayload = {
                 timestamp: new Date().toISOString(),
                 participantId: donorDriveId,
-                staticData: staticResult,
-                realTimeData: realTimeResult,
+                staticData: result.participant,
+                realTimeData: {
+                    latestDonations: result.latestDonations,
+                    topDonor: result.topDonor,
+                },
                 note: 'This payload shows all data returned from Extra Life API calls',
             }
 
@@ -213,6 +210,17 @@ export default function DebugPage() {
                         </div>
                     </div>
                     <div className='flex gap-3'>
+                        <div className='flex items-center gap-2'>
+                            <Switch
+                                checked={campaign?.livePolling ?? false}
+                                disabled={!campaign || setLivePolling.isPending}
+                                id='live-polling'
+                                onCheckedChange={(enabled) =>
+                                    setLivePolling.mutate({ enabled })
+                                }
+                            />
+                            <Label htmlFor='live-polling'>Live polling</Label>
+                        </div>
                         <Button
                             className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
                             onClick={handleTestVideo}

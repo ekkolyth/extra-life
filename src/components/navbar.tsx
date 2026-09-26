@@ -1,5 +1,6 @@
 'use client'
 
+import { useUser } from '@clerk/nextjs'
 import {
     ArrowLeftRight,
     BarChart3,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ADMIN_USERNAME } from '@/convex/lib/admin'
 import { cn } from '@/lib/utils'
 
 const navigationItems = [
@@ -89,6 +91,11 @@ const resources = [
 
 export function Sidebar() {
     const pathname = usePathname()
+    const { user } = useUser()
+    const isAdmin = user?.username === ADMIN_USERNAME
+    const visibleTools = tools.filter(
+        (item) => item.name !== 'Debug' || isAdmin
+    )
 
     return (
         <div className='flex h-full w-64 flex-col border-r border-zinc-900 bg-background'>
@@ -143,7 +150,7 @@ export function Sidebar() {
                     Tools
                 </h3>
                 <ul className='space-y-2'>
-                    {tools.map((item) => (
+                    {visibleTools.map((item) => (
                         <li key={item.name}>
                             <Link
                                 className='flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary'
