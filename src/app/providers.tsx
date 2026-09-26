@@ -2,6 +2,7 @@
 
 import { ClerkProvider as ClerkNextJSProvider, useAuth } from '@clerk/nextjs'
 import { shadcn } from '@clerk/themes'
+import { ConvexQueryClient } from '@convex-dev/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ConvexReactClient } from 'convex/react'
@@ -53,17 +54,21 @@ function ConvexClientProvider({ children }: { children: ReactNode }) {
 
 // Query Client Provider Component
 function QueryClientProviderWrapper({ children }: { children: ReactNode }) {
-    const [queryClient] = useState(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: {
-                        staleTime: 60 * 1000, // 1 minute
-                        refetchOnWindowFocus: false,
-                    },
+    const [queryClient] = useState(() => {
+        const convexQueryClient = new ConvexQueryClient(convex)
+        const client = new QueryClient({
+            defaultOptions: {
+                queries: {
+                    queryKeyHashFn: convexQueryClient.hashFn(),
+                    queryFn: convexQueryClient.queryFn(),
+                    staleTime: 60 * 1000, // 1 minute
+                    refetchOnWindowFocus: false,
                 },
-            })
-    )
+            },
+        })
+        convexQueryClient.connect(client)
+        return client
+    })
 
     return (
         <QueryClientProvider client={queryClient}>

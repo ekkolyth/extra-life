@@ -10,8 +10,10 @@
 
 import type * as apiMetadata from "../apiMetadata.js";
 import type * as campaigns from "../campaigns.js";
+import type * as donations from "../donations.js";
 import type * as donorDriveDebug from "../donorDriveDebug.js";
 import type * as donor_drive_validators from "../donor_drive_validators.js";
+import type * as donors from "../donors.js";
 import type * as goals from "../goals.js";
 import type * as lib_admin from "../lib/admin.js";
 import type * as lib_donordrive from "../lib/donordrive.js";
@@ -46,8 +48,10 @@ import type {
 declare const fullApi: ApiFromModules<{
   apiMetadata: typeof apiMetadata;
   campaigns: typeof campaigns;
+  donations: typeof donations;
   donorDriveDebug: typeof donorDriveDebug;
   donor_drive_validators: typeof donor_drive_validators;
+  donors: typeof donors;
   goals: typeof goals;
   "lib/admin": typeof lib_admin;
   "lib/donordrive": typeof lib_donordrive;
