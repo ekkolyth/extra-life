@@ -3,14 +3,14 @@
 import Image from 'next/image'
 
 import { Suspense } from 'react'
-import { useDonorDrive } from '@/hooks/use-donor-drive'
+import { useCampaign } from '@/hooks/use-campaign'
 import ThermometerProgressBar from './_components/thermometer-progress-bar'
 import styles from './progress.module.css'
 
 const ProgressContent = () => {
-    const { isLoading, error } = useDonorDrive()
+    const { isPending, error } = useCampaign()
 
-    if (isLoading) {
+    if (isPending) {
         return (
             <div className={styles.loading}>
                 <div className={styles.loadingText}>

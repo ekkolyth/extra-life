@@ -1,13 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import type { Donation as FullDonation } from '@/types/donor-drive'
 
-interface Donation {
-    amount: number
-    createdDateUTC: string
-    displayName?: string
-    message?: string
-}
+type Donation = Pick<
+    FullDonation,
+    'amount' | 'createdAt' | 'displayName' | 'message'
+>
 
 interface DonationVideoOverlayProps {
     donation: Donation | null

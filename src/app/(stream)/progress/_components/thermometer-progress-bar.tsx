@@ -1,7 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
-import { useDonorDrive } from '@/hooks/use-donor-drive'
+import { useCampaign } from '@/hooks/use-campaign'
 
 type ThermometerProgressBarProps = {
     style?: CSSProperties
@@ -12,9 +12,9 @@ export default function ThermometerProgressBar({
     style,
     className,
 }: ThermometerProgressBarProps) {
-    const { data: donorDriveData, isLoading, error } = useDonorDrive()
+    const { data: campaign, isPending, error } = useCampaign()
 
-    if (isLoading || error) {
+    if (isPending || error) {
         return null // Don't show anything while loading or on error
     }
 
@@ -32,14 +32,14 @@ export default function ThermometerProgressBar({
     )
     console.log(
         '[ThermometerProgressBar] real donations:',
-        donorDriveData?.sumDonations
+        campaign?.sumDonations
     )
 
     // Use override value if available, otherwise use real donations
     const donations =
         overrideDonations !== null && !Number.isNaN(overrideDonations)
             ? overrideDonations
-            : (donorDriveData?.sumDonations ?? 0)
+            : (campaign?.sumDonations ?? 0)
 
     console.log('[ThermometerProgressBar] final donations value:', donations)
 

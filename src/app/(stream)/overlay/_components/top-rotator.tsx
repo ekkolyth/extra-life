@@ -1,58 +1,13 @@
 'use client'
 
 import type { Goal } from '@/types/db'
+import type { OverlayData } from '@/types/donor-drive'
 import { ControllerIcon } from '../../../../../public/icons/controller'
 import { LeftText } from './left-text'
 import { RightText } from './right-text'
 
 interface TopRotatorProps {
-    data: {
-        displayName: string
-        fundraisingGoal: number
-        eventName: string
-        links: { donate: string; page: string; stream: string }
-        streamIsEnabled: boolean
-        streamingChannel: string
-        streamingPlatform: string
-        avatarImageURL: string
-        participantID: number
-        teamName: string
-        isTeamCaptain: boolean
-        isTeamCoCaptain: boolean
-        role: string
-        hasActivityTracking: boolean
-        numIncentives: number
-        numMilestones: number
-        sumDonations: number
-        sumPledges: number
-        numDonations: number
-        streamIsLive: boolean
-        latestDonations: Array<{
-            amount: number
-            avatarImageURL?: string
-            createdDateUTC?: string
-            donationID?: string
-            displayName?: string
-            donorID?: string
-            eventID?: number
-            isRegFee?: boolean
-            message?: string
-            modifiedDateUTC?: string
-            participantID?: number
-            recipientImageURL?: string
-            recipientName?: string
-            teamID?: number
-        }>
-        topDonor: {
-            displayName?: string
-            donorID?: string
-            avatarImageURL: string
-            modifiedDateUTC: string
-            sumDonations: number
-            numDonations: number
-            recipientImageURL?: string
-        } | null
-    }
+    data: OverlayData
     goals: Goal[]
 }
 

@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-
-interface Donation {
-    amount: number
-    createdDateUTC: string
-    displayName?: string
-    donationID?: string
-    message?: string
-}
+import type { Donation } from '@/types/donor-drive'
 
 interface UseDonationVideoTriggerProps {
     latestDonations: Donation[]
@@ -38,22 +31,17 @@ export function useDonationVideoTrigger({
 
         // Get current donation IDs
         const currentDonationIds = new Set(
-            latestDonations
-                .map((d) => d.donationID)
-                .filter((id): id is string => Boolean(id))
+            latestDonations.map((d) => d.donationID)
         )
 
         // Find new donations that weren't in the previous set
-        const newDonations = latestDonations.filter((donation) => {
-            const donationId =
-                donation.donationID ||
-                `${donation.amount}-${donation.createdDateUTC}`
-            return !previousDonationsRef.current.has(donationId)
-        })
+        const newDonations = latestDonations.filter(
+            (donation) => !previousDonationsRef.current.has(donation.donationID)
+        )
 
         // Check for qualifying donations within the time window
         const qualifyingDonations = newDonations.filter((donation) => {
-            const donationTime = new Date(donation.createdDateUTC).getTime()
+            const donationTime = donation.createdAt
             const timeSinceDonation = now - donationTime
 
             return (

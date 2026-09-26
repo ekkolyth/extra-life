@@ -4,8 +4,11 @@ import { useConvexQuery } from '@convex-dev/react-query'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import { api } from '@/convex/_generated/api'
+import { useCampaign } from '@/hooks/use-campaign'
 import { useDonationVideoTrigger } from '@/hooks/use-donation-video-trigger'
-import { useDonorDrive } from '@/hooks/use-donor-drive'
+import { useLatestDonations } from '@/hooks/use-donations'
+import { useTopDonor } from '@/hooks/use-top-donor'
+import type { OverlayData } from '@/types/donor-drive'
 import { DonationVideoOverlay } from './_components/donation-video-overlay'
 import ProgressBar from './_components/progress-bar'
 import { Randomizer } from './_components/randomizer'
@@ -18,58 +21,14 @@ const OverlayContent = () => {
 
     const [confetti, setConfetti] = useState(false)
 
-    // DonorDrive data
-    const { data: donorDriveData, isLoading, error } = useDonorDrive()
+    const { data: campaign, isPending, error } = useCampaign()
+    const { data: latestDonations = [] } = useLatestDonations(10)
+    const { data: topDonor = null } = useTopDonor()
 
-    const combinedData = donorDriveData
-        ? {
-              displayName: donorDriveData.displayName || 'Loading...',
-              fundraisingGoal: donorDriveData.fundraisingGoal || 2000,
-              eventName: donorDriveData.eventName || 'Demo Event',
-              links: { donate: '', page: '', stream: '' },
-              streamIsEnabled: donorDriveData.streamIsEnabled || false,
-              streamingChannel: donorDriveData.streamingChannel || '',
-              streamingPlatform: donorDriveData.streamingPlatform || '',
-              avatarImageURL: donorDriveData.avatarImageURL || '',
-              participantID: 0,
-              teamName: '',
-              isTeamCaptain: false,
-              isTeamCoCaptain: false,
-              role: '',
-              hasActivityTracking: false,
-              numIncentives: 0,
-              numMilestones: 0,
-              sumDonations: donorDriveData.sumDonations || 0,
-              sumPledges: donorDriveData.sumPledges || 0,
-              numDonations: donorDriveData.numDonations || 0,
-              streamIsLive: donorDriveData.streamIsLive || false,
-              latestDonations: donorDriveData.latestDonations || [],
-              topDonor: donorDriveData.topDonor || null,
-          }
-        : {
-              displayName: 'Loading...',
-              fundraisingGoal: 2000,
-              eventName: 'Demo Event',
-              links: { donate: '', page: '', stream: '' },
-              streamIsEnabled: false,
-              streamingChannel: '',
-              streamingPlatform: '',
-              avatarImageURL: '',
-              participantID: 0,
-              teamName: '',
-              isTeamCaptain: false,
-              isTeamCoCaptain: false,
-              role: '',
-              hasActivityTracking: false,
-              numIncentives: 0,
-              numMilestones: 0,
-              sumDonations: 0,
-              sumPledges: 0,
-              numDonations: 0,
-              streamIsLive: false,
-              latestDonations: [],
-              topDonor: null,
-          }
+    const sumDonations = campaign?.sumDonations ?? 0
+    const fundraisingGoal = campaign?.fundraisingGoal || 2000
+
+    const overlayData: OverlayData = { sumDonations, latestDonations, topDonor }
 
     // Goals from Convex
     const convexGoals = useConvexQuery(api.goals.list, {})
@@ -87,7 +46,7 @@ const OverlayContent = () => {
     // Big-donation video trigger
     const { shouldPlayVideo, currentDonation, handleVideoEnd } =
         useDonationVideoTrigger({
-            latestDonations: combinedData.latestDonations,
+            latestDonations,
             threshold: 100,
             timeWindowSeconds: 15,
         })
@@ -108,16 +67,15 @@ const OverlayContent = () => {
 
     // Confetti when >= 100%
     useEffect(() => {
-        const pct =
-            (combinedData.sumDonations / combinedData.fundraisingGoal) * 100
+        const pct = (sumDonations / fundraisingGoal) * 100
         if (pct >= 100 && !confetti) {
             setConfetti(true)
             const t = setTimeout(() => setConfetti(false), 30000)
             return () => clearTimeout(t)
         }
-    }, [combinedData.sumDonations, combinedData.fundraisingGoal, confetti])
+    }, [sumDonations, fundraisingGoal, confetti])
 
-    if (isLoading) {
+    if (isPending) {
         return (
             <div className={styles.loading}>
                 <div className={styles.loadingText}>
@@ -159,7 +117,7 @@ const OverlayContent = () => {
                     amount: 250.0,
                     displayName: 'Anonymous',
                     message: 'For the kids!',
-                    createdDateUTC: new Date().toISOString(),
+                    createdAt: Date.now(),
                 }}
                 isVisible={showTestVideo}
                 onVideoEnd={() => setShowTestVideo(false)}
@@ -171,7 +129,7 @@ const OverlayContent = () => {
             {/* Top Rotator */}
             {!limited && (
                 <div className={styles.topRotatorWrap}>
-                    <TopRotator data={combinedData} goals={goals} />
+                    <TopRotator data={overlayData} goals={goals} />
                 </div>
             )}
 

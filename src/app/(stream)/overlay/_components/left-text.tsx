@@ -3,55 +3,10 @@
 import { useConvexQuery } from '@convex-dev/react-query'
 import { useEffect, useState } from 'react'
 import { api } from '@/convex/_generated/api'
+import type { OverlayData } from '@/types/donor-drive'
 
 interface LeftTextProps {
-    data: {
-        displayName: string
-        fundraisingGoal: number
-        eventName: string
-        links: { donate: string; page: string; stream: string }
-        streamIsEnabled: boolean
-        streamingChannel: string
-        streamingPlatform: string
-        avatarImageURL: string
-        participantID: number
-        teamName: string
-        isTeamCaptain: boolean
-        isTeamCoCaptain: boolean
-        role: string
-        hasActivityTracking: boolean
-        numIncentives: number
-        numMilestones: number
-        sumDonations: number
-        sumPledges: number
-        numDonations: number
-        streamIsLive: boolean
-        latestDonations: Array<{
-            amount: number
-            avatarImageURL?: string
-            createdDateUTC?: string
-            donationID?: string
-            displayName?: string
-            donorID?: string
-            eventID?: number
-            isRegFee?: boolean
-            message?: string
-            modifiedDateUTC?: string
-            participantID?: number
-            recipientImageURL?: string
-            recipientName?: string
-            teamID?: number
-        }>
-        topDonor: {
-            displayName?: string
-            donorID?: string
-            avatarImageURL: string
-            modifiedDateUTC: string
-            sumDonations: number
-            numDonations: number
-            recipientImageURL?: string
-        } | null
-    }
+    data: OverlayData
 }
 
 export function LeftText(_props: LeftTextProps) {

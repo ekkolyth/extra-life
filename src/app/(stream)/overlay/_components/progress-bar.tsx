@@ -1,7 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
-import { useDonorDrive } from '@/hooks/use-donor-drive'
+import { useCampaign } from '@/hooks/use-campaign'
 
 type ProgressBarProps = {
     trackColor?: string
@@ -26,9 +26,9 @@ export default function ProgressBar({
     style,
     className,
 }: ProgressBarProps) {
-    const { data: donorDriveData, isLoading, error } = useDonorDrive()
+    const { data: campaign, isPending, error } = useCampaign()
 
-    if (isLoading) {
+    if (isPending) {
         return (
             <div
                 className={className}
@@ -56,8 +56,8 @@ export default function ProgressBar({
         )
     }
 
-    const donations = donorDriveData?.sumDonations ?? 0
-    const goal = donorDriveData?.fundraisingGoal ?? 2000
+    const donations = campaign?.sumDonations ?? 0
+    const goal = campaign?.fundraisingGoal ?? 2000
     const pct = Math.max(0, Math.min(100, (donations / goal) * 100 || 0))
 
     return (
