@@ -4,7 +4,7 @@ import { BanknoteIcon, DollarSign, Trophy, Users } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type { Goal } from '@/types/db'
-import type { Donor } from '@/utils/donor-drive-api-client'
+import type { Donor } from '@/types/donor-drive'
 
 // Loading component for individual values
 function LoadingValue({ className = 'h-8 w-24' }: { className?: string }) {
@@ -15,8 +15,6 @@ interface OverviewProps {
         sumDonations: number
         fundraisingGoal: number
         numDonations: number
-        numIncentives: number
-        numMilestones: number
     }
     goals?: Goal[]
     isLoading?: boolean

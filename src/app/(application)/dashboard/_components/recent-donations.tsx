@@ -5,7 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { DollarSign } from 'lucide-react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Donation } from '@/utils/donor-drive-api-client'
+import type { Donation } from '@/types/donor-drive'
 
 dayjs.extend(relativeTime)
 
@@ -92,13 +92,9 @@ export function RecentDonations({
                                     <p className='text-sm font-medium text-foreground'>
                                         {donation.displayName || 'Anonymous'}
                                     </p>
-                                    {donation.createdDateUTC && (
-                                        <p className='text-xs text-muted-foreground'>
-                                            {dayjs(
-                                                donation.createdDateUTC
-                                            ).fromNow()}
-                                        </p>
-                                    )}
+                                    <p className='text-xs text-muted-foreground'>
+                                        {dayjs(donation.createdAt).fromNow()}
+                                    </p>
                                 </div>
                             </div>
                             <span className='text-base font-bold text-primary'>

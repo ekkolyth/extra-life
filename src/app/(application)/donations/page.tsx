@@ -17,18 +17,18 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { api } from '@/convex/_generated/api'
+import { useCampaign } from '@/hooks/use-campaign'
+import { useAllDonations } from '@/hooks/use-donations'
 
 dayjs.extend(relativeTime)
 
 export default function DonationsPage() {
     const { user } = useUser()
-    const participantId = process.env.NEXT_PUBLIC_DONORDRIVE_ID
 
-    // Fetch all donations from Convex
-    const allDonations = useConvexQuery(
-        api.donorDriveData.getAllDonations,
-        participantId ? { participantId } : 'skip'
-    )
+    // triggers the sync pull like every other donor-data page
+    useCampaign()
+
+    const { data: allDonations } = useAllDonations()
 
     // Fetch viewed donations for current user
     const viewedDonationIDs = useConvexQuery(
@@ -162,7 +162,7 @@ export default function DonationsPage() {
     if (allDonations) {
         allDonations.forEach((d, i) => {
             console.log(
-                `  ${i + 1}. ID=${d.donationID}, Amount=$${d.amount}, Date=${d.createdDateUTC}`
+                `  ${i + 1}. ID=${d.donationID}, Amount=$${d.amount}, Date=${d.createdAt}`
             )
         })
     }
@@ -269,7 +269,7 @@ export default function DonationsPage() {
                                         )}
                                         <p className='text-xs text-muted-foreground mt-1'>
                                             {dayjs(
-                                                donation.createdDateUTC
+                                                donation.createdAt
                                             ).fromNow()}
                                         </p>
                                     </div>

@@ -18,12 +18,12 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart'
-import { Donation, Donor, StatsResult } from '@/utils/donor-drive-api-client'
+import type { Campaign, Donation, Donor } from '@/types/donor-drive'
 
 dayjs.extend(relativeTime)
 
 interface DonationActivityProps {
-    data: StatsResult
+    data: Campaign
     donations: Donation[]
     topDonor: Donor
 }
@@ -209,7 +209,7 @@ export function DonationActivity({
                                             </p>
                                             <p className='text-xs text-muted-foreground'>
                                                 {dayjs(
-                                                    donation.createdDateUTC
+                                                    donation.createdAt
                                                 ).fromNow()}
                                             </p>
                                         </div>
