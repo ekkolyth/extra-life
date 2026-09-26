@@ -80,6 +80,54 @@ describe('getDonorDrive', () => {
         })
     })
 
+    test('rate-limited with a negative Retry-After defaults to 300000ms', async () => {
+        const fetchImpl: FetchLike = async () =>
+            new Response(null, {
+                status: 429,
+                headers: { 'Retry-After': '-5' },
+            })
+
+        const result = await getDonorDrive('/x', {}, undefined, fetchImpl)
+
+        expect(result).toEqual({
+            kind: 'rate-limited',
+            status: 429,
+            retryAfterMs: 300000,
+        })
+    })
+
+    test('rate-limited with a non-numeric Retry-After defaults to 300000ms', async () => {
+        const fetchImpl: FetchLike = async () =>
+            new Response(null, {
+                status: 429,
+                headers: { 'Retry-After': 'abc' },
+            })
+
+        const result = await getDonorDrive('/x', {}, undefined, fetchImpl)
+
+        expect(result).toEqual({
+            kind: 'rate-limited',
+            status: 429,
+            retryAfterMs: 300000,
+        })
+    })
+
+    test('rate-limited with a zero Retry-After honours it', async () => {
+        const fetchImpl: FetchLike = async () =>
+            new Response(null, {
+                status: 429,
+                headers: { 'Retry-After': '0' },
+            })
+
+        const result = await getDonorDrive('/x', {}, undefined, fetchImpl)
+
+        expect(result).toEqual({
+            kind: 'rate-limited',
+            status: 429,
+            retryAfterMs: 0,
+        })
+    })
+
     test('500 returns an error with a fixed message', async () => {
         const fetchImpl: FetchLike = async () =>
             new Response(null, { status: 500 })
@@ -104,6 +152,24 @@ describe('getDonorDrive', () => {
         expect((result as { message: string }).message).toStartWith(
             'Invalid JSON'
         )
+    })
+
+    test('a body-read failure on 200 returns an error with the response status', async () => {
+        const stream = new ReadableStream({
+            async pull(controller) {
+                controller.error(new TypeError('connection reset'))
+            },
+        })
+        const fetchImpl: FetchLike = async () =>
+            new Response(stream, { status: 200 })
+
+        const result = await getDonorDrive('/x', {}, undefined, fetchImpl)
+
+        expect(result).toEqual({
+            kind: 'error',
+            status: 200,
+            message: 'connection reset',
+        })
     })
 
     test('a thrown network error returns an error with no status', async () => {

@@ -22,7 +22,9 @@ const retryAfterMs = (response: Response): number => {
     const header = response.headers.get('Retry-After')
     if (!header) return DEFAULT_RATE_LIMIT_BLOCK_MS
     const seconds = Number(header)
-    return Number.isNaN(seconds) ? DEFAULT_RATE_LIMIT_BLOCK_MS : seconds * 1000
+    return Number.isFinite(seconds) && seconds >= 0
+        ? seconds * 1000
+        : DEFAULT_RATE_LIMIT_BLOCK_MS
 }
 
 const getDonorDrive = async (
@@ -59,7 +61,17 @@ const getDonorDrive = async (
             message: `DonorDrive returned ${response.status}`,
         }
 
-    const text = await response.text()
+    let text: string
+    try {
+        text = await response.text()
+    } catch (error) {
+        return {
+            kind: 'error',
+            status: response.status,
+            message: error instanceof Error ? error.message : String(error),
+        }
+    }
+
     try {
         const body: unknown = JSON.parse(text)
         const etagHeader = response.headers.get('ETag')
