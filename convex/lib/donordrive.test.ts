@@ -188,16 +188,20 @@ describe('toDonorRow', () => {
 })
 
 describe('hasMorePages', () => {
-    test('true at a full page with no known id hit', () => {
-        expect(hasMorePages(DONORDRIVE_PAGE_SIZE, false)).toBe(true)
+    test('full page with a fresh row continues', () => {
+        expect(hasMorePages(DONORDRIVE_PAGE_SIZE, 1, false)).toBe(true)
     })
 
-    test('false at a full page that hit a known id', () => {
-        expect(hasMorePages(DONORDRIVE_PAGE_SIZE, true)).toBe(false)
+    test('full page with no fresh rows and no recovery stops', () => {
+        expect(hasMorePages(DONORDRIVE_PAGE_SIZE, 0, false)).toBe(false)
     })
 
-    test('false at a short page', () => {
-        expect(hasMorePages(37, false)).toBe(false)
+    test('full page with no fresh rows continues during recovery', () => {
+        expect(hasMorePages(DONORDRIVE_PAGE_SIZE, 0, true)).toBe(true)
+    })
+
+    test('short page stops even during recovery', () => {
+        expect(hasMorePages(37, 5, true)).toBe(false)
     })
 })
 
@@ -223,39 +227,55 @@ describe('paging simulation (spec check 5)', () => {
             (donationID) => ({ donationID })
         )
 
-    test('collects 237 fresh ids across three pages and stops', () => {
-        const pages = [makeIds(100, 0), makeIds(100, 100), makeIds(37, 200)]
-        const known = new Set<string>()
+    const runPaging = (
+        pages: { donationID: string }[][],
+        known: Set<string>,
+        recoverAll: boolean
+    ) => {
         const collected: string[] = []
         let pagesFetched = 0
-
         for (const page of pages) {
             pagesFetched++
-            const { fresh, hitKnown } = splitPage(page, known)
+            const { fresh } = splitPage(page, known)
             collected.push(...fresh.map((r) => r.donationID))
-            if (!hasMorePages(page.length, hitKnown)) break
+            if (!hasMorePages(page.length, fresh.length, recoverAll)) break
         }
+        return { collected, pagesFetched }
+    }
 
-        expect(collected.length).toBe(237)
-        expect(pagesFetched).toBe(3)
-    })
-
-    test('stops after page 2 when it contains one known id', () => {
+    test('a known id mid-page no longer stops paging', () => {
         const page1 = makeIds(100, 0)
         const page2 = makeIds(100, 100)
         const knownId = page2[50].donationID
-        const known = new Set([knownId])
         const pages = [page1, page2, makeIds(37, 200)]
-        const collected: string[] = []
-        let pagesFetched = 0
 
-        for (const page of pages) {
-            pagesFetched++
-            const { fresh, hitKnown } = splitPage(page, known)
-            collected.push(...fresh.map((r) => r.donationID))
-            if (!hasMorePages(page.length, hitKnown)) break
-        }
+        const { collected, pagesFetched } = runPaging(
+            pages,
+            new Set([knownId]),
+            false
+        )
 
-        expect(pagesFetched).toBe(2)
+        expect(collected.length).toBe(236)
+        expect(pagesFetched).toBe(3)
+    })
+
+    test('recoverAll continues past an all-known page', () => {
+        const pages = [makeIds(100, 0), makeIds(100, 100), makeIds(20, 200)]
+        const known = new Set(pages[0].map((r) => r.donationID))
+
+        const { collected, pagesFetched } = runPaging(pages, known, true)
+
+        expect(collected.length).toBe(120)
+        expect(pagesFetched).toBe(3)
+    })
+
+    test('without recoverAll, an all-known first page stops paging', () => {
+        const pages = [makeIds(100, 0), makeIds(100, 100), makeIds(20, 200)]
+        const known = new Set(pages[0].map((r) => r.donationID))
+
+        const { collected, pagesFetched } = runPaging(pages, known, false)
+
+        expect(collected.length).toBe(0)
+        expect(pagesFetched).toBe(1)
     })
 })

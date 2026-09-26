@@ -225,8 +225,12 @@ const toDonorRow = (d: DonorDriveDonor, year: number): DonorRowInput | null => {
     return row
 }
 
-const hasMorePages = (pageLength: number, hitKnown: boolean): boolean =>
-    pageLength === DONORDRIVE_PAGE_SIZE && !hitKnown
+const hasMorePages = (
+    pageLength: number,
+    freshCount: number,
+    recoverAll: boolean
+): boolean =>
+    pageLength === DONORDRIVE_PAGE_SIZE && (freshCount > 0 || recoverAll)
 
 export type {
     CampaignFields,

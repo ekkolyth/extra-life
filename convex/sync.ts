@@ -155,6 +155,10 @@ async function performSync(
     const donationsKey = `donations:${participantId}`
     if (!isBlocked(options.force, states.donations, Date.now())) {
         const firstEtag = options.force ? undefined : states.donations?.etag
+        const recoverAll =
+            states.donations?.lastError !== undefined &&
+            states.donations?.lastStatus !== 200 &&
+            states.donations?.lastStatus !== 304
         let offset = 0
         let firstPageEtag: string | undefined
         let pagingFailed = false
@@ -244,7 +248,7 @@ async function performSync(
                 internal.syncStore.knownDonationIds,
                 { ids: rows.map((row) => row.donationID) }
             )
-            const { fresh, hitKnown } = splitPage(rows, new Set(known))
+            const { fresh } = splitPage(rows, new Set(known))
             const insertResult: { inserted: number } = await ctx.runMutation(
                 internal.syncStore.insertDonations,
                 { rows: fresh }
@@ -261,7 +265,7 @@ async function performSync(
                 apiEndpoint: `GET /participants/${participantId}/donations?offset=${offset}`,
             })
 
-            if (!hasMorePages(pageLength, hitKnown)) break
+            if (!hasMorePages(pageLength, fresh.length, recoverAll)) break
             offset += DONORDRIVE_PAGE_SIZE
         }
 
@@ -393,7 +397,7 @@ async function performSync(
                 })
             }
 
-            if (!hasMorePages(pageLength, false)) break
+            if (!hasMorePages(pageLength, records.length, true)) break
             offset += DONORDRIVE_PAGE_SIZE
         }
 
