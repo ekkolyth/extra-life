@@ -242,12 +242,19 @@ export const finishRun = internalMutation({
     returns: v.null(),
     handler: async (ctx, args) => {
         const key = `participant:${args.participantId}`
+        const cooldownUntil = Date.now() + 15_000
         const existing = await ctx.db
             .query('syncState')
             .withIndex('by_key', (q) => q.eq('key', key))
             .unique()
         if (existing) {
-            await ctx.db.patch(existing._id, { inFlightUntil: undefined })
+            await ctx.db.patch(existing._id, { inFlightUntil: cooldownUntil })
+        } else {
+            await ctx.db.insert('syncState', {
+                key,
+                pollGeneration: 0,
+                inFlightUntil: cooldownUntil,
+            })
         }
         if (args.generation === undefined || !existing) return null
 

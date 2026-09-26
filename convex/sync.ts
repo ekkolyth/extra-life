@@ -31,7 +31,6 @@ import {
 import { getDonorDrive } from './lib/donordriveHttp'
 
 const IN_FLIGHT_LEASE_MS = 60_000
-const REQUEST_THROTTLE_MS = 15_000
 
 type SyncPull = {
     participantId: string | null
@@ -512,13 +511,10 @@ export const request = mutation({
             .withIndex('by_key', (q) => q.eq('key', key))
             .unique()
 
-        const staleEnough =
-            existing?.lastFetchedAt === undefined ||
-            existing.lastFetchedAt < now - REQUEST_THROTTLE_MS
         const notInFlight =
             existing?.inFlightUntil === undefined ||
             existing.inFlightUntil < now
-        if (!staleEnough || !notInFlight) return null
+        if (!notInFlight) return null
 
         if (existing) {
             await ctx.db.patch(existing._id, {
