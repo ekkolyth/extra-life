@@ -78,11 +78,11 @@ const getDonorDrive = async (
         return etagHeader
             ? { kind: 'ok', status: 200, body, etag: etagHeader }
             : { kind: 'ok', status: 200, body }
-    } catch (error) {
+    } catch {
         return {
             kind: 'error',
             status: 200,
-            message: `Invalid JSON: ${error instanceof Error ? error.message : String(error)}`,
+            message: 'Invalid JSON response',
         }
     }
 }

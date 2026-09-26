@@ -152,6 +152,12 @@ describe('getDonorDrive', () => {
         expect((result as { message: string }).message).toStartWith(
             'Invalid JSON'
         )
+        expect((result as { message: string }).message).not.toContain(
+            'not json'
+        )
+        expect((result as { message: string }).message).toBe(
+            'Invalid JSON response'
+        )
     })
 
     test('a body-read failure on 200 returns an error with the response status', async () => {

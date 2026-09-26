@@ -165,129 +165,149 @@ async function performSync(
         let stepEnded = false
         const recordErrors: string[] = []
 
-        while (!stepEnded) {
-            await recordApiCall()
-            const etagToSend = offset === 0 ? firstEtag : undefined
-            const response = await getDonorDrive(
-                `/participants/${participantId}/donations`,
-                {
-                    orderBy: 'createdDateUTC DESC',
-                    limit: String(DONORDRIVE_PAGE_SIZE),
-                    offset: String(offset),
-                },
-                etagToSend
-            )
+        try {
+            while (!stepEnded) {
+                await recordApiCall()
+                const etagToSend = offset === 0 ? firstEtag : undefined
+                const response = await getDonorDrive(
+                    `/participants/${participantId}/donations`,
+                    {
+                        orderBy: 'createdDateUTC DESC',
+                        limit: String(DONORDRIVE_PAGE_SIZE),
+                        offset: String(offset),
+                    },
+                    etagToSend
+                )
 
-            if (offset === 0 && response.kind === 'not-modified') {
-                await ctx.runMutation(internal.syncStore.recordFetch, {
-                    key: donationsKey,
-                    status: 304,
-                })
-                stepEnded = true
-                break
-            }
-            if (response.kind === 'rate-limited') {
-                const blockedUntil = Date.now() + response.retryAfterMs
-                console.warn(
-                    'donordrive rate limited',
-                    JSON.stringify({
-                        endpoint: donationsKey,
-                        blocked_until: blockedUntil,
+                if (offset === 0 && response.kind === 'not-modified') {
+                    await ctx.runMutation(internal.syncStore.recordFetch, {
+                        key: donationsKey,
+                        status: 304,
                     })
-                )
-                await ctx.runMutation(internal.syncStore.recordFetch, {
-                    key: donationsKey,
-                    status: 429,
-                    error: 'rate limited',
-                    blockedUntil,
-                })
-                pagingFailed = true
-                stepEnded = true
-                break
-            }
-            if (response.kind !== 'ok') {
-                const status =
-                    response.kind === 'not-modified' ? 304 : response.status
-                const error =
-                    response.kind === 'not-modified'
-                        ? 'unexpected 304 past the first page'
-                        : response.message
-                console.warn(
-                    'failed to fetch donordrive',
-                    JSON.stringify({ endpoint: donationsKey, status, error })
-                )
-                await ctx.runMutation(internal.syncStore.recordFetch, {
-                    key: donationsKey,
-                    status,
-                    error,
-                })
-                pagingFailed = true
-                stepEnded = true
-                break
-            }
-
-            if (offset === 0) firstPageEtag = response.etag
-            const { records, errors, pageLength } = parseRecords(
-                donationSchema,
-                response.body
-            )
-            recordErrors.push(...errors)
-
-            const rows: DonationRowInput[] = []
-            for (const record of records) {
-                const row = toDonationRow(record, {
-                    year: campaign.year,
-                    participantId,
-                })
-                if (row === null)
-                    recordErrors.push('missing donationID or createdDateUTC')
-                else rows.push(row)
-            }
-
-            const known: string[] = await ctx.runQuery(
-                internal.syncStore.knownDonationIds,
-                { ids: rows.map((row) => row.donationID) }
-            )
-            const { fresh } = splitPage(rows, new Set(known))
-            const insertResult: { inserted: number } = await ctx.runMutation(
-                internal.syncStore.insertDonations,
-                { rows: fresh }
-            )
-            donationsInserted += insertResult.inserted
-
-            if (offset === 0) pull.latestDonations = records.slice(0, 10)
-
-            await ctx.runMutation(api.donorDriveDebug.add, {
-                latestDonations: records,
-                stats: null,
-                topDonation: null,
-                topDonor: null,
-                apiEndpoint: `GET /participants/${participantId}/donations?offset=${offset}`,
-            })
-
-            if (!hasMorePages(pageLength, fresh.length, recoverAll)) break
-            offset += DONORDRIVE_PAGE_SIZE
-        }
-
-        if (!stepEnded) {
-            if (recordErrors.length > 0) {
-                console.warn(
-                    'skipped donordrive records',
-                    JSON.stringify({
-                        endpoint: donationsKey,
-                        error_count: recordErrors.length,
+                    stepEnded = true
+                    break
+                }
+                if (response.kind === 'rate-limited') {
+                    const blockedUntil = Date.now() + response.retryAfterMs
+                    console.warn(
+                        'donordrive rate limited',
+                        JSON.stringify({
+                            endpoint: donationsKey,
+                            blocked_until: blockedUntil,
+                        })
+                    )
+                    await ctx.runMutation(internal.syncStore.recordFetch, {
+                        key: donationsKey,
+                        status: 429,
+                        error: 'rate limited',
+                        blockedUntil,
                     })
+                    pagingFailed = true
+                    stepEnded = true
+                    break
+                }
+                if (response.kind !== 'ok') {
+                    const status =
+                        response.kind === 'not-modified' ? 304 : response.status
+                    const error =
+                        response.kind === 'not-modified'
+                            ? 'unexpected 304 past the first page'
+                            : response.message
+                    console.warn(
+                        'failed to fetch donordrive',
+                        JSON.stringify({
+                            endpoint: donationsKey,
+                            status,
+                            error,
+                        })
+                    )
+                    await ctx.runMutation(internal.syncStore.recordFetch, {
+                        key: donationsKey,
+                        status,
+                        error,
+                    })
+                    pagingFailed = true
+                    stepEnded = true
+                    break
+                }
+
+                if (offset === 0) firstPageEtag = response.etag
+                const { records, errors, pageLength } = parseRecords(
+                    donationSchema,
+                    response.body
                 )
+                recordErrors.push(...errors)
+
+                const rows: DonationRowInput[] = []
+                for (const record of records) {
+                    const row = toDonationRow(record, {
+                        year: campaign.year,
+                        participantId,
+                    })
+                    if (row === null)
+                        recordErrors.push(
+                            'missing donationID or createdDateUTC'
+                        )
+                    else rows.push(row)
+                }
+
+                const known: string[] = await ctx.runQuery(
+                    internal.syncStore.knownDonationIds,
+                    { ids: rows.map((row) => row.donationID) }
+                )
+                const { fresh } = splitPage(rows, new Set(known))
+                const insertResult: { inserted: number } =
+                    await ctx.runMutation(internal.syncStore.insertDonations, {
+                        rows: fresh,
+                    })
+                donationsInserted += insertResult.inserted
+
+                if (offset === 0) pull.latestDonations = records.slice(0, 10)
+
+                await ctx.runMutation(api.donorDriveDebug.add, {
+                    latestDonations: records,
+                    stats: null,
+                    topDonation: null,
+                    topDonor: null,
+                    apiEndpoint: `GET /participants/${participantId}/donations?offset=${offset}`,
+                })
+
+                if (!hasMorePages(pageLength, fresh.length, recoverAll)) break
+                offset += DONORDRIVE_PAGE_SIZE
             }
-            await ctx.runMutation(internal.syncStore.recordFetch, {
-                key: donationsKey,
-                status: 200,
-                etag: pagingFailed ? undefined : firstPageEtag,
-                error:
-                    recordErrors.length > 0
-                        ? recordErrors.join('; ')
-                        : undefined,
-            })
+
+            if (!stepEnded) {
+                if (recordErrors.length > 0) {
+                    console.warn(
+                        'skipped donordrive records',
+                        JSON.stringify({
+                            endpoint: donationsKey,
+                            error_count: recordErrors.length,
+                        })
+                    )
+                }
+                await ctx.runMutation(internal.syncStore.recordFetch, {
+                    key: donationsKey,
+                    status: 200,
+                    etag: pagingFailed ? undefined : firstPageEtag,
+                    error:
+                        recordErrors.length > 0
+                            ? recordErrors.join('; ')
+                            : undefined,
+                })
+            }
+        } catch (error) {
+            const message =
+                error instanceof Error ? error.message : String(error)
+            try {
+                await ctx.runMutation(internal.syncStore.recordFetch, {
+                    key: donationsKey,
+                    error: message,
+                })
+            } catch {
+                // preserve the original error below
+            }
+            throw error
         }
     }
 
