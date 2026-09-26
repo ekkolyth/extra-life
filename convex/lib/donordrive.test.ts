@@ -91,6 +91,30 @@ describe('parseRecords', () => {
         amount: 25,
     }
 
+    test('skips a donation with an unparseable date and records the error', () => {
+        const { records, errors } = parseRecords(donationSchema, [
+            { ...validDonation, createdDateUTC: 'nope' },
+        ])
+        expect(records.length).toBe(0)
+        expect(errors.length).toBe(1)
+        expect(errors[0]).toContain('date')
+    })
+
+    test('skips a donor with an unparseable date and records the error', () => {
+        const { records, errors } = parseRecords(donorSchema, [
+            {
+                donorID: 'd1',
+                avatarImageURL: '',
+                modifiedDateUTC: 'nope',
+                sumDonations: 0,
+                numDonations: 0,
+            },
+        ])
+        expect(records.length).toBe(0)
+        expect(errors.length).toBe(1)
+        expect(errors[0]).toContain('date')
+    })
+
     test('collects one record and one error for a mixed array', () => {
         const { records, errors, pageLength } = parseRecords(donationSchema, [
             { amount: 'x' },

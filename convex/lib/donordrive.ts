@@ -2,6 +2,23 @@ import { z } from 'zod'
 
 const DONORDRIVE_PAGE_SIZE = 100
 
+const parseDonorDriveDate = (value: string): number => {
+    // donors send "+0000"; Date.parse needs "+00:00"
+    const parsed = Date.parse(value.replace(/([+-]\d{2})(\d{2})$/, '$1:$2'))
+    if (Number.isNaN(parsed))
+        throw new Error(`Unparseable DonorDrive date: ${value}`)
+    return parsed
+}
+
+const isParseableDonorDriveDate = (value: string): boolean => {
+    try {
+        parseDonorDriveDate(value)
+        return true
+    } catch {
+        return false
+    }
+}
+
 const linksSchema = z.object({
     donate: z.string(),
     page: z.string(),
@@ -40,7 +57,9 @@ const donorSchema = z.object({
     displayName: z.string().optional(),
     donorID: z.string().optional(),
     avatarImageURL: z.string(),
-    modifiedDateUTC: z.string(),
+    modifiedDateUTC: z
+        .string()
+        .refine(isParseableDonorDriveDate, 'unparseable date'),
     sumDonations: z.number(),
     numDonations: z.number(),
     recipientImageURL: z.string().optional(),
@@ -54,7 +73,10 @@ const donationLinksSchema = z.object({
 const donationSchema = z.object({
     amount: z.number(),
     avatarImageURL: z.string().optional(),
-    createdDateUTC: z.string().optional(),
+    createdDateUTC: z
+        .string()
+        .refine(isParseableDonorDriveDate, 'unparseable date')
+        .optional(),
     donationID: z.string().optional(),
     eventID: z.number().optional(),
     isRegFee: z.boolean().optional(),
@@ -110,14 +132,6 @@ type DonorRowInput = {
     sumDonations: number
     numDonations: number
     modifiedAt: number
-}
-
-const parseDonorDriveDate = (value: string): number => {
-    // donors send "+0000"; Date.parse needs "+00:00"
-    const parsed = Date.parse(value.replace(/([+-]\d{2})(\d{2})$/, '$1:$2'))
-    if (Number.isNaN(parsed))
-        throw new Error(`Unparseable DonorDrive date: ${value}`)
-    return parsed
 }
 
 const parseRecords = <T>(
