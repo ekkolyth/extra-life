@@ -13,6 +13,7 @@ import type * as donorDriveData from "../donorDriveData.js";
 import type * as donorDriveDebug from "../donorDriveDebug.js";
 import type * as donor_drive_validators from "../donor_drive_validators.js";
 import type * as goals from "../goals.js";
+import type * as lib_donordrive from "../lib/donordrive.js";
 import type * as randomizer from "../randomizer.js";
 import type * as randomizerItem from "../randomizerItem.js";
 import type * as rotator from "../rotator.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   donorDriveDebug: typeof donorDriveDebug;
   donor_drive_validators: typeof donor_drive_validators;
   goals: typeof goals;
+  "lib/donordrive": typeof lib_donordrive;
   randomizer: typeof randomizer;
   randomizerItem: typeof randomizerItem;
   rotator: typeof rotator;
