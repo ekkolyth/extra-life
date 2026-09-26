@@ -2,7 +2,13 @@ import { v } from 'convex/values'
 import { api, internal } from './_generated/api'
 import type { Doc } from './_generated/dataModel'
 import type { ActionCtx } from './_generated/server'
-import { internalAction } from './_generated/server'
+import { action, internalAction, mutation } from './_generated/server'
+import {
+    donationValidator,
+    donorValidator,
+    statsValidator,
+} from './donor_drive_validators'
+import { requireAdmin } from './lib/admin'
 import type {
     DonationRowInput,
     DonorDriveDonation,
@@ -23,6 +29,9 @@ import {
     toDonorRow,
 } from './lib/donordrive'
 import { getDonorDrive } from './lib/donordriveHttp'
+
+const IN_FLIGHT_LEASE_MS = 60_000
+const REQUEST_THROTTLE_MS = 15_000
 
 type SyncPull = {
     participantId: string | null
@@ -483,5 +492,121 @@ export const run = internalAction({
             })
         }
         return null
+    },
+})
+
+export const request = mutation({
+    args: {},
+    returns: v.null(),
+    handler: async (ctx) => {
+        const campaign = await ctx.db
+            .query('campaigns')
+            .withIndex('by_active', (q) => q.eq('isActive', true))
+            .unique()
+        if (!campaign) return null
+
+        const key = `participant:${campaign.participantId}`
+        const now = Date.now()
+        const existing = await ctx.db
+            .query('syncState')
+            .withIndex('by_key', (q) => q.eq('key', key))
+            .unique()
+
+        const staleEnough =
+            existing?.lastFetchedAt === undefined ||
+            existing.lastFetchedAt < now - REQUEST_THROTTLE_MS
+        const notInFlight =
+            existing?.inFlightUntil === undefined ||
+            existing.inFlightUntil < now
+        if (!staleEnough || !notInFlight) return null
+
+        if (existing) {
+            await ctx.db.patch(existing._id, {
+                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+            })
+        } else {
+            await ctx.db.insert('syncState', {
+                key,
+                pollGeneration: 0,
+                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+            })
+        }
+
+        await ctx.scheduler.runAfter(0, internal.sync.run, {})
+        return null
+    },
+})
+
+export const setLivePolling = mutation({
+    args: { enabled: v.boolean() },
+    returns: v.null(),
+    handler: async (ctx, args) => {
+        await requireAdmin(ctx)
+
+        const campaign = await ctx.db
+            .query('campaigns')
+            .withIndex('by_active', (q) => q.eq('isActive', true))
+            .unique()
+        if (!campaign) throw new Error('No active campaign')
+
+        await ctx.db.patch(campaign._id, { livePolling: args.enabled })
+        if (!args.enabled) return null
+
+        const key = `participant:${campaign.participantId}`
+        const now = Date.now()
+        const existing = await ctx.db
+            .query('syncState')
+            .withIndex('by_key', (q) => q.eq('key', key))
+            .unique()
+        const generation = (existing?.pollGeneration ?? 0) + 1
+
+        if (existing) {
+            await ctx.db.patch(existing._id, {
+                pollGeneration: generation,
+                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+            })
+        } else {
+            await ctx.db.insert('syncState', {
+                key,
+                pollGeneration: generation,
+                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+            })
+        }
+
+        await ctx.scheduler.runAfter(0, internal.sync.run, { generation })
+        return null
+    },
+})
+
+export const forceRun = action({
+    args: {},
+    returns: v.object({
+        participant: v.union(statsValidator, v.null()),
+        latestDonations: v.array(donationValidator),
+        topDonor: v.union(donorValidator, v.null()),
+    }),
+    handler: async (ctx) => {
+        await requireAdmin(ctx)
+
+        const campaign: Doc<'campaigns'> | null = await ctx.runQuery(
+            internal.campaigns.getActive,
+            {}
+        )
+        if (!campaign) throw new Error('No active campaign')
+
+        let pull: SyncPull
+        try {
+            pull = await performSync(ctx, campaign, { force: true })
+        } finally {
+            await ctx.runMutation(internal.syncStore.finishRun, {
+                participantId: campaign.participantId,
+            })
+        }
+
+        return {
+            participant: pull.participant,
+            latestDonations: pull.latestDonations,
+            topDonor: pull.topDonor,
+        }
     },
 })
