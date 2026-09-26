@@ -231,7 +231,7 @@ async function performSync(
                     )
                     await ctx.runMutation(internal.syncStore.recordFetch, {
                         key: donationsKey,
-                        status,
+                        ...(response.kind === 'error' ? {} : { status }),
                         error,
                     })
                     pagingFailed = true
