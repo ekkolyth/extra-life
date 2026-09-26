@@ -32,6 +32,8 @@ import type * as schema_syncState from "../schema/syncState.js";
 import type * as schema_viewedDonations from "../schema/viewedDonations.js";
 import type * as schema_wheelRedemptions from "../schema/wheelRedemptions.js";
 import type * as segment from "../segment.js";
+import type * as sync from "../sync.js";
+import type * as syncStore from "../syncStore.js";
 import type * as viewedDonations from "../viewedDonations.js";
 import type * as wheelRedemption from "../wheelRedemption.js";
 
@@ -66,6 +68,8 @@ declare const fullApi: ApiFromModules<{
   "schema/viewedDonations": typeof schema_viewedDonations;
   "schema/wheelRedemptions": typeof schema_wheelRedemptions;
   segment: typeof segment;
+  sync: typeof sync;
+  syncStore: typeof syncStore;
   viewedDonations: typeof viewedDonations;
   wheelRedemption: typeof wheelRedemption;
 }>;
