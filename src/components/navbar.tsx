@@ -12,6 +12,7 @@ import {
     Monitor,
     MonitorPlay as Overlay,
     RotateCcw,
+    Settings,
     Target,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -60,7 +61,15 @@ const tools = [
         icon: Bug,
         external: false,
     },
+    {
+        name: 'Settings',
+        href: '/config',
+        icon: Settings,
+        external: false,
+    },
 ]
+
+const adminOnlyTools = new Set(['Debug', 'Settings'])
 
 const resources = [
     {
@@ -94,7 +103,7 @@ export function Sidebar() {
     const { user } = useUser()
     const isAdmin = user?.username === ADMIN_USERNAME
     const visibleTools = tools.filter(
-        (item) => item.name !== 'Debug' || isAdmin
+        (item) => !adminOnlyTools.has(item.name) || isAdmin
     )
 
     return (

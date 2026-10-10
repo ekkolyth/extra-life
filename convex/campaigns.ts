@@ -1,6 +1,13 @@
 import { v } from 'convex/values'
-import { internalMutation, internalQuery, query } from './_generated/server'
+import {
+    internalMutation,
+    internalQuery,
+    mutation,
+    query,
+} from './_generated/server'
+import { requireAdmin } from './lib/admin'
 import { campaignDoc } from './schema/campaigns'
+import { requestSync, startLivePolling } from './sync'
 
 export const register = internalMutation({
     args: {
@@ -82,5 +89,58 @@ export const getActive = internalQuery({
             .query('campaigns')
             .withIndex('by_active', (q) => q.eq('isActive', true))
             .unique()
+    },
+})
+
+export const setParticipantId = mutation({
+    args: { participantId: v.string() },
+    returns: v.null(),
+    handler: async (ctx, args) => {
+        await requireAdmin(ctx)
+
+        const participantId = args.participantId.trim()
+        if (participantId === '') throw new Error('Participant ID is required')
+
+        const campaign = await ctx.db
+            .query('campaigns')
+            .withIndex('by_active', (q) => q.eq('isActive', true))
+            .unique()
+        if (!campaign) throw new Error('No active campaign')
+        if (campaign.participantId === participantId) return null
+
+        const existingParticipant = await ctx.db
+            .query('campaigns')
+            .withIndex('by_participant', (q) =>
+                q.eq('participantId', participantId)
+            )
+            .first()
+        if (existingParticipant) {
+            throw new Error(
+                `Participant ${participantId} is already registered`
+            )
+        }
+
+        await ctx.db.patch(campaign._id, { participantId })
+
+        if (!campaign.livePolling) {
+            await requestSync(ctx, participantId)
+            return null
+        }
+
+        // the polling loop is keyed by participant, so retire the old loop and start one for the new id
+        const previous = await ctx.db
+            .query('syncState')
+            .withIndex('by_key', (q) =>
+                q.eq('key', `participant:${campaign.participantId}`)
+            )
+            .unique()
+        const retiredGeneration = (previous?.pollGeneration ?? 0) + 1
+        if (previous) {
+            await ctx.db.patch(previous._id, {
+                pollGeneration: retiredGeneration,
+            })
+        }
+        await startLivePolling(ctx, participantId, retiredGeneration)
+        return null
     },
 })

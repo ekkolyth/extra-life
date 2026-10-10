@@ -19,7 +19,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { JSONViewer } from '@/components/ui/json-viewer'
-import { Label } from '@/components/ui/label'
 import {
     Select,
     SelectContent,
@@ -27,7 +26,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import {
     Table,
     TableBody,
@@ -48,10 +46,6 @@ export default function DebugPage() {
     const { data: lastApiCallInfo } = useQuery(
         convexQuery(api.apiMetadata.getLastApiCall, {})
     )
-    const { data: campaign } = useQuery(convexQuery(api.campaigns.active, {}))
-    const setLivePolling = useMutation({
-        mutationFn: useConvexMutation(api.sync.setLivePolling),
-    })
     const forceRun = useMutation({
         mutationFn: useConvexAction(api.sync.forceRun),
     })
@@ -210,17 +204,6 @@ export default function DebugPage() {
                         </div>
                     </div>
                     <div className='flex gap-3'>
-                        <div className='flex items-center gap-2'>
-                            <Switch
-                                checked={campaign?.livePolling ?? false}
-                                disabled={!campaign || setLivePolling.isPending}
-                                id='live-polling'
-                                onCheckedChange={(enabled) =>
-                                    setLivePolling.mutate({ enabled })
-                                }
-                            />
-                            <Label htmlFor='live-polling'>Live polling</Label>
-                        </div>
                         <Button
                             className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
                             onClick={handleTestVideo}

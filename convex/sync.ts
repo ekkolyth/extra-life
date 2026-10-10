@@ -1,7 +1,7 @@
 import { v } from 'convex/values'
 import { api, internal } from './_generated/api'
 import type { Doc } from './_generated/dataModel'
-import type { ActionCtx } from './_generated/server'
+import type { ActionCtx, MutationCtx } from './_generated/server'
 import { action, internalAction, mutation } from './_generated/server'
 import {
     donationValidator,
@@ -494,6 +494,67 @@ export const run = internalAction({
     },
 })
 
+export async function requestSync(
+    ctx: MutationCtx,
+    participantId: string
+): Promise<void> {
+    const key = `participant:${participantId}`
+    const now = Date.now()
+    const existing = await ctx.db
+        .query('syncState')
+        .withIndex('by_key', (q) => q.eq('key', key))
+        .unique()
+
+    const notInFlight =
+        existing?.inFlightUntil === undefined || existing.inFlightUntil < now
+    if (!notInFlight) return
+
+    if (existing) {
+        await ctx.db.patch(existing._id, {
+            inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+        })
+    } else {
+        await ctx.db.insert('syncState', {
+            key,
+            pollGeneration: 0,
+            inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+        })
+    }
+
+    await ctx.scheduler.runAfter(0, internal.sync.run, {})
+}
+
+// minGeneration keeps runs still scheduled under a previous participant from matching
+export async function startLivePolling(
+    ctx: MutationCtx,
+    participantId: string,
+    minGeneration = 0
+): Promise<void> {
+    const key = `participant:${participantId}`
+    const now = Date.now()
+    const existing = await ctx.db
+        .query('syncState')
+        .withIndex('by_key', (q) => q.eq('key', key))
+        .unique()
+    const generation =
+        Math.max(existing?.pollGeneration ?? 0, minGeneration) + 1
+
+    if (existing) {
+        await ctx.db.patch(existing._id, {
+            pollGeneration: generation,
+            inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+        })
+    } else {
+        await ctx.db.insert('syncState', {
+            key,
+            pollGeneration: generation,
+            inFlightUntil: now + IN_FLIGHT_LEASE_MS,
+        })
+    }
+
+    await ctx.scheduler.runAfter(0, internal.sync.run, { generation })
+}
+
 export const request = mutation({
     args: {},
     returns: v.null(),
@@ -504,31 +565,7 @@ export const request = mutation({
             .unique()
         if (!campaign) return null
 
-        const key = `participant:${campaign.participantId}`
-        const now = Date.now()
-        const existing = await ctx.db
-            .query('syncState')
-            .withIndex('by_key', (q) => q.eq('key', key))
-            .unique()
-
-        const notInFlight =
-            existing?.inFlightUntil === undefined ||
-            existing.inFlightUntil < now
-        if (!notInFlight) return null
-
-        if (existing) {
-            await ctx.db.patch(existing._id, {
-                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
-            })
-        } else {
-            await ctx.db.insert('syncState', {
-                key,
-                pollGeneration: 0,
-                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
-            })
-        }
-
-        await ctx.scheduler.runAfter(0, internal.sync.run, {})
+        await requestSync(ctx, campaign.participantId)
         return null
     },
 })
@@ -548,28 +585,7 @@ export const setLivePolling = mutation({
         await ctx.db.patch(campaign._id, { livePolling: args.enabled })
         if (!args.enabled) return null
 
-        const key = `participant:${campaign.participantId}`
-        const now = Date.now()
-        const existing = await ctx.db
-            .query('syncState')
-            .withIndex('by_key', (q) => q.eq('key', key))
-            .unique()
-        const generation = (existing?.pollGeneration ?? 0) + 1
-
-        if (existing) {
-            await ctx.db.patch(existing._id, {
-                pollGeneration: generation,
-                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
-            })
-        } else {
-            await ctx.db.insert('syncState', {
-                key,
-                pollGeneration: generation,
-                inFlightUntil: now + IN_FLIGHT_LEASE_MS,
-            })
-        }
-
-        await ctx.scheduler.runAfter(0, internal.sync.run, { generation })
+        await startLivePolling(ctx, campaign.participantId)
         return null
     },
 })
