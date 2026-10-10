@@ -1,32 +1,28 @@
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { Plus, Shuffle } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Randomizer } from '@/types/db'
+import { api } from '@/convex/_generated/api'
+import type { Randomizer } from '@/types/db'
 
 interface RandomizersSectionProps {
     randomizers: Randomizer[]
 }
 
 export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
-    const totalItems = randomizers.reduce(
-        (acc, randomizer) => acc + (randomizer.items?.length || 0),
-        0
-    )
+    const {
+        mutate: trigger,
+        isPending,
+        variables,
+    } = useMutation({
+        mutationFn: useConvexMutation(api.randomizerSpin.trigger),
+        onError: (error) =>
+            console.error('Failed to trigger randomizer:', error),
+    })
 
-    const redeemedItems = randomizers.reduce(
-        (acc, randomizer) =>
-            acc +
-            (randomizer.items?.reduce(
-                (itemAcc, item) => itemAcc + item.redeemed,
-                0
-            ) || 0),
-        0
-    )
-
-    const leftItems = totalItems - redeemedItems
-
-    if (!randomizers || randomizers.length === 0) {
+    if (randomizers.length === 0) {
         return (
             <Card className='border-border/50 bg-card/50 backdrop-blur-sm'>
                 <CardHeader>
@@ -37,26 +33,7 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
                 </CardHeader>
                 <CardContent className='space-y-4'>
                     <div className='rounded-lg bg-muted/30 p-4'>
-                        <p className='text-xs text-muted-foreground mb-3'>
-                            Do not close this page once a randomizer is
-                            triggered, until it is finished spinning.
-                        </p>
-
-                        <div className='text-center space-y-2'>
-                            <div className='text-3xl font-bold text-foreground'>
-                                <span>0</span>
-                                <span className='text-muted-foreground mx-2'>
-                                    /
-                                </span>
-                                <span>0</span>
-                            </div>
-                            <div className='flex justify-center gap-4 text-xs text-muted-foreground'>
-                                <span>Left</span>
-                                <span>Total</span>
-                            </div>
-                        </div>
-
-                        <p className='text-sm text-muted-foreground text-center mt-3'>
+                        <p className='text-sm text-muted-foreground text-center'>
                             No randomizers found
                         </p>
                     </div>
@@ -87,40 +64,37 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
             </CardHeader>
             <CardContent className='space-y-4'>
                 <div className='rounded-lg bg-muted/30 p-4'>
-                    <p className='text-xs text-muted-foreground mb-3'>
-                        Do not close this page once a randomizer is triggered,
-                        until it is finished spinning.
-                    </p>
-
-                    <div className='text-center space-y-2'>
-                        <div className='text-3xl font-bold text-foreground'>
-                            <span>{leftItems}</span>
-                            <span className='text-muted-foreground mx-2'>
-                                /
-                            </span>
-                            <span>{totalItems}</span>
-                        </div>
-                        <div className='flex justify-center gap-4 text-xs text-muted-foreground'>
-                            <span>Left</span>
-                            <span>Total</span>
-                        </div>
-                    </div>
-
-                    <div className='mt-4 space-y-2'>
+                    <ul className='space-y-2'>
                         {randomizers.map((randomizer) => (
-                            <div
-                                className='flex justify-between items-center text-sm'
+                            <li
+                                className='flex justify-between items-center gap-3 text-sm'
                                 key={randomizer.id}
                             >
-                                <span className='text-foreground'>
+                                <span className='min-w-0 truncate text-foreground'>
                                     {randomizer.name}
                                 </span>
-                                <span className='text-muted-foreground'>
-                                    {randomizer.items?.length || 0} items
+                                <span className='ml-auto shrink-0 text-muted-foreground'>
+                                    {randomizer.items.length} items
                                 </span>
-                            </div>
+                                <Button
+                                    disabled={
+                                        randomizer.items.length === 0 ||
+                                        (isPending &&
+                                            variables?.randomizerId ===
+                                                randomizer.id)
+                                    }
+                                    onClick={() =>
+                                        trigger({ randomizerId: randomizer.id })
+                                    }
+                                    size='sm'
+                                    type='button'
+                                    variant='outline'
+                                >
+                                    Trigger
+                                </Button>
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 </div>
 
                 <Button

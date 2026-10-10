@@ -6,6 +6,7 @@ import { donorDriveDebug } from './schema/donorDriveDebug'
 import { donors } from './schema/donors'
 import { goals } from './schema/goals'
 import { randomizerItems, randomizers } from './schema/randomizer'
+import { randomizerSpins } from './schema/randomizerSpins'
 import { rotator } from './schema/rotator'
 import { segments } from './schema/segments'
 import { syncState } from './schema/syncState'
@@ -18,6 +19,7 @@ export default defineSchema({
     rotator,
     randomizers,
     randomizerItems,
+    randomizerSpins,
     wheelRedemptions,
     donorDriveDebug,
     apiMetadata,

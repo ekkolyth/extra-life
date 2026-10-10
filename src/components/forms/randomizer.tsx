@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import { useConvexMutation } from '@convex-dev/react-query'
@@ -17,18 +16,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { api } from '@/convex/_generated/api'
-import type { Id } from '@/convex/_generated/dataModel'
 import type { Randomizer } from '@/types/db'
 
 export const formSchema = z.object({
-    name: z.string().min(2),
-    items: z.array(
-        z.object({
-            name: z.string(),
-            limit: z.coerce.number().int().positive(),
-            redeemed: z.coerce.number().int().optional(),
-        })
-    ),
+    name: z.string().trim().min(1),
+    items: z.array(z.object({ name: z.string().trim().min(1) })),
 })
 
 interface RandomizerFormProps {
@@ -44,9 +36,9 @@ export function RandomizerForm(props: RandomizerFormProps) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: randomizer ?? {
-            name: '',
-            items: [],
+        defaultValues: {
+            name: randomizer?.name ?? '',
+            items: randomizer?.items.map((item) => ({ name: item.name })) ?? [],
         },
     })
     const { fields, append, remove } = useFieldArray({
@@ -59,23 +51,15 @@ export function RandomizerForm(props: RandomizerFormProps) {
             if (randomizer) {
                 // Update existing randomizer
                 await updateRandomizer({
-                    id: randomizer.id as Id<'randomizers'>,
+                    id: randomizer.id,
                     name: values.name,
-                    items: values.items.map((item) => ({
-                        name: item.name,
-                        limit: item.limit,
-                        redeemed: item.redeemed || 0,
-                    })),
+                    items: { create: values.items },
                 })
             } else {
                 // Create new randomizer
                 await createRandomizer({
                     name: values.name,
-                    items: values.items.map((item) => ({
-                        name: item.name,
-                        limit: item.limit,
-                        redeemed: item.redeemed || 0,
-                    })),
+                    items: { create: values.items },
                 })
             }
         } catch (error) {
@@ -87,7 +71,7 @@ export function RandomizerForm(props: RandomizerFormProps) {
         if (!randomizer) return
 
         try {
-            await deleteRandomizer({ id: randomizer.id as Id<'randomizers'> })
+            await deleteRandomizer({ id: randomizer.id })
         } catch (error) {
             console.error('Failed to delete randomizer:', error)
         }
@@ -157,38 +141,6 @@ export function RandomizerForm(props: RandomizerFormProps) {
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
-                                        control={form.control}
-                                        name={`items.${index}.limit`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Limit</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type='number'
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name={`items.${index}.redeemed`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Redeemed</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type='number'
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
                                     <Button
                                         onClick={() => remove(index)}
                                         size='icon'
@@ -202,9 +154,7 @@ export function RandomizerForm(props: RandomizerFormProps) {
                             ))}
                         <Button
                             className='mt-4'
-                            onClick={() =>
-                                append({ name: '', limit: 1, redeemed: 0 })
-                            }
+                            onClick={() => append({ name: '' })}
                             type='button'
                             variant='outline'
                         >
