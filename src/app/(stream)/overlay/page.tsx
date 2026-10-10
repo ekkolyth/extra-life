@@ -150,7 +150,7 @@ const OverlayContent = () => {
             )}
 
             {/* Randomizer View */}
-            {!limited && <Randomizer setConfetti={setConfetti} />}
+            {!limited && <Randomizer />}
         </div>
     )
 }

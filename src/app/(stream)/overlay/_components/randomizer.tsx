@@ -3,21 +3,17 @@
 import { useConvexQuery } from '@convex-dev/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { api } from '@/convex/_generated/api'
+import styles from '../overlay.module.css'
 
 // a spin older than this is history, so reloading the overlay doesn't replay it
 const FRESH_SPIN_MS = 15000
 
-interface RandomizerProps {
-    setConfetti: (confetti: boolean) => void
-}
-
-export function Randomizer(props: RandomizerProps) {
-    const { setConfetti } = props
-
+export function Randomizer() {
     const [visible, setVisible] = useState(false)
     const [spinning, setSpinning] = useState(false)
     const [choiceIndex, setChoiceIndex] = useState(0)
     const [choices, setChoices] = useState<string[]>([])
+    const [confetti, setConfetti] = useState(false)
     const playedSpinId = useRef<string | null>(null)
     // owned by the spin, not the effect, so a re-render with the same spin can't cut it short
     const timers = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -56,18 +52,19 @@ export function Randomizer(props: RandomizerProps) {
             setTimeout(() => setConfetti(false), 8000),
             setTimeout(() => setVisible(false), 9000),
         ]
-    }, [spin, setConfetti])
+    }, [spin])
 
     if (!visible) return null
 
     return (
         <div className='flex items-center justify-center h-screen'>
-            <div className='bg-gray-900 rounded-lg shadow overflow-hidden p-12 w-full max-w-4xl'>
+            <div className='relative bg-gray-900 rounded-lg shadow overflow-hidden p-12 w-full max-w-4xl'>
+                {confetti && <div className={styles.confettiLayer} />}
                 <p
                     className={
                         spinning
-                            ? 'text-4xl font-bold animate-pulse'
-                            : 'text-4xl font-bold'
+                            ? 'relative z-51 text-4xl font-bold animate-pulse'
+                            : 'relative z-51 text-4xl font-bold'
                     }
                 >
                     {choices[choiceIndex % choices.length]}
