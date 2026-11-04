@@ -4,7 +4,8 @@ import { useAuth } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Header } from '@/components/header'
-import { Sidebar } from '@/components/navbar'
+import { AppSidebar } from '@/components/navbar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 export default function DashboardLayout({
     children,
@@ -52,14 +53,14 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className='h-screen flex bg-background'>
-            <Sidebar />
-            <div className='flex-1 flex flex-col'>
+        <SidebarProvider className='h-svh'>
+            <AppSidebar />
+            <SidebarInset className='min-w-0'>
                 <Header />
-                <main className='flex-1 container p-4 overflow-auto bg-background'>
+                <div className='flex-1 min-h-0 container p-4 overflow-auto'>
                     {children}
-                </main>
-            </div>
-        </div>
+                </div>
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
