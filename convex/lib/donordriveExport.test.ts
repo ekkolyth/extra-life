@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test'
-import { parseDonorDriveExport } from './donordriveExport'
+import {
+    type ExportDonationRow,
+    fillMissingAmounts,
+    parseDonorDriveExport,
+} from './donordriveExport'
 
 const loadSample = (name: string) =>
     Bun.file(
@@ -165,6 +169,123 @@ describe('parseDonorDriveExport', () => {
         const { errors } = await parseDonorDriveExport(text)
         expect(errors).toEqual([
             { line: 5, message: 'expected 10 fields, got 8' },
+        ])
+    })
+})
+
+const row = (overrides: Partial<ExportDonationRow>): ExportDonationRow => ({
+    year: 2019,
+    donationID: 'csv:x',
+    amount: 1,
+    createdAt: 0,
+    isRegFee: false,
+    source: 'csv',
+    ...overrides,
+})
+
+describe('fillMissingAmounts', () => {
+    test('splits the 2019 gap evenly across the missing rows', () => {
+        const known = Array.from({ length: 12 }, (_, index) =>
+            row({ donationID: `csv:known${index}`, amount: 25 })
+        )
+        const rows = [
+            ...known,
+            row({ donationID: 'csv:known12', amount: 71 }),
+            row({
+                donationID: 'csv:missing1',
+                amount: undefined,
+                createdAt: 1000,
+            }),
+            row({
+                donationID: 'csv:missing2',
+                amount: undefined,
+                createdAt: 2000,
+            }),
+        ]
+        const result = fillMissingAmounts(rows, { 2019: 392.9 })
+        expect(result.errors).toEqual([])
+        const filled = result.rows.filter((r) =>
+            r.donationID.startsWith('csv:missing')
+        )
+        expect(filled.map((r) => r.amount)).toEqual([10.95, 10.95])
+        const totalCents = result.rows.reduce(
+            (sum, r) => sum + Math.round(r.amount * 100),
+            0
+        )
+        expect(totalCents).toBe(39290)
+    })
+
+    test('gives the leftover cent to the earliest row', () => {
+        const rows = [
+            row({
+                year: 2020,
+                donationID: 'csv:late',
+                amount: undefined,
+                createdAt: 2000,
+            }),
+            row({
+                year: 2020,
+                donationID: 'csv:early',
+                amount: undefined,
+                createdAt: 1000,
+            }),
+        ]
+        const result = fillMissingAmounts(rows, { 2020: 10.01 })
+        expect(result.errors).toEqual([])
+        expect(
+            result.rows.find((r) => r.donationID === 'csv:early')?.amount
+        ).toBe(5.01)
+        expect(
+            result.rows.find((r) => r.donationID === 'csv:late')?.amount
+        ).toBe(5)
+    })
+
+    test('passes through years without missing amounts', () => {
+        const input = {
+            ...row({ year: 2024, donationID: 'csv:a' }),
+            amount: 25,
+        }
+        expect(fillMissingAmounts([input], {})).toEqual({
+            rows: [input],
+            errors: [],
+        })
+    })
+
+    test('reports a missing amount with no known total', () => {
+        const result = fillMissingAmounts(
+            [row({ year: 2018, donationID: 'csv:a', amount: undefined })],
+            {}
+        )
+        expect(result.errors).toEqual([
+            '2018: 1 row(s) have no amount and no known total',
+        ])
+    })
+
+    test('reports known amounts that exceed the known total', () => {
+        const result = fillMissingAmounts(
+            [
+                row({ donationID: 'csv:a', amount: 10 }),
+                row({ donationID: 'csv:b', amount: 10 }),
+                row({ donationID: 'csv:c', amount: undefined }),
+            ],
+            { 2019: 10 }
+        )
+        expect(result.errors).toEqual([
+            '2019: known amounts 20.00 exceed known total 10.00',
+        ])
+    })
+
+    test('keeps the input order', () => {
+        const rows = [
+            row({ donationID: 'csv:3', amount: undefined, createdAt: 3 }),
+            row({ donationID: 'csv:1', amount: 5, createdAt: 1 }),
+            row({ donationID: 'csv:2', amount: undefined, createdAt: 2 }),
+        ]
+        const result = fillMissingAmounts(rows, { 2019: 15 })
+        expect(result.rows.map((r) => r.donationID)).toEqual([
+            'csv:3',
+            'csv:1',
+            'csv:2',
         ])
     })
 })

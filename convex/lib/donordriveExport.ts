@@ -207,5 +207,61 @@ const parseDonorDriveExport = async (
     return { rows, errors }
 }
 
-export type { ExportDonationRow, ExportParseError }
-export { parseDonorDriveExport }
+type FilledDonationRow = Omit<ExportDonationRow, 'amount'> & { amount: number }
+
+const toCents = (dollars: number): number => Math.round(dollars * 100)
+
+// Anonymous rows carry no amount; each year's gap to its known total is split
+// across them in whole cents, with the leftover cents going to the earliest row.
+const fillMissingAmounts = (
+    rows: ExportDonationRow[],
+    knownYearTotals: Record<number, number>
+): { rows: FilledDonationRow[]; errors: string[] } => {
+    const errors: string[] = []
+    const filled = new Map<string, number>()
+    const years = new Set(rows.map((row) => row.year))
+
+    for (const year of years) {
+        const yearRows = rows.filter((row) => row.year === year)
+        const missing = yearRows
+            .filter((row) => row.amount === undefined)
+            .sort((a, b) => a.createdAt - b.createdAt)
+        if (missing.length === 0) continue
+
+        const knownTotal = knownYearTotals[year]
+        if (knownTotal === undefined) {
+            errors.push(
+                `${year}: ${missing.length} row(s) have no amount and no known total`
+            )
+            continue
+        }
+        const presentCents = yearRows.reduce(
+            (sum, row) =>
+                sum + (row.amount === undefined ? 0 : toCents(row.amount)),
+            0
+        )
+        const gapCents = toCents(knownTotal) - presentCents
+        if (gapCents < 0) {
+            errors.push(
+                `${year}: known amounts ${(presentCents / 100).toFixed(2)} exceed known total ${knownTotal.toFixed(2)}`
+            )
+            continue
+        }
+        const shareCents = Math.floor(gapCents / missing.length)
+        const leftoverCents = gapCents - shareCents * missing.length
+        missing.forEach((row, index) => {
+            const cents = shareCents + (index === 0 ? leftoverCents : 0)
+            filled.set(row.donationID, cents / 100)
+        })
+    }
+
+    const out: FilledDonationRow[] = []
+    for (const row of rows) {
+        const amount = row.amount ?? filled.get(row.donationID)
+        if (amount !== undefined) out.push({ ...row, amount })
+    }
+    return { rows: out, errors }
+}
+
+export type { ExportDonationRow, ExportParseError, FilledDonationRow }
+export { fillMissingAmounts, parseDonorDriveExport }
