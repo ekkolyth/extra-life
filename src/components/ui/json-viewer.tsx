@@ -17,13 +17,13 @@ export function JSONViewer({ data, title }: JSONViewerProps) {
         rules: [],
         colors: {
             'editor.background': '#09090b', // Very dark grey to match bg-background
-            'editor.foreground': '#e5e7eb', // Light grey text
-            'editor.lineHighlightBackground': '#0a0a0a', // Match background exactly
-            'editor.selectionBackground': '#374151', // Subtle selection
-            'editor.inactiveSelectionBackground': '#1f2937', // Subtle inactive selection
+            'editor.foreground': '#e4e4e7', // Light grey text
+            'editor.lineHighlightBackground': '#09090b', // Match background exactly
+            'editor.selectionBackground': '#3f3f46', // Subtle selection
+            'editor.inactiveSelectionBackground': '#27272a', // Subtle inactive selection
             'editorGutter.background': '#09090b', // Ensure gutter matches
             'editorWidget.background': '#09090b', // Ensure widgets match
-            'editorSuggestWidget.background': '#0a0a0a', // Ensure suggestions match
+            'editorSuggestWidget.background': '#09090b', // Ensure suggestions match
         },
     }
 

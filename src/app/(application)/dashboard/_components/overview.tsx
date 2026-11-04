@@ -111,88 +111,79 @@ export function Overview({
             <div className='@container'>
                 <div className='grid grid-cols-1 gap-6 @lg:grid-cols-2 @4xl:grid-cols-4'>
                     <Card>
-                        <CardContent className='flex flex-1 flex-col justify-between gap-4'>
-                            <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
-                                <Users className='size-4 text-primary' />
-                            </div>
-                            <div className='flex flex-col gap-1'>
-                                {isLoading ? (
-                                    <>
-                                        <LoadingValue className='h-8 w-20' />
-                                        <LoadingValue className='h-4 w-28' />
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className='text-3xl sm:text-2xl font-semibold tabular-nums text-foreground'>
-                                            {data.numDonations}
-                                        </p>
-                                        <p className='truncate text-base sm:text-sm text-muted-foreground'>
-                                            Total Donations
-                                        </p>
-                                    </>
-                                )}
-                            </div>
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-2'>
+                                <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                                    <Users className='size-4 text-primary' />
+                                </div>
+                                Total Donations
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-1 flex-col justify-end gap-1'>
+                            {isLoading ? (
+                                <LoadingValue className='h-8 w-20' />
+                            ) : (
+                                <p className='text-3xl sm:text-2xl font-semibold tabular-nums text-foreground'>
+                                    {data.numDonations}
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
 
                     <Card>
-                        <CardContent className='flex flex-1 flex-col justify-between gap-4'>
-                            <div className='flex items-center gap-2'>
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-2'>
                                 <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
                                     <BanknoteIcon className='size-4 text-primary' />
                                 </div>
-                                {isLoading || !topDonor ? (
+                                Top Donor
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-1 flex-col justify-end gap-1'>
+                            {isLoading || !topDonor ? (
+                                <>
+                                    <LoadingValue className='h-4 w-24' />
+                                    <LoadingValue className='h-8 w-28' />
                                     <LoadingValue className='h-4 w-20' />
-                                ) : (
-                                    <p className='min-w-0 truncate text-base sm:text-sm font-medium text-muted-foreground'>
+                                </>
+                            ) : (
+                                <>
+                                    <p className='truncate text-base sm:text-sm font-medium text-foreground'>
                                         {topDonor.displayName || 'Anonymous'}
                                     </p>
-                                )}
-                            </div>
-                            <div className='flex flex-col gap-1'>
-                                {isLoading || !topDonor ? (
-                                    <>
-                                        <LoadingValue className='h-8 w-28' />
-                                        <LoadingValue className='h-4 w-20' />
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className='text-3xl sm:text-2xl font-semibold tabular-nums text-foreground'>
-                                            {formatter.format(
-                                                topDonor.sumDonations ?? 0
-                                            )}
-                                        </p>
-                                        <p className='truncate text-base sm:text-sm text-muted-foreground'>
-                                            {topDonor.numDonations}{' '}
-                                            {topDonor.numDonations === 1
-                                                ? 'donation'
-                                                : 'donations'}
-                                        </p>
-                                    </>
-                                )}
-                            </div>
+                                    <p className='text-3xl sm:text-2xl font-semibold tabular-nums text-foreground'>
+                                        {formatter.format(
+                                            topDonor.sumDonations ?? 0
+                                        )}
+                                    </p>
+                                    <p className='truncate text-base sm:text-sm text-muted-foreground'>
+                                        {topDonor.numDonations}{' '}
+                                        {topDonor.numDonations === 1
+                                            ? 'donation'
+                                            : 'donations'}
+                                    </p>
+                                </>
+                            )}
                         </CardContent>
                     </Card>
 
                     <Card className='@lg:col-span-2'>
-                        <CardContent className='flex flex-1 flex-col justify-between gap-4'>
-                            <div className='flex min-w-0 flex-col gap-1'>
-                                <div className='flex items-center gap-2'>
-                                    <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
-                                        <Trophy className='size-4 text-primary' />
-                                    </div>
-                                    <p className='text-base sm:text-sm font-medium text-primary'>
-                                        Next Goal
-                                    </p>
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-2'>
+                                <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                                    <Trophy className='size-4 text-primary' />
                                 </div>
-                                {isLoading || !nextGoal ? (
-                                    <LoadingValue className='h-7 w-40' />
-                                ) : (
-                                    <h3 className='truncate text-lg font-semibold text-foreground'>
-                                        {nextGoal.title}
-                                    </h3>
-                                )}
-                            </div>
+                                Next Goal
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-1 flex-col justify-between gap-4'>
+                            {isLoading || !nextGoal ? (
+                                <LoadingValue className='h-7 w-40' />
+                            ) : (
+                                <h3 className='truncate text-lg font-semibold text-foreground'>
+                                    {nextGoal.title}
+                                </h3>
+                            )}
                             <div className='flex flex-col gap-2'>
                                 <div className='flex justify-between gap-4 text-base sm:text-sm tabular-nums'>
                                     {isLoading ? (
