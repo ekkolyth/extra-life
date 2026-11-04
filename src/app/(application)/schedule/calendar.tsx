@@ -2,12 +2,42 @@
 
 import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
 import { set, subMinutes } from 'date-fns'
-import { TrashIcon } from 'lucide-react'
-import { Fragment } from 'react'
+import { PencilIcon, TrashIcon } from 'lucide-react'
+import { Fragment, useState } from 'react'
+import { SegmentForm } from '@/components/forms/segment'
 import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
 import { api } from '@/convex/_generated/api'
+import type { Segment } from '@/types/db'
 import { cn } from '@/utils/style'
 import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time'
+
+function EditSegmentDialog({ segment }: { segment: Segment }) {
+    const [open, setOpen] = useState(false)
+
+    return (
+        <Dialog onOpenChange={setOpen} open={open}>
+            <DialogTrigger asChild>
+                <Button size='sm' variant='ghost'>
+                    <span className='sr-only'>Edit</span>
+                    <PencilIcon className='h-4 w-4' />
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit Segment</DialogTitle>
+                </DialogHeader>
+                <SegmentForm onSaved={() => setOpen(false)} segment={segment} />
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 export function Calendar() {
     const segments = useConvexQuery(api.segment.list, {}) || []
@@ -101,16 +131,31 @@ export function Calendar() {
                                     }}
                                 >
                                     <p>{segment.title}</p>
-                                    <Button
-                                        onClick={() =>
-                                            deleteSegment({ id: segment._id })
-                                        }
-                                        size='sm'
-                                        variant='ghost'
-                                    >
-                                        <span className='sr-only'>Delete</span>
-                                        <TrashIcon className='h-4 w-4' />
-                                    </Button>
+                                    <div className='flex items-start'>
+                                        <EditSegmentDialog
+                                            segment={{
+                                                id: segment._id,
+                                                title: segment.title,
+                                                startsAt: segment.startsAt,
+                                                duration: segment.duration,
+                                                platform: segment.platform,
+                                            }}
+                                        />
+                                        <Button
+                                            onClick={() =>
+                                                deleteSegment({
+                                                    id: segment._id,
+                                                })
+                                            }
+                                            size='sm'
+                                            variant='ghost'
+                                        >
+                                            <span className='sr-only'>
+                                                Delete
+                                            </span>
+                                            <TrashIcon className='h-4 w-4' />
+                                        </Button>
+                                    </div>
                                 </li>
                             ))}
                         </ol>
