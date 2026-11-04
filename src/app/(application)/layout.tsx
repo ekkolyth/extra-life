@@ -2,7 +2,7 @@
 
 import { useAuth } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Header } from '@/components/header'
 import { AppSidebar } from '@/components/navbar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
@@ -14,17 +14,17 @@ export default function DashboardLayout({
 }) {
     const { isLoaded, isSignedIn } = useAuth()
     const router = useRouter()
-    const [hasRedirected, setHasRedirected] = useState(false)
+    const hasRedirected = useRef(false)
 
+    // the short delay lets a sign-out finish its own navigation home before this guard kicks in
     useEffect(() => {
-        if (isLoaded && !isSignedIn && !hasRedirected) {
-            setHasRedirected(true)
-            const timer = setTimeout(() => {
-                router.push('/auth/sign-in')
-            }, 100)
-            return () => clearTimeout(timer)
-        }
-    }, [isLoaded, isSignedIn, router, hasRedirected])
+        if (!isLoaded || isSignedIn || hasRedirected.current) return
+        const timer = setTimeout(() => {
+            hasRedirected.current = true
+            router.push('/auth/sign-in')
+        }, 100)
+        return () => clearTimeout(timer)
+    }, [isLoaded, isSignedIn, router])
 
     if (!isLoaded) {
         return (
@@ -56,7 +56,7 @@ export default function DashboardLayout({
         <SidebarProvider className='h-svh'>
             <AppSidebar />
             <SidebarInset className='min-w-0'>
-                <Header />
+                <Header withSidebarTrigger />
                 <div className='flex-1 min-h-0 container p-4 overflow-auto'>
                     {children}
                 </div>

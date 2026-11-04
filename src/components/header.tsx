@@ -6,10 +6,14 @@ import { ModeToggle } from '@/components/mode-toggle'
 import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 
-export function Header() {
+export function Header({
+    withSidebarTrigger = false,
+}: {
+    withSidebarTrigger?: boolean
+}) {
     return (
         <header className='flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4'>
-            <SidebarTrigger />
+            {withSidebarTrigger ? <SidebarTrigger /> : <div />}
             <div className='flex items-center gap-x-4'>
                 <ModeToggle />
                 <SignedOut>

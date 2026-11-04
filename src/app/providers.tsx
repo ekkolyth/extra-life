@@ -23,10 +23,12 @@ type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>
 function ClerkProvider({ children, appearance, ...props }: ClerkProviderProps) {
     return (
         <ClerkNextJSProvider
+            afterSignOutUrl='/'
             appearance={{
                 theme: shadcn,
                 ...appearance,
             }}
+            signInForceRedirectUrl='/dashboard'
             signInUrl='/auth/sign-in'
             {...props}
         >
@@ -100,6 +102,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 defaultTheme='system'
                 disableTransitionOnChange
                 enableSystem
+                // the theme script only needs to run from the server html; a data-block
+                // type on client renders stops React 19 erroring on a non-executing script
+                scriptProps={{
+                    type:
+                        typeof window === 'undefined'
+                            ? undefined
+                            : 'application/json',
+                }}
             >
                 <QueryClientProviderWrapper>
                     <ConvexClientProvider>{children}</ConvexClientProvider>
