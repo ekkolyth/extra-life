@@ -31,6 +31,7 @@ const donationRowInput = v.object({
     amount: donationFields.amount,
     message: donationFields.message,
     avatarImageURL: donationFields.avatarImageURL,
+    email: donationFields.email,
     isRegFee: donationFields.isRegFee,
     createdAt: donationFields.createdAt,
     source: donationFields.source,
