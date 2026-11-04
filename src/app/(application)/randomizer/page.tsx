@@ -1,11 +1,23 @@
 'use client'
 
 import { useConvexQuery } from '@convex-dev/react-query'
+import { PlusIcon } from 'lucide-react'
+import { useState } from 'react'
 import { RandomizerForm } from '@/components/forms/randomizer'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
 import { api } from '@/convex/_generated/api'
 import type { Randomizer } from '@/types/db'
+import { RandomizerCard } from './_components/randomizer-card'
 
 export default function RandomizerPage() {
+    const [isCreateOpen, setIsCreateOpen] = useState(false)
     const convexRandomizers = useConvexQuery(api.randomizer.list, {}) || []
 
     // Transform Convex data to match expected component types
@@ -24,11 +36,30 @@ export default function RandomizerPage() {
     }))
 
     return (
-        <div className='space-y-6'>
+        <div className='flex flex-col gap-6'>
+            <Dialog onOpenChange={setIsCreateOpen} open={isCreateOpen}>
+                <DialogTrigger asChild>
+                    <Button
+                        className='self-end text-base'
+                        size='lg'
+                        variant='outline'
+                    >
+                        <PlusIcon />
+                        Add Randomizer
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className='max-w-2xl'>
+                    <DialogHeader>
+                        <DialogTitle className='text-2xl'>
+                            New Randomizer
+                        </DialogTitle>
+                    </DialogHeader>
+                    <RandomizerForm onCreated={() => setIsCreateOpen(false)} />
+                </DialogContent>
+            </Dialog>
             {randomizers.map((randomizer: Randomizer) => (
-                <RandomizerForm key={randomizer.id} randomizer={randomizer} />
+                <RandomizerCard key={randomizer.id} randomizer={randomizer} />
             ))}
-            <RandomizerForm />
         </div>
     )
 }
