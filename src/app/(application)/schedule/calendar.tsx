@@ -130,7 +130,14 @@ export function Calendar() {
                                         }`,
                                     }}
                                 >
-                                    <p>{segment.title}</p>
+                                    <div>
+                                        <p>{segment.title}</p>
+                                        {segment.platform && (
+                                            <p className='text-sm opacity-80'>
+                                                {segment.platform}
+                                            </p>
+                                        )}
+                                    </div>
                                     <div className='flex items-start'>
                                         <EditSegmentDialog
                                             segment={{
