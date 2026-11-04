@@ -24,20 +24,19 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
 
     if (randomizers.length === 0) {
         return (
-            <Card className='border-border/50 bg-card/50 backdrop-blur-sm'>
+            <Card>
                 <CardHeader>
                     <CardTitle className='flex items-center gap-2'>
-                        <Shuffle className='h-5 w-5 text-primary' />
+                        <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                            <Shuffle className='size-4 text-primary' />
+                        </div>
                         Randomizers
                     </CardTitle>
                 </CardHeader>
-                <CardContent className='space-y-4'>
-                    <div className='rounded-lg bg-muted/30 p-4'>
-                        <p className='text-sm text-muted-foreground text-center'>
-                            No randomizers found
-                        </p>
-                    </div>
-
+                <CardContent className='flex flex-col gap-4'>
+                    <p className='py-6 text-center text-base sm:text-sm text-muted-foreground'>
+                        No randomizers found
+                    </p>
                     <Button
                         asChild
                         className='w-full bg-transparent'
@@ -58,56 +57,44 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
         <Card>
             <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
-                    <Shuffle className='h-5 w-5 text-primary' />
+                    <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                        <Shuffle className='size-4 text-primary' />
+                    </div>
                     Randomizers
                 </CardTitle>
             </CardHeader>
-            <CardContent className='space-y-4'>
-                <div className='rounded-lg bg-muted/30 p-4'>
-                    <ul className='space-y-2'>
-                        {randomizers.map((randomizer) => (
-                            <li
-                                className='flex justify-between items-center gap-3 text-sm'
-                                key={randomizer.id}
+            <CardContent>
+                <ul className='divide-y'>
+                    {randomizers.map((randomizer) => (
+                        <li
+                            className='flex items-center gap-3 py-3 text-base sm:text-sm first:pt-0 last:pb-0'
+                            key={randomizer.id}
+                        >
+                            <p className='min-w-0 flex-1 truncate font-medium text-foreground'>
+                                {randomizer.name}
+                            </p>
+                            <p className='shrink-0 tabular-nums text-muted-foreground'>
+                                {randomizer.items.length} items
+                            </p>
+                            <Button
+                                disabled={
+                                    randomizer.items.length === 0 ||
+                                    (isPending &&
+                                        variables?.randomizerId ===
+                                            randomizer.id)
+                                }
+                                onClick={() =>
+                                    trigger({ randomizerId: randomizer.id })
+                                }
+                                size='sm'
+                                type='button'
+                                variant='outline'
                             >
-                                <span className='min-w-0 truncate text-foreground'>
-                                    {randomizer.name}
-                                </span>
-                                <span className='ml-auto shrink-0 text-muted-foreground'>
-                                    {randomizer.items.length} items
-                                </span>
-                                <Button
-                                    disabled={
-                                        randomizer.items.length === 0 ||
-                                        (isPending &&
-                                            variables?.randomizerId ===
-                                                randomizer.id)
-                                    }
-                                    onClick={() =>
-                                        trigger({ randomizerId: randomizer.id })
-                                    }
-                                    size='sm'
-                                    type='button'
-                                    variant='outline'
-                                >
-                                    Trigger
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <Button
-                    asChild
-                    className='w-full bg-transparent'
-                    size='sm'
-                    variant='outline'
-                >
-                    <Link href='/randomizer'>
-                        <Plus className='h-4 w-4 mr-2' />
-                        Manage Randomizers
-                    </Link>
-                </Button>
+                                Trigger
+                            </Button>
+                        </li>
+                    ))}
+                </ul>
             </CardContent>
         </Card>
     )

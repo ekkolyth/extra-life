@@ -49,21 +49,21 @@ export default function AdminPage() {
     }))
 
     return (
-        <div className='space-y-4'>
+        <div className='flex flex-col gap-6'>
             <EnvCheck />
-            <div className='space-y-6'>
-                <Overview
-                    data={{
-                        sumDonations: campaign?.sumDonations ?? 0,
-                        fundraisingGoal: campaign?.fundraisingGoal || 2000,
-                        numDonations: campaign?.numDonations ?? 0,
-                    }}
-                    goals={goals}
-                    isLoading={isPending}
-                    topDonor={topDonor ?? null}
-                />
+            <Overview
+                data={{
+                    sumDonations: campaign?.sumDonations ?? 0,
+                    fundraisingGoal: campaign?.fundraisingGoal || 2000,
+                    numDonations: campaign?.numDonations ?? 0,
+                }}
+                goals={goals}
+                isLoading={isPending}
+                topDonor={topDonor ?? null}
+            />
 
-                <div className='grid md:grid-cols-2 gap-6'>
+            <div className='@container'>
+                <div className='grid grid-cols-1 gap-6 @3xl:grid-cols-2 @6xl:grid-cols-3'>
                     <ScheduleSection segments={segments} />
                     <RecentDonations
                         donations={latestDonations ?? []}
