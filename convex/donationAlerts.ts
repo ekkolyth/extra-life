@@ -1,5 +1,5 @@
-import { v } from 'convex/values'
-import { mutation, query } from './_generated/server'
+import { ConvexError, v } from 'convex/values'
+import { mutation, type QueryCtx, query } from './_generated/server'
 import { requireSignedIn } from './lib/admin'
 
 const TEST_ALERT = {
@@ -8,7 +8,16 @@ const TEST_ALERT = {
     message: 'For the kids!',
 }
 
-// the stream overlay calls this signed-out
+// stream alerts, test ones included, only run while live polling is on
+async function alertsOn(ctx: QueryCtx): Promise<boolean> {
+    const campaign = await ctx.db
+        .query('campaigns')
+        .withIndex('by_active', (q) => q.eq('isActive', true))
+        .unique()
+    return campaign?.livePolling === true
+}
+
+// public stream overlay subscription
 export const pending = query({
     args: {},
     returns: v.array(
@@ -21,6 +30,7 @@ export const pending = query({
         })
     ),
     handler: async (ctx) => {
+        if (!(await alertsOn(ctx))) return []
         const alerts = await ctx.db
             .query('donationAlerts')
             .withIndex('by_played_at', (q) => q.eq('playedAt', undefined))
@@ -36,7 +46,7 @@ export const pending = query({
     },
 })
 
-// signed-out overlay acks its own playback, so a repeat call is a no-op
+// the overlay acknowledges playback without auth; repeat calls are a no-op
 export const markPlayed = mutation({
     args: { alertId: v.id('donationAlerts') },
     returns: v.null(),
@@ -53,6 +63,11 @@ export const createTest = mutation({
     returns: v.null(),
     handler: async (ctx) => {
         await requireSignedIn(ctx)
+        if (!(await alertsOn(ctx))) {
+            throw new ConvexError(
+                'Turn on live polling to test donation alerts'
+            )
+        }
         await ctx.db.insert('donationAlerts', TEST_ALERT)
         return null
     },

@@ -5,9 +5,11 @@ import { api } from '@/convex/_generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
 
 export function useDonationVideoTrigger() {
-    const { data: pending = [] } = useQuery(
-        convexQuery(api.donationAlerts.pending, {})
-    )
+    const { data: pending, error } = useQuery({
+        ...convexQuery(api.donationAlerts.pending, {}),
+        // the subscription bridge drops recovery updates if the cache has never held data
+        initialData: [],
+    })
     const markPlayed = useConvexMutation(api.donationAlerts.markPlayed)
     // hide a finished alert right away instead of waiting for the subscription to drop it
     const [finished, setFinished] = useState<Set<Id<'donationAlerts'>>>(
@@ -26,5 +28,5 @@ export function useDonationVideoTrigger() {
         })
     }
 
-    return { currentAlert, handleVideoEnd }
+    return { currentAlert, handleVideoEnd, error }
 }

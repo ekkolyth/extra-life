@@ -5,8 +5,9 @@ import { shadcn } from '@clerk/themes'
 import { ConvexQueryClient } from '@convex-dev/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ConvexReactClient } from 'convex/react'
+import { ConvexProvider, ConvexReactClient } from 'convex/react'
 import { ConvexProviderWithClerk } from 'convex/react-clerk'
+import { usePathname } from 'next/navigation'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { ReactNode, useState } from 'react'
 
@@ -16,6 +17,7 @@ if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
 }
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL)
+const overlayConvex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL)
 
 // Clerk Provider Component
 type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>
@@ -55,9 +57,15 @@ function ConvexClientProvider({ children }: { children: ReactNode }) {
 }
 
 // Query Client Provider Component
-function QueryClientProviderWrapper({ children }: { children: ReactNode }) {
+function QueryClientProviderWrapper({
+    children,
+    client: convexClient = convex,
+}: {
+    children: ReactNode
+    client?: ConvexReactClient
+}) {
     const [queryClient] = useState(() => {
-        const convexQueryClient = new ConvexQueryClient(convex)
+        const convexQueryClient = new ConvexQueryClient(convexClient)
         const client = new QueryClient({
             defaultOptions: {
                 queries: {
@@ -82,6 +90,17 @@ function QueryClientProviderWrapper({ children }: { children: ReactNode }) {
 
 // Main Providers Component
 export function Providers({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname()
+    if (pathname === '/overlay') {
+        return (
+            <ConvexProvider client={overlayConvex}>
+                <QueryClientProviderWrapper client={overlayConvex}>
+                    {children}
+                </QueryClientProviderWrapper>
+            </ConvexProvider>
+        )
+    }
+
     // Check for required Clerk environment variable
     if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
         console.error('❌ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set')

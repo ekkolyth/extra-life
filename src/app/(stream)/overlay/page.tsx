@@ -43,7 +43,11 @@ const OverlayContent = () => {
         endOfStream: g.endOfStream,
     }))
 
-    const { currentAlert, handleVideoEnd } = useDonationVideoTrigger()
+    const {
+        currentAlert,
+        handleVideoEnd,
+        error: alertError,
+    } = useDonationVideoTrigger()
 
     // Confetti when >= 100%
     useEffect(() => {
@@ -65,14 +69,16 @@ const OverlayContent = () => {
         )
     }
 
-    if (error) {
+    if (error || alertError) {
         return (
             <div className={styles.loading}>
                 <div
                     className={styles.loadingText}
                     style={{ color: '#ef4444' }}
                 >
-                    Error loading overlay data
+                    {alertError
+                        ? 'Error loading donation alerts'
+                        : 'Error loading overlay data'}
                 </div>
             </div>
         )

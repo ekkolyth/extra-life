@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import type { Donation as FullDonation } from '@/types/donor-drive'
 
 type Donation = Pick<FullDonation, 'amount' | 'displayName' | 'message'>
@@ -18,6 +19,7 @@ export function DonationVideoOverlay({
 }: DonationVideoOverlayProps) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const [hasPlayed, setHasPlayed] = useState(false)
+    const [playbackError, setPlaybackError] = useState(false)
 
     useEffect(() => {
         if (isVisible && videoRef.current && !hasPlayed) {
@@ -29,27 +31,18 @@ export function DonationVideoOverlay({
             // Play the video
             video.play().catch((error) => {
                 console.error('Error playing donation video:', error)
-                // If autoplay fails, try playing without audio first, then enable audio
-                video.muted = true
-                video
-                    .play()
-                    .then(() => {
-                        // After video starts, unmute it
-                        video.muted = false
-                    })
-                    .catch(() => {
-                        onVideoEnd() // Call onVideoEnd if both attempts fail
-                    })
+                setPlaybackError(true)
             })
 
             setHasPlayed(true)
         }
-    }, [isVisible, hasPlayed, onVideoEnd])
+    }, [isVisible, hasPlayed])
 
     // Reset hasPlayed when overlay becomes invisible
     useEffect(() => {
         if (!isVisible) {
             setHasPlayed(false)
+            setPlaybackError(false)
         }
     }, [isVisible])
 
@@ -70,7 +63,7 @@ export function DonationVideoOverlay({
                 onEnded={handleVideoEnd}
                 onError={() => {
                     console.error('Video playback error')
-                    onVideoEnd()
+                    setPlaybackError(true)
                 }}
                 playsInline
                 preload='auto'
@@ -79,6 +72,14 @@ export function DonationVideoOverlay({
                 <source src='/videos/alert.webm' type='video/webm' />
                 Your browser does not support the video tag.
             </video>
+
+            {playbackError && (
+                <Alert className='absolute top-8 right-8' variant='destructive'>
+                    <AlertDescription>
+                        Error playing donation video
+                    </AlertDescription>
+                </Alert>
+            )}
 
             {/* Donation Details Overlay */}
             <div className='absolute top-8 left-8 pointer-events-none'>
