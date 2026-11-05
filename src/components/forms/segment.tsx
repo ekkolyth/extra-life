@@ -22,35 +22,63 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { api } from '@/convex/_generated/api'
+import { segmentPlatforms } from '@/convex/schema/segments'
+import type { Segment } from '@/types/db'
+import { cn } from '@/utils/style'
 
 const formSchema = z.object({
-    id: z.string().optional(),
     title: z.string().min(2).max(50),
     startsAt: z.string(),
     duration: z.string(),
+    platform: z.enum(segmentPlatforms).optional(),
 })
 
-export function SegmentForm() {
+type FormData = z.infer<typeof formSchema>
+
+interface SegmentFormProps {
+    onSaved?: () => void
+    segment?: Segment
+}
+
+export function SegmentForm(props: SegmentFormProps) {
+    const { segment, onSaved } = props
+
     const createSegment = useConvexMutation(api.segment.create)
-    const form = useForm<z.infer<typeof formSchema>>({
+    const updateSegment = useConvexMutation(api.segment.update)
+    const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            title: '',
-            startsAt: '',
-            duration: '1',
-        },
+        defaultValues: segment
+            ? {
+                  title: segment.title,
+                  startsAt: segment.startsAt,
+                  duration: String(segment.duration),
+                  platform: segment.platform,
+              }
+            : {
+                  title: '',
+                  startsAt: '',
+                  duration: '1',
+                  platform: undefined,
+              },
     })
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: FormData) {
+        const data = {
+            title: values.title,
+            startsAt: values.startsAt,
+            duration: parseInt(values.duration, 10),
+            platform: values.platform,
+        }
         try {
-            await createSegment({
-                title: values.title,
-                startsAt: values.startsAt,
-                duration: parseInt(values.duration, 10),
-            })
-            form.reset()
+            if (segment) {
+                await updateSegment({ id: segment.id, ...data })
+            } else {
+                await createSegment(data)
+                form.reset()
+            }
+            onSaved?.()
         } catch (error) {
-            console.error('Failed to create segment:', error)
+            console.error('Failed to save segment:', error)
         }
     }
 
@@ -58,10 +86,10 @@ export function SegmentForm() {
         <div>
             <Form {...form}>
                 <form
-                    className='border p-4 rounded'
+                    className={cn(!segment && 'border p-4 rounded')}
                     onSubmit={form.handleSubmit(onSubmit)}
                 >
-                    <p className='mb-4'>Add Segment</p>
+                    {!segment && <p className='mb-4'>Add Segment</p>}
                     <div className='space-y-6'>
                         <FormField
                             control={form.control}
@@ -145,6 +173,39 @@ export function SegmentForm() {
                                             <SelectItem value='12'>
                                                 6 hr
                                             </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name='platform'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Platform</FormLabel>
+                                    <Select
+                                        name={field.name}
+                                        onValueChange={field.onChange}
+                                        value={field.value ?? ''}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder='Select a platform' />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {segmentPlatforms.map(
+                                                (platform) => (
+                                                    <SelectItem
+                                                        key={platform}
+                                                        value={platform}
+                                                    >
+                                                        {platform}
+                                                    </SelectItem>
+                                                )
+                                            )}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

@@ -42,140 +42,121 @@ export function Overview({
     const progressToNext = nextGoal ? (totalRaised / nextGoal.amount) * 100 : 0
 
     return (
-        <div className='space-y-6'>
-            <Card className='border-border/50 bg-card/50 backdrop-blur-sm'>
-                <CardHeader className='pb-3'>
-                    <CardTitle className='flex items-center gap-2 text-xl'>
-                        <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10'>
-                            <DollarSign className='h-4 w-4 text-primary' />
+        <div className='flex flex-col gap-6'>
+            <Card>
+                <CardHeader>
+                    <CardTitle className='flex items-center gap-2'>
+                        <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                            <DollarSign className='size-4 text-primary' />
                         </div>
-                        Total Raised YTD
+                        <span className='truncate'>Total Raised YTD</span>
                     </CardTitle>
                 </CardHeader>
-                <CardContent className='space-y-6'>
-                    <div className='space-y-4'>
-                        <div className='flex items-baseline gap-3'>
+                <CardContent className='flex flex-col gap-4'>
+                    <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
+                        {isLoading ? (
+                            <LoadingValue className='h-10 w-40' />
+                        ) : (
+                            <p className='text-4xl font-semibold tracking-tight tabular-nums text-foreground'>
+                                ${totalRaised.toFixed(2)}
+                            </p>
+                        )}
+                        <div className='flex flex-col gap-1 text-base sm:text-sm tabular-nums'>
                             {isLoading ? (
-                                <LoadingValue className='h-12 w-32' />
+                                <>
+                                    <LoadingValue className='h-5 w-20' />
+                                    <LoadingValue className='h-4 w-24' />
+                                </>
                             ) : (
-                                <span className='text-5xl font-bold tracking-tight text-foreground'>
-                                    ${totalRaised.toFixed(2)}
-                                </span>
+                                <>
+                                    <p className='text-muted-foreground'>
+                                        of ${goal.toLocaleString()}
+                                    </p>
+                                    <p className='font-medium text-primary'>
+                                        +${totalRaised.toFixed(2)} this month
+                                    </p>
+                                </>
                             )}
-                            <div className='flex flex-col'>
-                                {isLoading ? (
-                                    <>
-                                        <LoadingValue className='h-6 w-20' />
-                                        <LoadingValue className='h-4 w-24 mt-1' />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className='text-lg text-muted-foreground'>
-                                            of ${goal.toLocaleString()}
-                                        </span>
-                                        <span className='text-sm text-primary font-medium'>
-                                            +${totalRaised.toFixed(2)} this
-                                            month
-                                        </span>
-                                    </>
-                                )}
-                            </div>
                         </div>
-                        <div className='space-y-2'>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        {isLoading ? (
+                            <LoadingValue className='h-2 w-full' />
+                        ) : (
+                            <Progress value={progressPercentage} />
+                        )}
+                        <div className='flex justify-between gap-4 text-base sm:text-sm text-muted-foreground tabular-nums'>
                             {isLoading ? (
-                                <LoadingValue className='h-2 w-full' />
+                                <>
+                                    <LoadingValue className='h-4 w-20' />
+                                    <LoadingValue className='h-4 w-24' />
+                                </>
                             ) : (
-                                <Progress
-                                    className='h-2'
-                                    value={progressPercentage}
-                                />
+                                <>
+                                    <p>
+                                        {progressPercentage.toFixed(1)}%
+                                        complete
+                                    </p>
+                                    <p>
+                                        ${(goal - totalRaised).toLocaleString()}{' '}
+                                        remaining
+                                    </p>
+                                </>
                             )}
-                            <div className='flex justify-between text-sm'>
-                                {isLoading ? (
-                                    <>
-                                        <LoadingValue className='h-4 w-20' />
-                                        <LoadingValue className='h-4 w-24' />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className='text-muted-foreground'>
-                                            {progressPercentage.toFixed(1)}%
-                                            complete
-                                        </span>
-                                        <span className='text-muted-foreground'>
-                                            $
-                                            {(
-                                                goal - totalRaised
-                                            ).toLocaleString()}{' '}
-                                            remaining
-                                        </span>
-                                    </>
-                                )}
-                            </div>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Stats grid with modern design */}
-            <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
-                {/* Total Donations Card */}
-                <Card className='border-border/50 bg-card/30 backdrop-blur-sm hover:bg-card/50 transition-colors flex flex-col'>
-                    <CardContent className='p-4 flex flex-col flex-1 justify-between'>
-                        <div className='flex items-center justify-start'>
-                            <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10'>
-                                <Users className='h-6 w-6 text-primary' />
-                            </div>
-                        </div>
-                        <div className='flex flex-col gap-1 flex-1 justify-end'>
+            <div className='@container'>
+                <div className='grid grid-cols-1 gap-6 @lg:grid-cols-2 @4xl:grid-cols-4'>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-2'>
+                                <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                                    <Users className='size-4 text-primary' />
+                                </div>
+                                Total Donations
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-1 flex-col justify-end gap-1'>
                             {isLoading ? (
-                                <>
-                                    <LoadingValue className='h-10 w-24' />
-                                    <LoadingValue className='h-4 w-32' />
-                                </>
+                                <LoadingValue className='h-8 w-20' />
                             ) : (
-                                <>
-                                    <p className='text-4xl font-bold text-foreground leading-tight'>
-                                        {data.numDonations}
-                                    </p>
-                                    <p className='text-sm text-muted-foreground font-medium'>
-                                        Total Donations
-                                    </p>
-                                </>
+                                <p className='text-3xl sm:text-2xl font-semibold tabular-nums text-foreground'>
+                                    {data.numDonations}
+                                </p>
                             )}
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
 
-                {/* Top Donor Card - matches the style of other stat cards */}
-                <Card className='border-border/50 bg-card/30 backdrop-blur-sm hover:bg-card/50 transition-colors flex flex-col'>
-                    <CardContent className='p-4 flex flex-col flex-1 justify-between'>
-                        <div className='flex items-center justify-between'>
-                            <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10'>
-                                <BanknoteIcon className='h-6 w-6 text-primary' />
-                            </div>
-                            {isLoading || !topDonor ? (
-                                <LoadingValue className='h-4 w-20' />
-                            ) : (
-                                <span className='text-lg font-semibold text-muted-foreground truncate max-w-[120px]'>
-                                    {topDonor.displayName || 'Anonymous'}
-                                </span>
-                            )}
-                        </div>
-                        <div className='flex flex-col gap-1 flex-1 justify-end'>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-2'>
+                                <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                                    <BanknoteIcon className='size-4 text-primary' />
+                                </div>
+                                Top Donor
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-1 flex-col justify-end gap-1'>
                             {isLoading || !topDonor ? (
                                 <>
-                                    <LoadingValue className='h-10 w-24' />
-                                    <LoadingValue className='h-4 w-32' />
+                                    <LoadingValue className='h-4 w-24' />
+                                    <LoadingValue className='h-8 w-28' />
+                                    <LoadingValue className='h-4 w-20' />
                                 </>
                             ) : (
                                 <>
-                                    <p className='text-4xl font-bold text-foreground leading-tight'>
+                                    <p className='truncate text-base sm:text-sm font-medium text-foreground'>
+                                        {topDonor.displayName || 'Anonymous'}
+                                    </p>
+                                    <p className='text-3xl sm:text-2xl font-semibold tabular-nums text-foreground'>
                                         {formatter.format(
                                             topDonor.sumDonations ?? 0
                                         )}
                                     </p>
-                                    <p className='text-sm text-muted-foreground font-medium'>
+                                    <p className='truncate text-base sm:text-sm text-muted-foreground'>
                                         {topDonor.numDonations}{' '}
                                         {topDonor.numDonations === 1
                                             ? 'donation'
@@ -183,78 +164,63 @@ export function Overview({
                                     </p>
                                 </>
                             )}
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
 
-                {/* Next Goal Card - spans 2 columns */}
-                <Card className='border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm flex flex-col lg:col-span-2'>
-                    <CardContent className='p-4 flex flex-col flex-1 justify-between'>
-                        <div className='flex items-center gap-3 mb-2'>
-                            <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20'>
-                                <Trophy className='h-6 w-6 text-primary' />
-                            </div>
-                            <div>
-                                <span className='text-xs font-medium text-primary'>
-                                    Next Goal
-                                </span>
-                                {isLoading || !nextGoal ? (
-                                    <LoadingValue className='h-6 w-32 mt-1' />
-                                ) : (
-                                    <h3 className='text-xl font-bold text-foreground'>
-                                        {nextGoal.title}
-                                    </h3>
-                                )}
-                            </div>
-                        </div>
-                        {isLoading || !nextGoal ? (
-                            <LoadingValue className='h-3 w-24 mb-2' />
-                        ) : (
-                            <p className='text-xs text-muted-foreground mb-2'>
-                                {nextGoal.endOfStream
-                                    ? 'End of Stream Goal'
-                                    : 'Donation Goal'}
-                            </p>
-                        )}
-                        <div className='flex flex-col gap-1 flex-1 justify-end'>
-                            <div className='flex justify-between text-xs mb-2'>
+                    <Card className='@lg:col-span-2'>
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-2'>
+                                <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                                    <Trophy className='size-4 text-primary' />
+                                </div>
+                                Next Goal
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-1 flex-col justify-between gap-4'>
+                            {isLoading || !nextGoal ? (
+                                <LoadingValue className='h-7 w-40' />
+                            ) : (
+                                <h3 className='truncate text-lg font-semibold text-foreground'>
+                                    {nextGoal.title}
+                                </h3>
+                            )}
+                            <div className='flex flex-col gap-2'>
+                                <div className='flex justify-between gap-4 text-base sm:text-sm tabular-nums'>
+                                    {isLoading ? (
+                                        <>
+                                            <LoadingValue className='h-4 w-20' />
+                                            <LoadingValue className='h-4 w-20' />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className='text-muted-foreground'>
+                                                ${totalRaised.toFixed(2)} raised
+                                            </p>
+                                            <p className='font-medium text-foreground'>
+                                                $
+                                                {nextGoal?.amount.toLocaleString() ||
+                                                    '0'}{' '}
+                                                target
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
                                 {isLoading ? (
-                                    <>
-                                        <LoadingValue className='h-3 w-20' />
-                                        <LoadingValue className='h-3 w-20' />
-                                    </>
+                                    <LoadingValue className='h-2 w-full' />
                                 ) : (
-                                    <>
-                                        <span className='text-muted-foreground'>
-                                            ${totalRaised.toFixed(2)} raised
-                                        </span>
-                                        <span className='font-medium'>
-                                            $
-                                            {nextGoal?.amount.toLocaleString() ||
-                                                '0'}{' '}
-                                            target
-                                        </span>
-                                    </>
+                                    <Progress value={progressToNext} />
+                                )}
+                                {isLoading ? (
+                                    <LoadingValue className='h-4 w-16' />
+                                ) : (
+                                    <p className='text-base sm:text-sm text-muted-foreground tabular-nums'>
+                                        {progressToNext.toFixed(1)}% complete
+                                    </p>
                                 )}
                             </div>
-                            {isLoading ? (
-                                <LoadingValue className='h-2 w-full' />
-                            ) : (
-                                <Progress
-                                    className='h-2'
-                                    value={progressToNext}
-                                />
-                            )}
-                            {isLoading ? (
-                                <LoadingValue className='h-3 w-16 mt-1' />
-                            ) : (
-                                <p className='text-xs text-muted-foreground mt-1'>
-                                    {progressToNext.toFixed(1)}% complete
-                                </p>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     )

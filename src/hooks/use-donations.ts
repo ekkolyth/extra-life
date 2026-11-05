@@ -13,13 +13,15 @@ function useLatestDonations(limit: number) {
     )
 }
 
-function useAllDonations() {
+// defaults to the active campaign's year
+function useAllDonations(year?: number) {
     const { data: campaign } = useQuery(convexQuery(api.campaigns.active, {}))
+    const targetYear = year ?? campaign?.year
 
     return useQuery(
         convexQuery(
             api.donations.list,
-            campaign ? { year: campaign.year } : 'skip'
+            targetYear === undefined ? 'skip' : { year: targetYear }
         )
     )
 }

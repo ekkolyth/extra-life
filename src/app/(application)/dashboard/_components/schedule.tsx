@@ -1,4 +1,4 @@
-import { Calendar, Clock } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Segment } from '@/types/db'
 import { useSegments } from '@/utils/use-segments'
@@ -11,34 +11,29 @@ export function ScheduleSection({ segments }: ScheduleSectionProps) {
     const { currentSegment, nextSegment } = useSegments(segments)
 
     return (
-        <Card className='border-border/50 bg-card/50 backdrop-blur-sm'>
+        <Card>
             <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
-                    <Calendar className='h-5 w-5 text-primary' />
+                    <div className='flex size-8 shrink-0 items-center justify-center rounded-sm border'>
+                        <Calendar className='size-4 text-primary' />
+                    </div>
                     Schedule
                 </CardTitle>
             </CardHeader>
-            <CardContent className='space-y-6 py-6'>
-                <div className='space-y-3'>
-                    <div className='flex items-center gap-3'>
-                        <Clock className='h-5 w-5 text-muted-foreground' />
-                        <span className='text-base font-semibold text-foreground'>
-                            Right Now
-                        </span>
-                    </div>
-                    <p className='text-2xl font-medium text-foreground pl-8'>
+            <CardContent className='flex flex-col divide-y'>
+                <div className='flex flex-col gap-1 pb-4'>
+                    <p className='text-base sm:text-sm text-muted-foreground'>
+                        Right Now
+                    </p>
+                    <p className='truncate text-lg font-medium text-foreground'>
                         {currentSegment?.title || 'n/a'}
                     </p>
                 </div>
-
-                <div className='space-y-3 pt-2'>
-                    <div className='flex items-center gap-3'>
-                        <Clock className='h-5 w-5 text-muted-foreground' />
-                        <span className='text-base font-semibold text-foreground'>
-                            Up Next
-                        </span>
-                    </div>
-                    <p className='text-2xl font-semibold text-primary pl-8'>
+                <div className='flex flex-col gap-1 pt-4'>
+                    <p className='text-base sm:text-sm text-muted-foreground'>
+                        Up Next
+                    </p>
+                    <p className='truncate text-lg font-medium text-primary'>
                         {nextSegment?.title || 'n/a'}
                     </p>
                 </div>

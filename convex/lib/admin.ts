@@ -10,3 +10,12 @@ export async function requireAdmin(
         throw new Error('Unauthorized: admin access required')
     }
 }
+
+export async function requireSignedIn(
+    ctx: QueryCtx | MutationCtx | ActionCtx
+): Promise<void> {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+        throw new Error('Unauthorized: sign-in required')
+    }
+}

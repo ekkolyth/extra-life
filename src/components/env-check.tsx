@@ -16,10 +16,6 @@ export function EnvCheck() {
         missingVars.push('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY')
     }
 
-    if (!process.env.NEXT_PUBLIC_DONORDRIVE_ID) {
-        missingVars.push('NEXT_PUBLIC_DONORDRIVE_ID')
-    }
-
     if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
         missingVars.push('NEXT_PUBLIC_CONVEX_URL')
     }

@@ -1,4 +1,5 @@
 import type { Id } from '@/convex/_generated/dataModel'
+import type { SegmentPlatform } from '@/convex/schema/segments'
 
 export interface Goal {
     amount: number
@@ -10,6 +11,7 @@ export interface Goal {
 export interface Segment {
     duration: number
     id: Id<'segments'>
+    platform?: SegmentPlatform
     startsAt: string
     title: string
 }

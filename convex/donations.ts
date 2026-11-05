@@ -1,16 +1,24 @@
 import { v } from 'convex/values'
 import { query } from './_generated/server'
+import { requireSignedIn } from './lib/admin'
+import {
+    addDonationToTotals,
+    donationTotalsValidator,
+    finishDonationTotals,
+} from './lib/donationTotals'
 import { donationDoc } from './schema/donations'
 
 export const latest = query({
     args: { year: v.number(), limit: v.number() },
-    returns: v.array(donationDoc),
+    returns: v.array(donationDoc.omit('email')),
     handler: async (ctx, args) => {
-        return await ctx.db
+        const rows = await ctx.db
             .query('donations')
             .withIndex('by_year_created', (q) => q.eq('year', args.year))
             .order('desc')
             .take(args.limit)
+        // the stream overlay calls this signed-out
+        return rows.map(({ email: _email, ...row }) => row)
     },
 })
 
@@ -18,10 +26,24 @@ export const list = query({
     args: { year: v.number() },
     returns: v.array(donationDoc),
     handler: async (ctx, args) => {
+        await requireSignedIn(ctx)
         return await ctx.db
             .query('donations')
             .withIndex('by_year_created', (q) => q.eq('year', args.year))
             .order('desc')
             .collect()
+    },
+})
+
+// open to signed-out callers: the marketing page reads it and it carries no donor data
+export const totalsByYear = query({
+    args: {},
+    returns: donationTotalsValidator,
+    handler: async (ctx) => {
+        const byYear = new Map<number, { cents: number; count: number }>()
+        for await (const row of ctx.db.query('donations')) {
+            addDonationToTotals(byYear, row)
+        }
+        return finishDonationTotals(byYear)
     },
 })

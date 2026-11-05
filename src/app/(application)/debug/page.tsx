@@ -46,6 +46,7 @@ export default function DebugPage() {
     const { data: lastApiCallInfo } = useQuery(
         convexQuery(api.apiMetadata.getLastApiCall, {})
     )
+    const { data: campaign } = useQuery(convexQuery(api.campaigns.active, {}))
     const forceRun = useMutation({
         mutationFn: useConvexAction(api.sync.forceRun),
     })
@@ -114,11 +115,11 @@ export default function DebugPage() {
         setIsForcingAPI(true)
         setApiPayloadData(null)
 
-        const donorDriveId = process.env.NEXT_PUBLIC_DONORDRIVE_ID
-        if (!donorDriveId) {
-            console.error('No donor drive ID found')
+        if (!campaign) {
+            console.error('No active campaign found')
             return
         }
+        const donorDriveId = campaign.participantId
 
         try {
             console.log('🚀 Forcing fresh API calls...')

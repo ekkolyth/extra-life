@@ -1,5 +1,6 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
+import { segmentPlatform } from './schema/segments'
 
 export const list = query({
     handler: async (ctx) => {
@@ -12,6 +13,7 @@ export const create = mutation({
         title: v.string(),
         startsAt: v.string(),
         duration: v.number(),
+        platform: v.optional(segmentPlatform),
     },
     handler: async (ctx, args) => {
         // Check if a segment with the same title already exists
@@ -36,6 +38,7 @@ export const update = mutation({
         title: v.optional(v.string()),
         startsAt: v.optional(v.string()),
         duration: v.optional(v.number()),
+        platform: v.optional(segmentPlatform),
     },
     handler: async (ctx, args) => {
         const { id, ...data } = args
