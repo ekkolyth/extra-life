@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { DonateButton } from '@/components/marketing/donate-button'
+import { FundraisingTotals } from '@/components/marketing/fundraising-totals'
 import {
     LightboxPhoto,
     type Photo,
@@ -7,7 +8,6 @@ import {
 } from '@/components/marketing/photo-lightbox'
 import { TwitchEmbed } from '@/components/marketing/twitch-embed'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const photos = {
     tattoo: {
@@ -166,53 +166,7 @@ export default function Home() {
                     </div>
 
                     <div className='space-y-6'>
-                        {/* Total Fundraising Card */}
-                        <Card className='bg-gradient-to-br from-blue-600 to-purple-600 text-white border-0'>
-                            <CardContent className='p-6 text-center'>
-                                <div className='text-4xl font-bold mb-2'>
-                                    $12,834.26
-                                </div>
-                                <div className='text-lg opacity-90'>
-                                    Total Raised Since 2017
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Fundraising Totals */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className='text-lg'>
-                                    Fundraising Totals
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className='space-y-3'>
-                                    {[
-                                        { year: '2025', amount: '$1,827.05' },
-                                        { year: '2024', amount: '$2,100.00' },
-                                        { year: '2023', amount: '$2,157.81' },
-                                        { year: '2022', amount: '$2,214.00' },
-                                        { year: '2021', amount: '$2,154.17' },
-                                        { year: '2020', amount: '$1,528.65' },
-                                        { year: '2019', amount: '$392.90' },
-                                        { year: '2018', amount: '$354.68' },
-                                        { year: '2017', amount: '$105.00' },
-                                    ].map((item) => (
-                                        <div
-                                            className='flex justify-between items-center'
-                                            key={item.year}
-                                        >
-                                            <span className='font-medium text-blue-600 dark:text-blue-400'>
-                                                {item.year}
-                                            </span>
-                                            <span className='font-bold text-foreground'>
-                                                {item.amount}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <FundraisingTotals />
                     </div>
                 </section>
 
