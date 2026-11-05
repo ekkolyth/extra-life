@@ -58,7 +58,7 @@
     --destructive: var(--color-red-600);
     --destructive-foreground: var(--color-white);
     --border: var(--color-neutral-200);
-    --input: var(--color-white);
+    --input: var(--color-neutral-200);
     --ring: var(--color-sky-600);
     --chart-1: var(--color-sky-600);
     --chart-2: var(--color-cyan-700);
@@ -69,8 +69,8 @@
     --sidebar-foreground: var(--color-neutral-700);
     --sidebar-primary: var(--color-sky-600);
     --sidebar-primary-foreground: var(--color-white);
-    --sidebar-accent: var(--color-neutral-100);
-    --sidebar-accent-foreground: var(--color-neutral-700);
+    --sidebar-accent: var(--color-sky-500);
+    --sidebar-accent-foreground: var(--color-neutral-950);
     --sidebar-border: var(--color-neutral-200);
     --sidebar-ring: var(--color-sky-600);
 }
@@ -171,6 +171,6 @@
         @apply border-border outline-ring/50;
     }
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground font-medium;
     }
 }

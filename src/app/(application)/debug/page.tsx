@@ -284,7 +284,7 @@ export default function DebugPage() {
                         )}
 
                         {/* Logs Table */}
-                        <Card className='bg-zinc-950/90 border-border'>
+                        <Card className='bg-card dark:bg-zinc-950/90 border-border'>
                             <CardHeader className='border-b border-border'>
                                 <div className='flex items-center justify-between'>
                                     <CardTitle className='text-lg text-foreground'>
@@ -396,7 +396,7 @@ export default function DebugPage() {
                                                             <Badge
                                                                 className={`${getDataTypeColor(
                                                                     dataType
-                                                                )} text-xs text-accent border-accent font-medium bg-zinc-950 px-2 py-1`}
+                                                                )} text-xs text-accent border-accent font-medium bg-background dark:bg-zinc-950 px-2 py-1`}
                                                             >
                                                                 {dataType}
                                                             </Badge>
