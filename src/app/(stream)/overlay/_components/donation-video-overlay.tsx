@@ -56,7 +56,7 @@ export function DonationVideoOverlay({
     }
 
     return (
-        <div className='fixed inset-0 z-50 bg-black'>
+        <div className='fixed inset-0 z-50 bg-transparent'>
             <video
                 className='w-full h-full object-cover'
                 muted={false} // Enable audio
