@@ -4,7 +4,7 @@ import {
     createRouteMatcher,
 } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { ADMIN_USERNAME } from '@/convex/lib/admin'
+import { isAdminUser } from '@/convex/lib/admin'
 
 const isAdminRoute = createRouteMatcher(['/debug(.*)', '/config(.*)'])
 
@@ -13,7 +13,7 @@ export default clerkMiddleware(async (auth, req) => {
     const { userId } = await auth()
     if (userId) {
         const user = await (await clerkClient()).users.getUser(userId)
-        if (user.username === ADMIN_USERNAME) return
+        if (isAdminUser(user)) return
     }
     return NextResponse.redirect(new URL('/dashboard', req.url))
 })

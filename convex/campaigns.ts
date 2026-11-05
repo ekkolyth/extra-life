@@ -5,7 +5,6 @@ import {
     mutation,
     query,
 } from './_generated/server'
-import { requireAdmin } from './lib/admin'
 import { campaignDoc } from './schema/campaigns'
 import { requestSync, startLivePolling } from './sync'
 
@@ -96,8 +95,6 @@ export const setParticipantId = mutation({
     args: { participantId: v.string() },
     returns: v.null(),
     handler: async (ctx, args) => {
-        await requireAdmin(ctx)
-
         const participantId = args.participantId.trim()
         if (participantId === '') throw new Error('Participant ID is required')
 

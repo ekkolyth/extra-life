@@ -34,7 +34,7 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar'
 import { api } from '@/convex/_generated/api'
-import { ADMIN_USERNAME } from '@/convex/lib/admin'
+import { isAdminUser } from '@/convex/lib/admin'
 import { participantPageUrl } from '@/utils/extra-life'
 
 type NavLinkItem = {
@@ -151,7 +151,7 @@ function NavItem({
 function AppSidebar() {
     const pathname = usePathname()
     const { user } = useUser()
-    const isAdmin = user?.username === ADMIN_USERNAME
+    const isAdmin = isAdminUser(user)
     const { data: campaign } = useQuery(convexQuery(api.campaigns.active, {}))
     const visibleResources = campaign
         ? [
