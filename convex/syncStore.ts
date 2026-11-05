@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
 import { internal } from './_generated/api'
 import { internalMutation, internalQuery } from './_generated/server'
+import { shouldQueueAlert } from './lib/donationAlerts'
 import type { CampaignFields, DonorRowInput } from './lib/donordrive'
 import { campaignFields } from './schema/campaigns'
 import { donationFields } from './schema/donations'
@@ -138,6 +139,14 @@ export const insertDonations = internalMutation({
     args: { rows: v.array(donationRowInput) },
     returns: v.object({ inserted: v.number() }),
     handler: async (ctx, args) => {
+        const campaign = await ctx.db
+            .query('campaigns')
+            .withIndex('by_active', (q) => q.eq('isActive', true))
+            .unique()
+        // stream alerts only run while live polling is on
+        const alertsOn = campaign?.livePolling === true
+        const now = Date.now()
+
         let inserted = 0
         for (const row of args.rows) {
             const existing = await ctx.db
@@ -147,8 +156,17 @@ export const insertDonations = internalMutation({
                 )
                 .unique()
             if (existing) continue
-            await ctx.db.insert('donations', row)
+            const donationId = await ctx.db.insert('donations', row)
             inserted++
+
+            if (alertsOn && shouldQueueAlert(row, now)) {
+                await ctx.db.insert('donationAlerts', {
+                    donationId,
+                    displayName: row.displayName,
+                    amount: row.amount,
+                    message: row.message,
+                })
+            }
         }
         return { inserted }
     },

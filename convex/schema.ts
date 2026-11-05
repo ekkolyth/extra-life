@@ -1,6 +1,7 @@
 import { defineSchema } from 'convex/server'
 import { apiMetadata } from './schema/apiMetadata'
 import { campaigns } from './schema/campaigns'
+import { donationAlerts } from './schema/donationAlerts'
 import { donations } from './schema/donations'
 import { donorDriveDebug } from './schema/donorDriveDebug'
 import { donors } from './schema/donors'
@@ -25,6 +26,7 @@ export default defineSchema({
     apiMetadata,
     campaigns,
     donations,
+    donationAlerts,
     donors,
     syncState,
     viewedDonations,

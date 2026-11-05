@@ -50,6 +50,9 @@ export default function DebugPage() {
     const forceRun = useMutation({
         mutationFn: useConvexAction(api.sync.forceRun),
     })
+    const createTestAlert = useMutation({
+        mutationFn: useConvexMutation(api.donationAlerts.createTest),
+    })
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
     const [isRefreshing] = useState(false)
     const [isForcingAPI, setIsForcingAPI] = useState(false)
@@ -104,8 +107,7 @@ export default function DebugPage() {
 
     const handleTestVideo = async () => {
         try {
-            await fetch('/api/test-video', { method: 'POST' })
-            console.log('🎬 Test video trigger sent')
+            await createTestAlert.mutateAsync({})
         } catch (error) {
             console.error('Failed to trigger test video:', error)
         }
