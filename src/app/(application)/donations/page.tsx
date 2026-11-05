@@ -1,14 +1,25 @@
 'use client'
 
 import { useUser } from '@clerk/nextjs'
-import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
+import {
+    convexQuery,
+    useConvexMutation,
+    useConvexQuery,
+} from '@convex-dev/react-query'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Eye, EyeOff, MoreVertical } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+    Card,
+    CardAction,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
     DropdownMenu,
@@ -16,19 +27,63 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { api } from '@/convex/_generated/api'
 import { useCampaign } from '@/hooks/use-campaign'
 import { useAllDonations } from '@/hooks/use-donations'
 
 dayjs.extend(relativeTime)
 
+const CURRENT_YEAR_VALUE = 'current'
+
+interface YearSelectProps {
+    onChange: (value: string) => void
+    pastYears: number[]
+    value: string
+}
+
+function YearSelect({ value, pastYears, onChange }: YearSelectProps) {
+    return (
+        <Select name='year' onValueChange={onChange} value={value}>
+            <SelectTrigger aria-label='Donation year' size='sm'>
+                <SelectValue />
+            </SelectTrigger>
+            <SelectContent align='end'>
+                <SelectItem value={CURRENT_YEAR_VALUE}>Current</SelectItem>
+                {pastYears.map((year) => (
+                    <SelectItem key={year} value={String(year)}>
+                        {year}
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    )
+}
+
 export default function DonationsPage() {
     const { user } = useUser()
 
     // triggers the sync pull like every other donor-data page
-    useCampaign()
+    const { data: campaign } = useCampaign()
 
-    const { data: allDonations } = useAllDonations()
+    const [yearValue, setYearValue] = useState(CURRENT_YEAR_VALUE)
+    const selectedYear =
+        yearValue === CURRENT_YEAR_VALUE ? undefined : Number(yearValue)
+
+    const { data: totals } = useQuery(
+        convexQuery(api.donations.totalsByYear, {})
+    )
+    const pastYears = (totals?.years ?? [])
+        .map((entry) => entry.year)
+        .filter((year) => year !== campaign?.year)
+
+    const { data: allDonations } = useAllDonations(selectedYear)
 
     // Fetch viewed donations for current user
     const viewedDonationIDs = useConvexQuery(
@@ -114,6 +169,20 @@ export default function DonationsPage() {
         }
     }
 
+    // selection is per year, so switching years starts fresh
+    const handleYearChange = (value: string) => {
+        setYearValue(value)
+        setSelectedDonationIDs(new Set())
+    }
+
+    const yearSelect = (
+        <YearSelect
+            onChange={handleYearChange}
+            pastYears={pastYears}
+            value={yearValue}
+        />
+    )
+
     // Loading state
     if (allDonations === undefined || viewedDonationIDs === undefined) {
         return (
@@ -121,6 +190,7 @@ export default function DonationsPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Donations</CardTitle>
+                        <CardAction>{yearSelect}</CardAction>
                     </CardHeader>
                     <CardContent>
                         <p className='text-sm text-muted-foreground'>
@@ -139,6 +209,7 @@ export default function DonationsPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Donations</CardTitle>
+                        <CardAction>{yearSelect}</CardAction>
                     </CardHeader>
                     <CardContent>
                         <p className='text-sm text-muted-foreground'>
@@ -172,6 +243,7 @@ export default function DonationsPage() {
             <Card className='border-border/50 bg-card/30 backdrop-blur-sm'>
                 <CardHeader>
                     <CardTitle>Donations</CardTitle>
+                    <CardAction>{yearSelect}</CardAction>
                 </CardHeader>
                 <CardContent className='space-y-4'>
                     {/* Bulk Actions */}

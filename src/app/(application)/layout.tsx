@@ -57,7 +57,7 @@ export default function DashboardLayout({
             <AppSidebar />
             <SidebarInset className='min-w-0'>
                 <Header withSidebarTrigger />
-                <div className='flex-1 min-h-0 container p-4 overflow-auto'>
+                <div className='flex-1 min-h-0 container p-4 overflow-auto [scrollbar-gutter:stable]'>
                     {children}
                 </div>
             </SidebarInset>
