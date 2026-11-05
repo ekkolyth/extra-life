@@ -6,6 +6,7 @@ import {
     useConvexMutation,
 } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { ConvexError } from 'convex/values'
 import { formatDistanceToNow } from 'date-fns'
 import {
     ChevronDownIcon,
@@ -15,6 +16,7 @@ import {
     TrashIcon,
 } from 'lucide-react'
 import React, { useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -56,6 +58,7 @@ export default function DebugPage() {
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
     const [isRefreshing] = useState(false)
     const [isForcingAPI, setIsForcingAPI] = useState(false)
+    const [testVideoError, setTestVideoError] = useState<string | null>(null)
     const [apiPayloadData, setApiPayloadData] = useState<{
         timestamp: string
         participantId: string
@@ -106,10 +109,20 @@ export default function DebugPage() {
     }
 
     const handleTestVideo = async () => {
+        setTestVideoError(null)
+        if (!campaign?.livePolling) {
+            setTestVideoError('Turn on live polling to test donation alerts')
+            return
+        }
         try {
             await createTestAlert.mutateAsync({})
         } catch (error) {
             console.error('Failed to trigger test video:', error)
+            setTestVideoError(
+                error instanceof ConvexError && typeof error.data === 'string'
+                    ? error.data
+                    : 'Failed to trigger test video'
+            )
         }
     }
 
@@ -209,6 +222,7 @@ export default function DebugPage() {
                     <div className='flex gap-3'>
                         <Button
                             className='flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary'
+                            disabled={createTestAlert.isPending}
                             onClick={handleTestVideo}
                             variant='outline'
                         >
@@ -236,6 +250,12 @@ export default function DebugPage() {
                         </Button>
                     </div>
                 </div>
+
+                {testVideoError && (
+                    <Alert className='mb-6' variant='destructive'>
+                        <AlertDescription>{testVideoError}</AlertDescription>
+                    </Alert>
+                )}
 
                 {debugData.length === 0 ? (
                     <Card className='bg-card border-border'>
