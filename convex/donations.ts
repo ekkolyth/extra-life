@@ -1,15 +1,12 @@
 import { v } from 'convex/values'
 import { query } from './_generated/server'
 import { requireSignedIn } from './lib/admin'
-import { summarizeDonationTotals } from './lib/donationTotals'
+import {
+    addDonationToTotals,
+    donationTotalsValidator,
+    finishDonationTotals,
+} from './lib/donationTotals'
 import { donationDoc } from './schema/donations'
-
-const donationTotalsValidator = v.object({
-    years: v.array(
-        v.object({ year: v.number(), total: v.number(), count: v.number() })
-    ),
-    total: v.number(),
-})
 
 export const latest = query({
     args: { year: v.number(), limit: v.number() },
@@ -42,6 +39,11 @@ export const list = query({
 export const totalsByYear = query({
     args: {},
     returns: donationTotalsValidator,
-    handler: async (ctx) =>
-        summarizeDonationTotals(await ctx.db.query('donations').collect()),
+    handler: async (ctx) => {
+        const byYear = new Map<number, { cents: number; count: number }>()
+        for await (const row of ctx.db.query('donations')) {
+            addDonationToTotals(byYear, row)
+        }
+        return finishDonationTotals(byYear)
+    },
 })

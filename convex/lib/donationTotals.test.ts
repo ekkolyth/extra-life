@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test'
-import { summarizeDonationTotals } from './donationTotals'
+import {
+    addDonationToTotals,
+    finishDonationTotals,
+    summarizeDonationTotals,
+} from './donationTotals'
 
 describe('summarizeDonationTotals', () => {
     test('returns empty totals for no rows', () => {
@@ -23,5 +27,18 @@ describe('summarizeDonationTotals', () => {
             ],
             total: 47.2,
         })
+    })
+
+    test('accumulates rows one at a time to the same result', () => {
+        const rows = [
+            { year: 2019, amount: 10.95 },
+            { year: 2024, amount: 25 },
+            { year: 2019, amount: 10.95 },
+        ]
+        const byYear = new Map<number, { cents: number; count: number }>()
+        for (const row of rows) addDonationToTotals(byYear, row)
+        expect(finishDonationTotals(byYear)).toEqual(
+            summarizeDonationTotals(rows)
+        )
     })
 })

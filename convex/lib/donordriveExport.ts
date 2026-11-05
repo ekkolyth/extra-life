@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
+import { toCents } from './donationTotals'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -22,7 +23,8 @@ const ACCEPTED_HEADERS = [SHARED_HEADER.join(','), INCENTIVE_HEADER.join(',')]
 // title line, export timestamp line, blank line
 const PREAMBLE_RECORDS = 3
 const EXPORT_TIMEZONE = 'America/New_York'
-const DATE_TIME_PATTERN = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{1,2}):(\d{2})(AM|PM)$/
+const DATE_TIME_PATTERN =
+    /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/(\d{4}) (0?[1-9]|1[0-2]):([0-5]\d)(AM|PM)$/
 
 const visibilitySchema = z.enum(['Public', 'Private'])
 
@@ -31,7 +33,7 @@ const exportRecordSchema = z.object({
     showName: visibilitySchema,
     amount: z.union([
         z.literal('Anonymous'),
-        z.string().regex(/^[\d,]+(\.\d{1,2})?$/, 'not a dollar amount'),
+        z.string().regex(/^\d[\d,]*(\.\d{1,2})?$/, 'not a dollar amount'),
     ]),
     showAmount: visibilitySchema,
     dateTime: z.string().regex(DATE_TIME_PATTERN, 'expected MM/DD/YYYY h:mmAM'),
@@ -54,7 +56,7 @@ type ExportDonationRow = {
 
 type ExportParseError = { line: number; message: string }
 
-type CsvRecord = { line: number; fields: string[] }
+type CsvRecord = { line: number; fields: string[]; malformed: boolean }
 
 // a quote opens a quoted field only at the field's start; a bare quote mid-field is literal text
 const readCsvRecords = (text: string): CsvRecord[] => {
@@ -62,6 +64,7 @@ const readCsvRecords = (text: string): CsvRecord[] => {
     let fields: string[] = []
     let field = ''
     let inQuotes = false
+    let malformed = false
     let line = 1
     let recordLine = 1
     for (let i = 0; i < text.length; i++) {
@@ -72,6 +75,15 @@ const readCsvRecords = (text: string): CsvRecord[] => {
                 i++
             } else if (char === '"') {
                 inQuotes = false
+                const next = text[i + 1]
+                if (
+                    next !== undefined &&
+                    next !== ',' &&
+                    next !== '\n' &&
+                    next !== '\r'
+                ) {
+                    malformed = true
+                }
             } else {
                 if (char === '\n') line++
                 field += char
@@ -86,7 +98,8 @@ const readCsvRecords = (text: string): CsvRecord[] => {
         } else if (char === '\n' || char === '\r') {
             if (char === '\r' && text[i + 1] === '\n') i++
             fields.push(field)
-            records.push({ line: recordLine, fields })
+            records.push({ line: recordLine, fields, malformed })
+            malformed = false
             fields = []
             field = ''
             line++
@@ -97,7 +110,7 @@ const readCsvRecords = (text: string): CsvRecord[] => {
     }
     if (field !== '' || fields.length > 0) {
         fields.push(field)
-        records.push({ line: recordLine, fields })
+        records.push({ line: recordLine, fields, malformed })
     }
     return records
 }
@@ -124,7 +137,7 @@ const sha256Hex = async (input: string): Promise<string> => {
 const parseDonorDriveExport = async (
     text: string
 ): Promise<{ rows: ExportDonationRow[]; errors: ExportParseError[] }> => {
-    const records = readCsvRecords(text.replace(/^﻿/, ''))
+    const records = readCsvRecords(text.replace(/^\uFEFF/, ''))
     const header = records[PREAMBLE_RECORDS]
     if (!header || !ACCEPTED_HEADERS.includes(header.fields.join(','))) {
         return {
@@ -141,6 +154,13 @@ const parseDonorDriveExport = async (
 
     for (const record of records.slice(PREAMBLE_RECORDS + 1)) {
         if (record.fields.length === 1 && record.fields[0] === '') continue
+        if (record.malformed) {
+            errors.push({
+                line: record.line,
+                message: 'malformed quoted field',
+            })
+            continue
+        }
         if (record.fields.length !== header.fields.length) {
             errors.push({
                 line: record.line,
@@ -209,10 +229,7 @@ const parseDonorDriveExport = async (
 
 type FilledDonationRow = Omit<ExportDonationRow, 'amount'> & { amount: number }
 
-const toCents = (dollars: number): number => Math.round(dollars * 100)
-
-// Anonymous rows carry no amount; each year's gap to its known total is split
-// across them in whole cents, with the leftover cents going to the earliest row.
+// each year's gap to its known total is split across anonymous rows in whole cents, leftover to the earliest row
 const fillMissingAmounts = (
     rows: ExportDonationRow[],
     knownYearTotals: Record<number, number>

@@ -14,7 +14,10 @@ const loadSample = (name: string) =>
     ).text()
 
 const EIGHT_COLUMN_INCENTIVE_ROWS =
-    '﻿Sample_Participant - Donor Export\nDate: 11/04/2026 5:25 PM \n\nName,Show Name,Amount,Show Amount,Date/Time (ET),Email,Message,Show Message\nWheel Fan,Public,20.00,Public,11/05/2022 8:00PM,wheel.fan@example.com,spin it,Public\r\nPlain Donor,Public,15.00,Public,11/05/2022 7:00PM,plain@example.com,,Public'
+    '\uFEFFSample_Participant - Donor Export\nDate: 11/04/2026 5:25 PM \n\nName,Show Name,Amount,Show Amount,Date/Time (ET),Email,Message,Show Message\nWheel Fan,Public,20.00,Public,11/05/2022 8:00PM,wheel.fan@example.com,spin it,Public\r\nPlain Donor,Public,15.00,Public,11/05/2022 7:00PM,plain@example.com,,Public'
+
+const HEADER_LINES =
+    'Title\nDate: 11/04/2026 5:25 PM \n\nName,Show Name,Amount,Show Amount,Date/Time (ET),Email,Message,Show Message\n'
 
 describe('parseDonorDriveExport', () => {
     test('parses the sample cleanly', async () => {
@@ -86,6 +89,42 @@ describe('parseDonorDriveExport', () => {
         )
         expect(rows[6]?.message).toBe('Y\'all are 5" tall')
         expect(rows[6]?.amount).toBe(7)
+    })
+
+    test('omits the message on a public row with an empty message', async () => {
+        const { rows } = await parseDonorDriveExport(
+            await loadSample('sample.csv')
+        )
+        expect(rows[3]).not.toHaveProperty('message')
+    })
+
+    test('reports a closing quote followed by text and keeps the other rows', async () => {
+        const text =
+            HEADER_LINES +
+            'Bad,Public,5.00,Public,11/05/2022 7:00PM,"a"b,hi,Public\nGood,Public,6.00,Public,11/05/2022 8:00PM,g@example.com,hi,Public\n'
+        const { rows, errors } = await parseDonorDriveExport(text)
+        expect(errors).toEqual([{ line: 5, message: 'malformed quoted field' }])
+        expect(rows.map((r) => r.amount)).toEqual([6])
+    })
+
+    test('reports an amount with no digits', async () => {
+        const text =
+            HEADER_LINES +
+            'Bad,Public,",",Public,11/05/2022 7:00PM,a@example.com,hi,Public\n'
+        const { rows, errors } = await parseDonorDriveExport(text)
+        expect(rows).toEqual([])
+        expect(errors.length).toBe(1)
+        expect(errors[0]?.message).toContain('not a dollar amount')
+    })
+
+    test('reports an out-of-range date and time', async () => {
+        const text =
+            HEADER_LINES +
+            'Bad,Public,5.00,Public,13/40/2024 25:00PM,a@example.com,hi,Public\n'
+        const { rows, errors } = await parseDonorDriveExport(text)
+        expect(rows).toEqual([])
+        expect(errors.length).toBe(1)
+        expect(errors[0]?.message).toContain('expected MM/DD/YYYY h:mmAM')
     })
 
     test('produces stable IDs', async () => {
@@ -259,6 +298,7 @@ describe('fillMissingAmounts', () => {
         expect(result.errors).toEqual([
             '2018: 1 row(s) have no amount and no known total',
         ])
+        expect(result.rows).toEqual([])
     })
 
     test('reports known amounts that exceed the known total', () => {
@@ -272,6 +312,26 @@ describe('fillMissingAmounts', () => {
         )
         expect(result.errors).toEqual([
             '2019: known amounts 20.00 exceed known total 10.00',
+        ])
+    })
+
+    test('drops an errored year while another year still fills', () => {
+        const rows = [
+            row({ year: 2019, donationID: 'csv:a19', amount: 10 }),
+            row({ year: 2019, donationID: 'csv:m19', amount: undefined }),
+            row({ year: 2020, donationID: 'csv:a20', amount: 10 }),
+            row({ year: 2020, donationID: 'csv:b20', amount: 10 }),
+            row({ year: 2020, donationID: 'csv:m20', amount: undefined }),
+        ]
+        const result = fillMissingAmounts(rows, { 2019: 25, 2020: 10 })
+        expect(result.errors).toEqual([
+            '2020: known amounts 20.00 exceed known total 10.00',
+        ])
+        expect(result.rows.map((r) => [r.donationID, r.amount])).toEqual([
+            ['csv:a19', 10],
+            ['csv:m19', 15],
+            ['csv:a20', 10],
+            ['csv:b20', 10],
         ])
     })
 
