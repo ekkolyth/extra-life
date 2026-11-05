@@ -1,13 +1,19 @@
 import { parseArgs } from 'node:util'
 import { Glob } from 'bun'
+import { z } from 'zod'
 import {
     type ExportDonationRow,
     fillMissingAmounts,
     parseDonorDriveExport,
 } from '../convex/lib/donordriveExport'
 
+const COPY_ROW_LIMIT = 10000
+
+const insertResultSchema = z.object({ inserted: z.number() })
+const copyRowSchema = z.record(z.string(), z.unknown())
+
 // DonorDrive shows 2019 raised $392.90; its export hides two amounts
-const knownYearTotals: Record<number, number> = { 2019: 392.9 }
+const KNOWN_YEAR_TOTALS: Record<number, number> = { 2019: 392.9 }
 
 const runConvex = async (args: string[]): Promise<string> => {
     const child = Bun.spawn(['bunx', 'convex', ...args], {
@@ -26,20 +32,33 @@ const runConvex = async (args: string[]): Promise<string> => {
     return stdout
 }
 
-const insertRows = async (rows: object[], prod: boolean): Promise<number> => {
+const insertRows = async (
+    rows: object[],
+    prod: boolean,
+    year: number
+): Promise<number> => {
     const stdout = await runConvex([
         'run',
         'syncStore:insertDonations',
         JSON.stringify({ rows }),
         ...(prod ? ['--prod'] : []),
     ])
-    return (JSON.parse(stdout) as { inserted: number }).inserted
+    const result = insertResultSchema.safeParse(JSON.parse(stdout))
+    if (!result.success) {
+        console.error(
+            `${year}: syncStore:insertDonations returned an unexpected result: ${result.error.message}`
+        )
+        process.exit(1)
+    }
+    return result.data.inserted
 }
 
 const importDirectory = async (dir: string, prod: boolean) => {
     const parsed: ExportDonationRow[] = []
     let failed = false
+    let fileCount = 0
     for (const file of new Glob('*.csv').scanSync(dir)) {
+        fileCount++
         const { rows, errors } = await parseDonorDriveExport(
             await Bun.file(`${dir}/${file}`).text()
         )
@@ -49,12 +68,16 @@ const importDirectory = async (dir: string, prod: boolean) => {
         }
         parsed.push(...rows)
     }
+    if (fileCount === 0) {
+        console.error(`no CSV files in ${dir}`)
+        process.exit(1)
+    }
     if (failed) process.exit(1)
 
     const unique = [
         ...new Map(parsed.map((row) => [row.donationID, row])).values(),
     ]
-    const { rows, errors } = fillMissingAmounts(unique, knownYearTotals)
+    const { rows, errors } = fillMissingAmounts(unique, KNOWN_YEAR_TOTALS)
     if (errors.length > 0) {
         for (const error of errors) console.error(error)
         process.exit(1)
@@ -64,7 +87,7 @@ const importDirectory = async (dir: string, prod: boolean) => {
     console.log('year\tparsed\tinserted\tskipped')
     for (const year of years) {
         const yearRows = rows.filter((row) => row.year === year)
-        const inserted = await insertRows(yearRows, prod)
+        const inserted = await insertRows(yearRows, prod, year)
         console.log(
             `${year}\t${yearRows.length}\t${inserted}\t${yearRows.length - inserted}`
         )
@@ -77,17 +100,33 @@ const copyYearFromProd = async (year: number) => {
         'donations',
         '--prod',
         '--limit',
-        '10000',
+        String(COPY_ROW_LIMIT),
         '--format',
         'jsonLines',
     ])
-    const rows = stdout
+    const parsedRows = stdout
         .split('\n')
         .filter((line) => line.startsWith('{'))
-        .map((line) => JSON.parse(line) as Record<string, unknown>)
+        .map((line) => {
+            const result = copyRowSchema.safeParse(JSON.parse(line))
+            if (!result.success) {
+                console.error(
+                    `${year}: convex data donations returned an unexpected row: ${result.error.message}`
+                )
+                process.exit(1)
+            }
+            return result.data
+        })
+    if (parsedRows.length >= COPY_ROW_LIMIT) {
+        console.error(
+            `${year}: convex data donations returned ${parsedRows.length} rows, the --limit; the export may be truncated`
+        )
+        process.exit(1)
+    }
+    const rows = parsedRows
         .filter((row) => row.year === year)
         .map(({ _id, _creationTime, ...row }) => row)
-    const inserted = await insertRows(rows, false)
+    const inserted = await insertRows(rows, false, year)
     console.log(
         `${year}\tcopied ${rows.length}\tinserted ${inserted}\tskipped ${rows.length - inserted}`
     )
@@ -102,13 +141,23 @@ const { values, positionals } = parseArgs({
     allowPositionals: true,
 })
 
+const USAGE =
+    'usage: import-donation-csv.ts <dir> [--prod] | --copy-year <year>'
+
 if (values['copy-year'] !== undefined) {
-    await copyYearFromProd(Number(values['copy-year']))
+    const year = Number(values['copy-year'])
+    if (!Number.isInteger(year)) {
+        console.error(USAGE)
+        process.exit(1)
+    }
+    if (values.prod) {
+        console.error('--copy-year always writes to dev; drop --prod')
+        process.exit(1)
+    }
+    await copyYearFromProd(year)
 } else if (positionals[0]) {
     await importDirectory(positionals[0], values.prod ?? false)
 } else {
-    console.error(
-        'usage: import-donation-csv.ts <dir> [--prod] | --copy-year <year>'
-    )
+    console.error(USAGE)
     process.exit(1)
 }

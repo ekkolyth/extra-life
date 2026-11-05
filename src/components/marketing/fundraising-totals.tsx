@@ -9,14 +9,16 @@ import { USDollar } from '@/utils/currency'
 
 export function FundraisingTotals() {
     const { data } = useQuery(convexQuery(api.donations.totalsByYear, {}))
-    const firstYear = data?.years.at(-1)?.year
+    const firstYear = data?.years.length
+        ? Math.min(...data.years.map((item) => item.year))
+        : undefined
 
     return (
         <>
             {/* Total Fundraising Card */}
             <Card className='bg-gradient-to-br from-blue-600 to-purple-600 text-white border-0'>
                 <CardContent className='p-6 text-center'>
-                    <div className='text-4xl font-bold mb-2'>
+                    <div className='text-4xl font-bold mb-2 tabular-nums'>
                         {data ? (
                             USDollar.format(data.total)
                         ) : (
@@ -25,7 +27,9 @@ export function FundraisingTotals() {
                     </div>
                     <div className='text-lg opacity-90'>
                         Total Raised Since{' '}
-                        {firstYear ?? (
+                        {data ? (
+                            firstYear
+                        ) : (
                             <Skeleton className='inline-block h-5 w-12 align-middle bg-white/20' />
                         )}
                     </div>
@@ -50,7 +54,7 @@ export function FundraisingTotals() {
                                     <span className='font-medium text-blue-600 dark:text-blue-400'>
                                         {item.year}
                                     </span>
-                                    <span className='font-bold text-foreground'>
+                                    <span className='font-bold text-foreground tabular-nums'>
                                         {USDollar.format(item.total)}
                                     </span>
                                 </div>
