@@ -50,6 +50,9 @@ export default function DebugPage() {
     const forceRun = useMutation({
         mutationFn: useConvexAction(api.sync.forceRun),
     })
+    const createTestAlert = useMutation({
+        mutationFn: useConvexMutation(api.donationAlerts.createTest),
+    })
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
     const [isRefreshing] = useState(false)
     const [isForcingAPI, setIsForcingAPI] = useState(false)
@@ -104,8 +107,7 @@ export default function DebugPage() {
 
     const handleTestVideo = async () => {
         try {
-            await fetch('/api/test-video', { method: 'POST' })
-            console.log('🎬 Test video trigger sent')
+            await createTestAlert.mutateAsync({})
         } catch (error) {
             console.error('Failed to trigger test video:', error)
         }
@@ -282,7 +284,7 @@ export default function DebugPage() {
                         )}
 
                         {/* Logs Table */}
-                        <Card className='bg-zinc-950/90 border-border'>
+                        <Card className='bg-card dark:bg-zinc-950/90 border-border'>
                             <CardHeader className='border-b border-border'>
                                 <div className='flex items-center justify-between'>
                                     <CardTitle className='text-lg text-foreground'>
@@ -394,7 +396,7 @@ export default function DebugPage() {
                                                             <Badge
                                                                 className={`${getDataTypeColor(
                                                                     dataType
-                                                                )} text-xs text-accent border-accent font-medium bg-zinc-950 px-2 py-1`}
+                                                                )} text-xs text-accent border-accent font-medium bg-background dark:bg-zinc-950 px-2 py-1`}
                                                             >
                                                                 {dataType}
                                                             </Badge>

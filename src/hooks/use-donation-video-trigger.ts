@@ -1,95 +1,30 @@
-import { useEffect, useRef, useState } from 'react'
-import type { Donation } from '@/types/donor-drive'
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { api } from '@/convex/_generated/api'
+import type { Id } from '@/convex/_generated/dataModel'
 
-interface UseDonationVideoTriggerProps {
-    latestDonations: Donation[]
-    threshold: number
-    timeWindowSeconds: number
-}
-
-export function useDonationVideoTrigger({
-    latestDonations,
-    threshold,
-    timeWindowSeconds,
-}: UseDonationVideoTriggerProps) {
-    const [currentDonation, setCurrentDonation] = useState<Donation | null>(
-        null
+export function useDonationVideoTrigger() {
+    const { data: pending = [] } = useQuery(
+        convexQuery(api.donationAlerts.pending, {})
     )
-    const [shouldPlayVideo, setShouldPlayVideo] = useState(false)
-    const [isPlaying, setIsPlaying] = useState(false)
-    const [videoQueue, setVideoQueue] = useState<Donation[]>([])
-    const previousDonationsRef = useRef<Set<string>>(new Set())
-    const lastTriggerTimeRef = useRef<number>(0)
+    const markPlayed = useConvexMutation(api.donationAlerts.markPlayed)
+    // hide a finished alert right away instead of waiting for the subscription to drop it
+    const [finished, setFinished] = useState<Set<Id<'donationAlerts'>>>(
+        new Set()
+    )
 
-    useEffect(() => {
-        if (!latestDonations || latestDonations.length === 0) {
-            return
-        }
-
-        const now = Date.now()
-        const timeWindowMs = timeWindowSeconds * 1000
-
-        // Get current donation IDs
-        const currentDonationIds = new Set(
-            latestDonations.map((d) => d.donationID)
-        )
-
-        // Find new donations that weren't in the previous set
-        const newDonations = latestDonations.filter(
-            (donation) => !previousDonationsRef.current.has(donation.donationID)
-        )
-
-        // Check for qualifying donations within the time window
-        const qualifyingDonations = newDonations.filter((donation) => {
-            const donationTime = donation.createdAt
-            const timeSinceDonation = now - donationTime
-
-            return (
-                donation.amount >= threshold &&
-                timeSinceDonation <= timeWindowMs &&
-                timeSinceDonation >= 0 // Donation is not in the future
-            )
-        })
-
-        // Add qualifying donations to the queue
-        if (qualifyingDonations.length > 0) {
-            console.log(
-                `🎉 ${qualifyingDonations.length} big donation(s) detected:`,
-                qualifyingDonations.map(
-                    (d) => `$${d.amount} from ${d.displayName || 'Anonymous'}`
-                )
-            )
-
-            setVideoQueue((prevQueue) => [...prevQueue, ...qualifyingDonations])
-            lastTriggerTimeRef.current = now
-        }
-
-        // Update the previous donations set
-        previousDonationsRef.current = currentDonationIds
-    }, [latestDonations, threshold, timeWindowSeconds])
-
-    // Process video queue
-    useEffect(() => {
-        if (videoQueue.length > 0 && !isPlaying) {
-            const nextDonation = videoQueue[0]
-            setCurrentDonation(nextDonation)
-            setShouldPlayVideo(true)
-            setIsPlaying(true)
-
-            // Remove the first item from queue
-            setVideoQueue((prevQueue) => prevQueue.slice(1))
-        }
-    }, [videoQueue, isPlaying])
+    const currentAlert =
+        pending.find((alert) => !finished.has(alert._id)) ?? null
 
     const handleVideoEnd = () => {
-        setShouldPlayVideo(false)
-        setIsPlaying(false)
-        setCurrentDonation(null)
+        if (!currentAlert) return
+        const alertId = currentAlert._id
+        setFinished((prev) => new Set(prev).add(alertId))
+        markPlayed({ alertId }).catch((error: unknown) => {
+            console.error('failed to mark alert played', error)
+        })
     }
 
-    return {
-        shouldPlayVideo,
-        currentDonation,
-        handleVideoEnd,
-    }
+    return { currentAlert, handleVideoEnd }
 }

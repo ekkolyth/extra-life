@@ -1,7 +1,6 @@
 'use client'
 
 import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query'
-import { set, subMinutes } from 'date-fns'
 import { PencilIcon, TrashIcon } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { SegmentForm } from '@/components/forms/segment'
@@ -14,9 +13,18 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import { api } from '@/convex/_generated/api'
+import type { SegmentPlatform } from '@/convex/schema/segments'
 import type { Segment } from '@/types/db'
 import { cn } from '@/utils/style'
 import { timeslotFromIndex, timeslotIndexFromStart } from '@/utils/time'
+
+const platformBackgrounds: Record<SegmentPlatform, string> = {
+    'Podcast Set': 'bg-purple-200 dark:bg-purple-600',
+    Xbox: 'bg-emerald-200 dark:bg-emerald-600',
+    Switch: 'bg-red-200 dark:bg-red-600',
+    PS4: 'bg-blue-300 dark:bg-blue-900',
+    PC: 'bg-pink-200 dark:bg-pink-600',
+}
 
 function EditSegmentDialog({ segment }: { segment: Segment }) {
     const [open, setOpen] = useState(false)
@@ -42,38 +50,6 @@ function EditSegmentDialog({ segment }: { segment: Segment }) {
 export function Calendar() {
     const segments = useConvexQuery(api.segment.list, {}) || []
     const deleteSegment = useConvexMutation(api.segment.removeSegment)
-
-    function getBackground(id: string) {
-        let background = 'bg-secondary'
-        const segment = segments.find((s) => s._id === id)
-        const startHour = Number(segment?.startsAt.split(':')[0] ?? '')
-        const startMinutes = Number(segment?.startsAt.split(':')[1] ?? '')
-        const endHour = startHour + Number(segment?.duration) / 2
-        const endMinutes = startMinutes + (Number(segment?.duration) % 2) * 30
-
-        const now = new Date()
-        let start = new Date()
-        let end = new Date()
-        start = set(start, {
-            hours: startHour,
-            minutes: startMinutes,
-            seconds: 0,
-        })
-        end = set(end, {
-            hours: endHour,
-            minutes: endMinutes,
-            seconds: 0,
-        })
-
-        // If the end is before now, make it grey
-        if (now > end) background = 'bg-secondary'
-        // If the start is before now and the end is after now, make it green
-        else if (now > start && now < end) background = 'dark:bg-green-600'
-        // If the start is within 30 minutes of now, make it yellow
-        else if (now >= subMinutes(start, 30)) background = 'dark:bg-yellow-600'
-
-        return background
-    }
 
     return (
         <div className='isolate flex flex-auto overflow-hidden'>
@@ -121,7 +97,11 @@ export function Calendar() {
                                 <li
                                     className={cn(
                                         'p-2 m-2 rounded flex justify-between',
-                                        getBackground(segment._id)
+                                        segment.platform
+                                            ? platformBackgrounds[
+                                                  segment.platform
+                                              ]
+                                            : 'bg-primary text-primary-foreground'
                                     )}
                                     key={segment._id}
                                     style={{

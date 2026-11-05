@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Donation as FullDonation } from '@/types/donor-drive'
 
-type Donation = Pick<
-    FullDonation,
-    'amount' | 'createdAt' | 'displayName' | 'message'
->
+type Donation = Pick<FullDonation, 'amount' | 'displayName' | 'message'>
 
 interface DonationVideoOverlayProps {
     donation: Donation | null

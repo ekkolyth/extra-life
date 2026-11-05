@@ -8,7 +8,6 @@ import {
     donorValidator,
     statsValidator,
 } from './donor_drive_validators'
-import { requireAdmin } from './lib/admin'
 import type {
     DonationRowInput,
     DonorDriveDonation,
@@ -574,8 +573,6 @@ export const setLivePolling = mutation({
     args: { enabled: v.boolean() },
     returns: v.null(),
     handler: async (ctx, args) => {
-        await requireAdmin(ctx)
-
         const campaign = await ctx.db
             .query('campaigns')
             .withIndex('by_active', (q) => q.eq('isActive', true))
@@ -598,8 +595,6 @@ export const forceRun = action({
         topDonor: v.union(donorValidator, v.null()),
     }),
     handler: async (ctx) => {
-        await requireAdmin(ctx)
-
         const campaign: Doc<'campaigns'> | null = await ctx.runQuery(
             internal.campaigns.getActive,
             {}

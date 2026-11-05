@@ -43,27 +43,7 @@ const OverlayContent = () => {
         endOfStream: g.endOfStream,
     }))
 
-    // Big-donation video trigger
-    const { shouldPlayVideo, currentDonation, handleVideoEnd } =
-        useDonationVideoTrigger({
-            latestDonations,
-            threshold: 100,
-            timeWindowSeconds: 15,
-        })
-
-    // Debug video trigger
-    const [showTestVideo, setShowTestVideo] = useState(false)
-    useEffect(() => {
-        const checkForTestTrigger = async () => {
-            try {
-                const response = await fetch('/api/test-video')
-                const data = await response.json()
-                if (data.triggered) setShowTestVideo(true)
-            } catch {}
-        }
-        const interval = setInterval(checkForTestTrigger, 500)
-        return () => clearInterval(interval)
-    }, [])
+    const { currentAlert, handleVideoEnd } = useDonationVideoTrigger()
 
     // Confetti when >= 100%
     useEffect(() => {
@@ -105,23 +85,15 @@ const OverlayContent = () => {
             style={{ backgroundColor: 'transparent' }}
         >
             {/* Donation Video Overlay */}
-            <DonationVideoOverlay
-                donation={currentDonation}
-                isVisible={shouldPlayVideo}
-                onVideoEnd={handleVideoEnd}
-            />
-
-            {/* Test Video Overlay */}
-            <DonationVideoOverlay
-                donation={{
-                    amount: 250.0,
-                    displayName: 'Anonymous',
-                    message: 'For the kids!',
-                    createdAt: Date.now(),
-                }}
-                isVisible={showTestVideo}
-                onVideoEnd={() => setShowTestVideo(false)}
-            />
+            {currentAlert && (
+                // remount per alert so playback state never carries over to the next one
+                <DonationVideoOverlay
+                    donation={currentAlert}
+                    isVisible
+                    key={currentAlert._id}
+                    onVideoEnd={handleVideoEnd}
+                />
+            )}
 
             {/* Confetti */}
             {!limited && confetti && <div className={styles.confettiLayer} />}

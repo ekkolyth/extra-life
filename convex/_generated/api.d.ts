@@ -10,12 +10,14 @@
 
 import type * as apiMetadata from "../apiMetadata.js";
 import type * as campaigns from "../campaigns.js";
+import type * as donationAlerts from "../donationAlerts.js";
 import type * as donations from "../donations.js";
 import type * as donorDriveDebug from "../donorDriveDebug.js";
 import type * as donor_drive_validators from "../donor_drive_validators.js";
 import type * as donors from "../donors.js";
 import type * as goals from "../goals.js";
 import type * as lib_admin from "../lib/admin.js";
+import type * as lib_donationAlerts from "../lib/donationAlerts.js";
 import type * as lib_donationTotals from "../lib/donationTotals.js";
 import type * as lib_donordrive from "../lib/donordrive.js";
 import type * as lib_donordriveExport from "../lib/donordriveExport.js";
@@ -26,6 +28,7 @@ import type * as randomizerSpin from "../randomizerSpin.js";
 import type * as rotator from "../rotator.js";
 import type * as schema_apiMetadata from "../schema/apiMetadata.js";
 import type * as schema_campaigns from "../schema/campaigns.js";
+import type * as schema_donationAlerts from "../schema/donationAlerts.js";
 import type * as schema_donations from "../schema/donations.js";
 import type * as schema_donorDriveDebug from "../schema/donorDriveDebug.js";
 import type * as schema_donors from "../schema/donors.js";
@@ -52,12 +55,14 @@ import type {
 declare const fullApi: ApiFromModules<{
   apiMetadata: typeof apiMetadata;
   campaigns: typeof campaigns;
+  donationAlerts: typeof donationAlerts;
   donations: typeof donations;
   donorDriveDebug: typeof donorDriveDebug;
   donor_drive_validators: typeof donor_drive_validators;
   donors: typeof donors;
   goals: typeof goals;
   "lib/admin": typeof lib_admin;
+  "lib/donationAlerts": typeof lib_donationAlerts;
   "lib/donationTotals": typeof lib_donationTotals;
   "lib/donordrive": typeof lib_donordrive;
   "lib/donordriveExport": typeof lib_donordriveExport;
@@ -68,6 +73,7 @@ declare const fullApi: ApiFromModules<{
   rotator: typeof rotator;
   "schema/apiMetadata": typeof schema_apiMetadata;
   "schema/campaigns": typeof schema_campaigns;
+  "schema/donationAlerts": typeof schema_donationAlerts;
   "schema/donations": typeof schema_donations;
   "schema/donorDriveDebug": typeof schema_donorDriveDebug;
   "schema/donors": typeof schema_donors;
