@@ -8,6 +8,7 @@ import {
 } from '@/components/marketing/photo-lightbox'
 import { TwitchEmbed } from '@/components/marketing/twitch-embed'
 import { Button } from '@/components/ui/button'
+import { rileyUrl } from '@/utils/extra-life'
 
 const photos = {
     tattoo: {
@@ -45,9 +46,6 @@ function WidePhoto(photo: Photo) {
 }
 
 export default function Home() {
-    const rileyURL =
-        'https://rileykids.org/transforming-childrens-health/rileychildrenshealth'
-
     return (
         <main className='flex flex-col min-h-screen'>
             <PhotoLightbox photos={Object.values(photos)}>
@@ -56,14 +54,6 @@ export default function Home() {
                     <div className='absolute inset-0 bg-black/20' />
                     <div className='relative container mx-auto px-4 pt-20 pb-28'>
                         <div className='text-center space-y-6'>
-                            <div className='flex items-center justify-center space-x-2 mb-8'>
-                                <div className='w-8 h-8 border-2 border-white rounded-full flex items-center justify-center'>
-                                    <div className='w-2 h-2 bg-white rounded-full'></div>
-                                </div>
-                                <span className='text-lg font-medium'>
-                                    Children&apos;s Miracle Network Hospitals
-                                </span>
-                            </div>
                             <h1 className='text-4xl md:text-6xl font-bold tracking-tight max-w-4xl mx-auto'>
                                 Play Games to Change Kids&apos; Health to Change
                                 the Future
@@ -117,7 +107,7 @@ export default function Home() {
                                 size='lg'
                                 variant='outline'
                             >
-                                <Link href={rileyURL}>Learn about Riley</Link>
+                                <Link href={rileyUrl}>Learn about Riley</Link>
                             </Button>
                         </div>
                     </div>
