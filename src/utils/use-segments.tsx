@@ -6,6 +6,11 @@ export function useSegments(segments: Segment[]) {
     const [nextSegment, setNextSegment] = useState<Segment | null>(null)
     const segmentsRef = useRef(segments)
 
+    // callers rebuild the array every render, so react to content, not identity
+    const segmentsKey = segments
+        .map((s) => `${s.id}|${s.startsAt}|${s.duration}|${s.title}`)
+        .join(',')
+
     // Update ref when segments change
     useEffect(() => {
         segmentsRef.current = segments
@@ -13,7 +18,7 @@ export function useSegments(segments: Segment[]) {
 
     useEffect(() => {
         // Don't set up interval if segments haven't loaded yet
-        if (!segments || segments.length === 0) {
+        if (segmentsKey === '') {
             setCurrentSegment(null)
             setNextSegment(null)
             return
@@ -95,7 +100,7 @@ export function useSegments(segments: Segment[]) {
         const interval = setInterval(updateSegments, 60000)
 
         return () => clearInterval(interval)
-    }, [segments]) // Re-run when segments change
+    }, [segmentsKey]) // Re-run when segments change
 
     return { currentSegment, nextSegment }
 }
