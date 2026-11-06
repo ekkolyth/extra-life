@@ -1,17 +1,26 @@
 'use client'
 
 import { useConvexMutation } from '@convex-dev/react-query'
-import { CheckIcon, PencilIcon, TrashIcon, XIcon } from 'lucide-react'
-import { type KeyboardEvent, type ReactNode, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { api } from '@/convex/_generated/api'
-import { cn } from '@/lib/utils'
 import type { Randomizer } from '@/types/db'
+import { EditableText } from './editable-text'
+import { type ItemTarget, RandomizerList } from './randomizer-list'
+
+type ListKey = 'first' | 'second'
 
 // One field at a time: every save rewrites the whole item list, which
 // recreates item ids, so a second open row would lose its draft.
-type EditTarget = 'name' | 'new' | number
+type EditTarget = 'name' | { list: ListKey; target: 'listName' | ItemTarget }
+
+interface CardValues {
+    firstListName: string
+    items: string[]
+    name: string
+    secondItems: string[]
+    secondListName: string
+}
 
 interface RandomizerCardProps {
     randomizer: Randomizer
@@ -24,28 +33,56 @@ function RandomizerCard(props: RandomizerCardProps) {
     const updateRandomizer = useConvexMutation(api.randomizer.update)
     const deleteRandomizer = useConvexMutation(api.randomizer.delete)
 
-    const itemNames = randomizer.items.map((item) => item.name)
+    const isDual = randomizer.kind === 'dual'
 
-    async function save(name: string, items: string[]) {
+    function targetIn(list: ListKey) {
+        if (
+            editing !== null &&
+            typeof editing === 'object' &&
+            editing.list === list
+        ) {
+            return editing.target
+        }
+        return null
+    }
+
+    function itemTargetIn(list: ListKey): ItemTarget | null {
+        const target = targetIn(list)
+        return target === 'listName' ? null : target
+    }
+
+    async function save(changes: Partial<CardValues>) {
+        const values: CardValues = {
+            name: randomizer.name,
+            firstListName: randomizer.firstListName ?? '',
+            secondListName: randomizer.secondListName ?? '',
+            items: randomizer.items.map((item) => item.name),
+            secondItems: randomizer.secondItems.map((item) => item.name),
+            ...changes,
+        }
         try {
             await updateRandomizer({
                 id: randomizer.id,
-                name,
+                name: values.name,
                 items: {
-                    create: items.map((itemName) => ({ name: itemName })),
+                    create: values.items.map((itemName) => ({
+                        name: itemName,
+                    })),
                 },
+                ...(isDual && {
+                    secondItems: {
+                        create: values.secondItems.map((itemName) => ({
+                            name: itemName,
+                        })),
+                    },
+                    firstListName: values.firstListName,
+                    secondListName: values.secondListName,
+                }),
             })
             setEditing(null)
         } catch (error) {
             console.error('Failed to save randomizer:', error)
         }
-    }
-
-    async function removeItem(index: number) {
-        await save(
-            randomizer.name,
-            itemNames.filter((_, i) => i !== index)
-        )
     }
 
     async function handleDelete() {
@@ -65,7 +102,7 @@ function RandomizerCard(props: RandomizerCardProps) {
                     label='randomizer name'
                     onCancel={() => setEditing(null)}
                     onEdit={() => setEditing('name')}
-                    onSave={(name) => save(name, itemNames)}
+                    onSave={(name) => save({ name })}
                     value={randomizer.name}
                 />
                 <Button
@@ -78,179 +115,73 @@ function RandomizerCard(props: RandomizerCardProps) {
                     Delete {randomizer.name}
                 </Button>
             </header>
-            <section className='flex flex-col items-start gap-2'>
-                <h4 className='font-semibold'>Items</h4>
-                <ul className='w-full divide-y'>
-                    {itemNames.map((itemName, index) => (
-                        <li className='py-3' key={randomizer.items[index].id}>
+            {isDual ? (
+                <div className='grid items-start gap-6 md:grid-cols-2'>
+                    <RandomizerList
+                        editing={itemTargetIn('first')}
+                        heading={
                             <EditableText
-                                isEditing={editing === index}
-                                label={itemName}
+                                className='font-semibold'
+                                isEditing={targetIn('first') === 'listName'}
+                                label={randomizer.firstListName ?? ''}
                                 onCancel={() => setEditing(null)}
-                                onEdit={() => setEditing(index)}
-                                onSave={(name) =>
-                                    save(
-                                        randomizer.name,
-                                        itemNames.map((existing, i) =>
-                                            i === index ? name : existing
-                                        )
-                                    )
+                                onEdit={() =>
+                                    setEditing({
+                                        list: 'first',
+                                        target: 'listName',
+                                    })
                                 }
-                                value={itemName}
-                            >
-                                <Button
-                                    className='shrink-0'
-                                    onClick={() => removeItem(index)}
-                                    size='icon'
-                                    type='button'
-                                    variant='outline'
-                                >
-                                    <span className='sr-only'>
-                                        Remove {itemName}
-                                    </span>
-                                    <TrashIcon />
-                                </Button>
-                            </EditableText>
-                        </li>
-                    ))}
-                    {editing === 'new' && (
-                        <li className='py-3'>
-                            <EditableText
-                                isEditing
-                                label='new item'
-                                onCancel={() => setEditing(null)}
-                                onEdit={() => setEditing('new')}
-                                onSave={(name) =>
-                                    save(randomizer.name, [...itemNames, name])
+                                onSave={(firstListName) =>
+                                    save({ firstListName })
                                 }
-                                placeholder='Demo Item'
-                                value=''
+                                value={randomizer.firstListName ?? ''}
                             />
-                        </li>
-                    )}
-                </ul>
-                <Button
-                    onClick={() => setEditing('new')}
-                    type='button'
-                    variant='outline'
-                >
-                    Add Item
-                </Button>
-            </section>
-        </div>
-    )
-}
-
-interface EditableTextProps {
-    children?: ReactNode
-    className?: string
-    isEditing: boolean
-    label: string
-    onCancel: () => void
-    onEdit: () => void
-    onSave: (value: string) => Promise<void>
-    placeholder?: string
-    value: string
-}
-
-function EditableText(props: EditableTextProps) {
-    const {
-        value,
-        label,
-        isEditing,
-        onEdit,
-        onCancel,
-        onSave,
-        placeholder,
-        className,
-        children,
-    } = props
-    const [draft, setDraft] = useState(value)
-    const [isSaving, setIsSaving] = useState(false)
-
-    const trimmed = draft.trim()
-    const isChanged = trimmed !== value
-    const canSave = isChanged && trimmed !== '' && !isSaving
-
-    function startEditing() {
-        setDraft(value)
-        onEdit()
-    }
-
-    async function commit() {
-        if (!canSave) return
-        setIsSaving(true)
-        await onSave(trimmed)
-        setIsSaving(false)
-    }
-
-    function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-        if (event.key === 'Enter') {
-            event.preventDefault()
-            commit()
-        } else if (event.key === 'Escape') {
-            onCancel()
-        }
-    }
-
-    if (!isEditing) {
-        return (
-            <div className='flex min-w-0 flex-1 items-center gap-2'>
-                <span className={cn('min-w-0 flex-1 truncate', className)}>
-                    {value}
-                </span>
-                <Button
-                    className='shrink-0'
-                    onClick={startEditing}
-                    size='icon'
-                    type='button'
-                    variant='outline'
-                >
-                    <span className='sr-only'>Edit {label}</span>
-                    <PencilIcon />
-                </Button>
-                {children}
-            </div>
-        )
-    }
-
-    return (
-        <div className='flex min-w-0 flex-1 items-center gap-2'>
-            <Input
-                aria-label={label}
-                autoComplete='off'
-                autoFocus
-                className='flex-1'
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={placeholder}
-                value={draft}
-            />
-            {isChanged ? (
-                <Button
-                    className='shrink-0'
-                    disabled={!canSave}
-                    onClick={commit}
-                    size='icon'
-                    type='button'
-                    variant='outline'
-                >
-                    <span className='sr-only'>Save {label}</span>
-                    <CheckIcon />
-                </Button>
+                        }
+                        items={randomizer.items}
+                        onCancel={() => setEditing(null)}
+                        onChange={(items) => save({ items })}
+                        onEdit={(target) =>
+                            setEditing({ list: 'first', target })
+                        }
+                    />
+                    <RandomizerList
+                        editing={itemTargetIn('second')}
+                        heading={
+                            <EditableText
+                                className='font-semibold'
+                                isEditing={targetIn('second') === 'listName'}
+                                label={randomizer.secondListName ?? ''}
+                                onCancel={() => setEditing(null)}
+                                onEdit={() =>
+                                    setEditing({
+                                        list: 'second',
+                                        target: 'listName',
+                                    })
+                                }
+                                onSave={(secondListName) =>
+                                    save({ secondListName })
+                                }
+                                value={randomizer.secondListName ?? ''}
+                            />
+                        }
+                        items={randomizer.secondItems}
+                        onCancel={() => setEditing(null)}
+                        onChange={(secondItems) => save({ secondItems })}
+                        onEdit={(target) =>
+                            setEditing({ list: 'second', target })
+                        }
+                    />
+                </div>
             ) : (
-                <Button
-                    className='shrink-0'
-                    onClick={onCancel}
-                    size='icon'
-                    type='button'
-                    variant='outline'
-                >
-                    <span className='sr-only'>Cancel editing {label}</span>
-                    <XIcon />
-                </Button>
+                <RandomizerList
+                    editing={itemTargetIn('first')}
+                    heading={<h4 className='font-semibold'>Items</h4>}
+                    items={randomizer.items}
+                    onCancel={() => setEditing(null)}
+                    onChange={(items) => save({ items })}
+                    onEdit={(target) => setEditing({ list: 'first', target })}
+                />
             )}
-            {children}
         </div>
     )
 }

@@ -18,14 +18,26 @@ import { RandomizerCard } from './_components/randomizer-card'
 
 export default function RandomizerPage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false)
+    const [isDualCreateOpen, setIsDualCreateOpen] = useState(false)
     const convexRandomizers = useConvexQuery(api.randomizer.list, {}) || []
 
     // Transform Convex data to match expected component types
     const randomizers: Randomizer[] = convexRandomizers.map((r) => ({
         id: r._id,
         name: r.name,
+        kind: r.kind,
+        firstListName: r.firstListName,
+        secondListName: r.secondListName,
         items:
             r.items?.map((item) => ({
+                id: item._id,
+                name: item.name,
+                limit: item.limit,
+                redeemed: item.redeemed,
+                randomizerId: item.randomizerId,
+            })) || [],
+        secondItems:
+            r.secondItems?.map((item) => ({
                 id: item._id,
                 name: item.name,
                 limit: item.limit,
@@ -37,26 +49,56 @@ export default function RandomizerPage() {
 
     return (
         <div className='flex flex-col gap-6'>
-            <Dialog onOpenChange={setIsCreateOpen} open={isCreateOpen}>
-                <DialogTrigger asChild>
-                    <Button
-                        className='self-end text-base'
-                        size='lg'
-                        variant='outline'
-                    >
-                        <PlusIcon />
-                        Add Randomizer
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className='max-w-2xl'>
-                    <DialogHeader>
-                        <DialogTitle className='text-2xl'>
-                            New Randomizer
-                        </DialogTitle>
-                    </DialogHeader>
-                    <RandomizerForm onCreated={() => setIsCreateOpen(false)} />
-                </DialogContent>
-            </Dialog>
+            <div className='flex flex-wrap justify-end gap-2'>
+                <Dialog onOpenChange={setIsCreateOpen} open={isCreateOpen}>
+                    <DialogTrigger asChild>
+                        <Button
+                            className='text-base'
+                            size='lg'
+                            variant='outline'
+                        >
+                            <PlusIcon />
+                            Add Randomizer
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className='max-w-2xl'>
+                        <DialogHeader>
+                            <DialogTitle className='text-2xl'>
+                                New Randomizer
+                            </DialogTitle>
+                        </DialogHeader>
+                        <RandomizerForm
+                            onCreated={() => setIsCreateOpen(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
+                <Dialog
+                    onOpenChange={setIsDualCreateOpen}
+                    open={isDualCreateOpen}
+                >
+                    <DialogTrigger asChild>
+                        <Button
+                            className='text-base'
+                            size='lg'
+                            variant='outline'
+                        >
+                            <PlusIcon />
+                            Add Dual Randomizer
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className='max-w-2xl'>
+                        <DialogHeader>
+                            <DialogTitle className='text-2xl'>
+                                New Dual Randomizer
+                            </DialogTitle>
+                        </DialogHeader>
+                        <RandomizerForm
+                            dual
+                            onCreated={() => setIsDualCreateOpen(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
+            </div>
             {randomizers.map((randomizer: Randomizer) => (
                 <RandomizerCard key={randomizer.id} randomizer={randomizer} />
             ))}

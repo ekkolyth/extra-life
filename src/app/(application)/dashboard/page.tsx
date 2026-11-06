@@ -38,7 +38,17 @@ export default function AdminPage() {
     const randomizers: Randomizer[] = (convexRandomizers || []).map((r) => ({
         id: r._id,
         name: r.name,
+        kind: r.kind,
+        firstListName: r.firstListName,
+        secondListName: r.secondListName,
         items: r.items.map((item) => ({
+            id: item._id,
+            name: item.name,
+            limit: item.limit,
+            redeemed: item.redeemed,
+            randomizerId: item.randomizerId,
+        })),
+        secondItems: r.secondItems.map((item) => ({
             id: item._id,
             name: item.name,
             limit: item.limit,

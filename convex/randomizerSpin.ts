@@ -1,5 +1,7 @@
 import { ConvexError, v } from 'convex/values'
 import { mutation, query } from './_generated/server'
+import { pickSpin, splitItems } from './lib/randomizerSpin'
+import { spinReel } from './schema/randomizerSpins'
 
 export const latest = query({
     args: {},
@@ -10,6 +12,7 @@ export const latest = query({
             randomizerId: v.id('randomizers'),
             items: v.array(v.string()),
             result: v.string(),
+            second: v.optional(spinReel),
         }),
         v.null()
     ),
@@ -29,15 +32,22 @@ export const trigger = mutation({
             .query('randomizerItems')
             .filter((q) => q.eq(q.field('randomizerId'), args.randomizerId))
             .collect()
-        if (items.length === 0) {
+        const { first: firstItems, second: secondItems } = splitItems(items)
+        if (firstItems.length === 0) {
             throw new ConvexError(`"${randomizer.name}" has no items`)
         }
 
-        const names = items.map((item) => item.name)
+        const secondNames =
+            randomizer.kind === 'dual'
+                ? secondItems.map((item) => item.name)
+                : undefined
         await ctx.db.insert('randomizerSpins', {
             randomizerId: args.randomizerId,
-            items: names,
-            result: names[Math.floor(Math.random() * names.length)],
+            ...pickSpin(
+                firstItems.map((item) => item.name),
+                secondNames,
+                Math.random
+            ),
         })
         return null
     },

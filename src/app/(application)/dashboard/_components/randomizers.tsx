@@ -73,9 +73,6 @@ export function RandomizersSection({ randomizers }: RandomizersSectionProps) {
                             <p className='min-w-0 flex-1 truncate font-medium text-foreground'>
                                 {randomizer.name}
                             </p>
-                            <p className='shrink-0 tabular-nums text-muted-foreground'>
-                                {randomizer.items.length} items
-                            </p>
                             <Button
                                 disabled={
                                     randomizer.items.length === 0 ||
