@@ -19,6 +19,8 @@ export const campaignFields = {
     isActive: v.boolean(),
     livePolling: v.boolean(),
     lastSyncedAt: v.optional(v.number()),
+    // epoch ms; drives the overlay's time-left countdown
+    streamEndsAt: v.optional(v.number()),
 }
 
 export const campaigns = defineTable(campaignFields)

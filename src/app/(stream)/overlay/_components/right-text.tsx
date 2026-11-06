@@ -1,13 +1,13 @@
 'use client'
 
-import { useConvexQuery } from '@convex-dev/react-query'
+import { convexQuery, useConvexQuery } from '@convex-dev/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '@/convex/_generated/api'
+import { formatTimeLeft } from '@/lib/time-left'
 import type { Goal } from '@/types/db'
 import type { OverlayData } from '@/types/donor-drive'
 import { useSegments } from '@/utils/use-segments'
-
-const eventDateEnd = new Date('November 8, 2025 22:00:00')
 
 interface TopRotatorProps {
     data: OverlayData
@@ -18,7 +18,9 @@ export function RightText(props: TopRotatorProps) {
     const { goals, data } = props
     const [index, setIndex] = useState(0)
     const [nextGoal, setNextGoal] = useState<Goal | null>(null)
-    const [timeLeft, setTimeLeft] = useState('00h 00m 00s')
+    const [timeLeft, setTimeLeft] = useState<string | null>(null)
+    const { data: campaign } = useQuery(convexQuery(api.campaigns.active, {}))
+    const streamEndsAt = campaign?.streamEndsAt
 
     // Use the data passed from parent
     const combinedData = data
@@ -44,29 +46,17 @@ export function RightText(props: TopRotatorProps) {
         }
     }, [combinedData, goals])
 
-    // Calculate time left
     useEffect(() => {
-        const updateCountdown = () => {
-            const now = new Date()
-            const timeDifference = eventDateEnd.getTime() - now.getTime()
-
-            const hours = Math.floor(timeDifference / (1000 * 60 * 60))
-            const minutes = Math.floor(
-                (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
-            )
-            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000)
-
-            setTimeLeft(
-                `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(
-                    seconds
-                ).padStart(2, '0')}s`
-            )
+        if (streamEndsAt === undefined) {
+            setTimeLeft(null)
+            return
         }
-
-        updateCountdown() // Initial call
+        const updateCountdown = () =>
+            setTimeLeft(formatTimeLeft(streamEndsAt - Date.now()))
+        updateCountdown()
         const interval = setInterval(updateCountdown, 1000)
         return () => clearInterval(interval)
-    }, [])
+    }, [streamEndsAt])
 
     // Memoize bonusText to prevent recreation on every render
     const bonusText = useMemo(
@@ -100,10 +90,10 @@ export function RightText(props: TopRotatorProps) {
                     ? `${nextGoal?.title}${nextGoal?.endOfStream ? ` - End Of Stream` : ''}`
                     : '',
             },
-            {
-                label: 'time left',
-                text: timeLeft,
-            },
+            // hidden until an end time is set in settings
+            ...(timeLeft === null
+                ? []
+                : [{ label: 'time left', text: timeLeft }]),
         ],
         [
             currentSegment,

@@ -141,3 +141,17 @@ export const setParticipantId = mutation({
         return null
     },
 })
+
+export const setStreamEndsAt = mutation({
+    args: { streamEndsAt: v.number() },
+    returns: v.null(),
+    handler: async (ctx, args) => {
+        const campaign = await ctx.db
+            .query('campaigns')
+            .withIndex('by_active', (q) => q.eq('isActive', true))
+            .unique()
+        if (!campaign) throw new Error('No active campaign')
+        await ctx.db.patch(campaign._id, { streamEndsAt: args.streamEndsAt })
+        return null
+    },
+})

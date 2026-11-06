@@ -9,6 +9,13 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { api } from '@/convex/_generated/api'
 
+// datetime-local wants local wall-clock time with no zone suffix
+function toDateTimeLocal(epochMs: number) {
+    const date = new Date(epochMs)
+    const offsetMs = date.getTimezoneOffset() * 60_000
+    return new Date(epochMs - offsetMs).toISOString().slice(0, 16)
+}
+
 export default function ConfigPage() {
     const { data: campaign } = useQuery(convexQuery(api.campaigns.active, {}))
     const setParticipantId = useMutation({
@@ -22,6 +29,29 @@ export default function ConfigPage() {
         null
     )
     const participantId = draftParticipantId ?? campaign?.participantId ?? ''
+
+    const setStreamEndsAt = useMutation({
+        mutationFn: useConvexMutation(api.campaigns.setStreamEndsAt),
+    })
+    const [draftStreamEndsAt, setDraftStreamEndsAt] = useState<string | null>(
+        null
+    )
+    const savedStreamEndsAt =
+        campaign?.streamEndsAt === undefined
+            ? ''
+            : toDateTimeLocal(campaign.streamEndsAt)
+    const streamEndsAt = draftStreamEndsAt ?? savedStreamEndsAt
+
+    const handleStreamEndsAtSubmit = (
+        event: React.FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault()
+        // parsed as local time because the string has no zone suffix
+        setStreamEndsAt.mutate(
+            { streamEndsAt: new Date(streamEndsAt).getTime() },
+            { onSuccess: () => setDraftStreamEndsAt(null) }
+        )
+    }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -64,6 +94,40 @@ export default function ConfigPage() {
                 {setParticipantId.error && (
                     <p className='text-sm text-destructive'>
                         {setParticipantId.error.message}
+                    </p>
+                )}
+            </form>
+            <form
+                className='flex max-w-xs flex-col gap-2'
+                onSubmit={handleStreamEndsAtSubmit}
+            >
+                <Label htmlFor='stream-ends-at'>Stream ends at</Label>
+                <div className='flex gap-2'>
+                    <Input
+                        disabled={!campaign}
+                        id='stream-ends-at'
+                        name='streamEndsAt'
+                        onChange={(event) =>
+                            setDraftStreamEndsAt(event.target.value)
+                        }
+                        type='datetime-local'
+                        value={streamEndsAt}
+                    />
+                    <Button
+                        disabled={
+                            !campaign ||
+                            setStreamEndsAt.isPending ||
+                            streamEndsAt === '' ||
+                            streamEndsAt === savedStreamEndsAt
+                        }
+                        type='submit'
+                    >
+                        Save
+                    </Button>
+                </div>
+                {setStreamEndsAt.error && (
+                    <p className='text-sm text-destructive'>
+                        {setStreamEndsAt.error.message}
                     </p>
                 )}
             </form>
