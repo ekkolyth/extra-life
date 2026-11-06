@@ -1,5 +1,6 @@
-import { ConvexError, v } from 'convex/values'
+import { ConvexError, type ObjectType, v } from 'convex/values'
 import { mutation, query } from './_generated/server'
+import { splitItems } from './lib/randomizerSpin'
 
 function requireNames(name: string, items: { name: string }[]) {
     const trimmedName = name.trim()
@@ -11,6 +12,30 @@ function requireNames(name: string, items: { name: string }[]) {
     return { name: trimmedName, itemNames }
 }
 
+const dualArgs = {
+    secondItems: v.optional(
+        v.object({ create: v.array(v.object({ name: v.string() })) })
+    ),
+    firstListName: v.optional(v.string()),
+    secondListName: v.optional(v.string()),
+}
+
+function requireDual(args: ObjectType<typeof dualArgs>) {
+    if (!args.secondItems) return null
+    const firstListName = args.firstListName?.trim()
+    const secondListName = args.secondListName?.trim()
+    if (!firstListName || !secondListName) {
+        throw new ConvexError('List name is required')
+    }
+    const secondItemNames = args.secondItems.create.map((item) =>
+        item.name.trim()
+    )
+    if (secondItemNames.some((itemName) => !itemName)) {
+        throw new ConvexError('Item name is required')
+    }
+    return { firstListName, secondListName, secondItemNames }
+}
+
 export const list = query({
     handler: async (ctx) => {
         const randomizers = await ctx.db.query('randomizers').collect()
@@ -20,7 +45,8 @@ export const list = query({
                     .query('randomizerItems')
                     .filter((q) => q.eq(q.field('randomizerId'), r._id))
                     .collect()
-                return { ...r, items }
+                const { first, second } = splitItems(items)
+                return { ...r, items: first, secondItems: second }
             })
         )
     },
@@ -32,9 +58,11 @@ export const create = mutation({
         items: v.object({
             create: v.array(v.object({ name: v.string() })),
         }),
+        ...dualArgs,
     },
     handler: async (ctx, args) => {
         const { name, itemNames } = requireNames(args.name, args.items.create)
+        const dual = requireDual(args)
 
         // Check if a randomizer with the same name already exists
         const existingRandomizer = await ctx.db
@@ -48,7 +76,16 @@ export const create = mutation({
             )
         }
 
-        const id = await ctx.db.insert('randomizers', { name })
+        const id = await ctx.db.insert('randomizers', {
+            name,
+            ...(dual
+                ? {
+                      kind: 'dual' as const,
+                      firstListName: dual.firstListName,
+                      secondListName: dual.secondListName,
+                  }
+                : {}),
+        })
         for (const itemName of itemNames) {
             // 0 means unlimited; redeems are no longer tracked
             await ctx.db.insert('randomizerItems', {
@@ -56,6 +93,15 @@ export const create = mutation({
                 limit: 0,
                 redeemed: 0,
                 randomizerId: id,
+            })
+        }
+        for (const itemName of dual?.secondItemNames ?? []) {
+            await ctx.db.insert('randomizerItems', {
+                name: itemName,
+                limit: 0,
+                redeemed: 0,
+                randomizerId: id,
+                list: 'second' as const,
             })
         }
     },
@@ -68,11 +114,22 @@ export const update = mutation({
         items: v.object({
             create: v.array(v.object({ name: v.string() })),
         }),
+        ...dualArgs,
     },
     handler: async (ctx, args) => {
         const { id } = args
         const { name, itemNames } = requireNames(args.name, args.items.create)
-        await ctx.db.patch(id, { name })
+        const dual = requireDual(args)
+        await ctx.db.patch(id, {
+            name,
+            ...(dual
+                ? {
+                      kind: 'dual' as const,
+                      firstListName: dual.firstListName,
+                      secondListName: dual.secondListName,
+                  }
+                : {}),
+        })
         const existing = await ctx.db
             .query('randomizerItems')
             .filter((q) => q.eq(q.field('randomizerId'), id))
@@ -86,6 +143,15 @@ export const update = mutation({
                 limit: 0,
                 redeemed: 0,
                 randomizerId: id,
+            })
+        }
+        for (const itemName of dual?.secondItemNames ?? []) {
+            await ctx.db.insert('randomizerItems', {
+                name: itemName,
+                limit: 0,
+                redeemed: 0,
+                randomizerId: id,
+                list: 'second' as const,
             })
         }
     },

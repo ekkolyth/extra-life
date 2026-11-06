@@ -36,8 +36,12 @@ export interface WheelRedemption {
 }
 
 export interface Randomizer {
+    firstListName?: string
     id: Id<'randomizers'>
     items: RandomizerItem[]
+    kind?: 'dual'
     name: string
     redemptions: WheelRedemption[]
+    secondItems: RandomizerItem[]
+    secondListName?: string
 }

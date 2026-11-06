@@ -22,6 +22,7 @@ import type * as lib_donationTotals from "../lib/donationTotals.js";
 import type * as lib_donordrive from "../lib/donordrive.js";
 import type * as lib_donordriveExport from "../lib/donordriveExport.js";
 import type * as lib_donordriveHttp from "../lib/donordriveHttp.js";
+import type * as lib_randomizerSpin from "../lib/randomizerSpin.js";
 import type * as randomizer from "../randomizer.js";
 import type * as randomizerItem from "../randomizerItem.js";
 import type * as randomizerSpin from "../randomizerSpin.js";
@@ -67,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   "lib/donordrive": typeof lib_donordrive;
   "lib/donordriveExport": typeof lib_donordriveExport;
   "lib/donordriveHttp": typeof lib_donordriveHttp;
+  "lib/randomizerSpin": typeof lib_randomizerSpin;
   randomizer: typeof randomizer;
   randomizerItem: typeof randomizerItem;
   randomizerSpin: typeof randomizerSpin;
